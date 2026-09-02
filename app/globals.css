@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans:
+    "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto,
+    "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+}
+
+html {
+  color-scheme: light;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+/* 본문 글(가이드) 스타일 */
+.prose-ev h2 {
+  @apply mt-10 mb-3 text-xl font-bold text-slate-900 md:text-2xl;
+}
+.prose-ev h3 {
+  @apply mt-7 mb-2 text-lg font-bold text-slate-900;
+}
+.prose-ev p {
+  @apply my-4 leading-7 text-slate-700;
+}
+.prose-ev ul {
+  @apply my-4 list-disc space-y-1.5 pl-6 leading-7 text-slate-700;
+}
+.prose-ev ol {
+  @apply my-4 list-decimal space-y-1.5 pl-6 leading-7 text-slate-700;
+}
+.prose-ev li > strong,
+.prose-ev p > strong {
+  @apply font-semibold text-slate-900;
+}
+.prose-ev a {
+  @apply text-emerald-700 underline underline-offset-2;
+}
+.prose-ev table {
+  @apply my-6 w-full border-collapse text-sm;
+}
+.prose-ev th {
+  @apply border border-slate-200 bg-slate-50 px-3 py-2 text-left font-semibold text-slate-800;
+}
+.prose-ev td {
+  @apply border border-slate-200 px-3 py-2 text-slate-700;
+}
+.prose-ev blockquote {
+  @apply my-5 border-l-4 border-emerald-500 bg-emerald-50 px-4 py-3 text-slate-700;
+}
+.prose-ev .callout {
+  @apply my-5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900;
+}
+.table-wrap {
+  @apply w-full overflow-x-auto rounded-lg border border-slate-200;
+}
