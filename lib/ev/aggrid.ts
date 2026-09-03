@@ -72,6 +72,7 @@ export function agRowsToRemain(grid: AgGridData): RemainRow[] {
     if (!cell.name) continue;
     if (cell.sidoShort) carrySido = cell.sidoShort;
     const sido = getSidoByShort(carrySido || cell.name.slice(0, 2));
+    if (!sido && /공단|협회|공사/.test(cell.name)) continue; // 한국환경공단·협회 등 비지자체 행 제외
     const sidoShort = sido?.short ?? (carrySido || cell.name.slice(0, 2));
     const vehicleType = cType ? (r[cType] ?? "").replace(/^전기/, "").trim() || "승용" : "승용";
     const key = `${sidoShort}|${cell.name}|${vehicleType}`;
@@ -126,14 +127,19 @@ export function agRowsToLocalPrice(grid: AgGridData, sidoText: string, regionTex
   const H = grid.headers;
   const cLocal = findCol(H, [/^지방비/, /지방비|지자체보조금|지방보조금/]);
   if (!cLocal) return [];
-  const cClass = findCol(H, [/^차급$/, /^차종$/, /^구분$/, /차급|차종/]);
-  const cModel = findCol(H, [/모델|차량명|차명/]);
+  const cClass = findCol(H, [/^차급$/, /^차종$/, /차종\/차급/, /^구분$/, /차급|차종/]);
+  const cModel = findCol(H, [/^모델$/, /모델|차량명|차명/]);
+  // 차종/차급 값 예: "전기승용 일반승용", "전기승용 택시", "전기화물 소형". 일반승용만 대상으로 하고, 없으면 택시·법인 제외한 승용.
+  const classOf = (r: Record<string, string>) => (cClass ? r[cClass] ?? "" : "").replace(/\s/g, "");
+  const hasGeneral = grid.rows.some((r) => /일반승용/.test(classOf(r)));
   let max: number | null = null;
   for (const r of grid.rows) {
-    const cls = cClass ? r[cClass] ?? "" : "";
+    const cls = classOf(r);
     const model = cModel ? r[cModel] ?? "" : "";
-    if (cClass && cls && !/승용/.test(cls)) continue;
-    if (!cClass && /화물|승합|이륜|버스/.test(model)) continue;
+    if (cClass && cls) {
+      if (!/승용/.test(cls)) continue;
+      if (hasGeneral ? !/일반승용/.test(cls) : /택시|법인|영업|초소형/.test(cls)) continue;
+    } else if (/화물|승합|이륜|버스|택시/.test(model)) continue;
     const v = toNum(r[cLocal]);
     if (v !== null && (max === null || v > max)) max = v;
   }

@@ -23,7 +23,7 @@ const ROOT = resolve(__dirname, "..");
 const SNAP = resolve(ROOT, "data/snapshot");
 const NAV_TIMEOUT = 45_000;
 /** 전체 실행 상한 (ms). CI 스텝 타임아웃보다 짧게 */
-const TOTAL_BUDGET_MS = 8 * 60 * 1000;
+const TOTAL_BUDGET_MS = 12 * 60 * 1000;
 const startedAt = Date.now();
 const elapsed = () => Date.now() - startedAt;
 const log = (...a: unknown[]) => console.log(`[${(elapsed() / 1000).toFixed(1)}s]`, ...a);
@@ -214,6 +214,19 @@ async function collectRemain(page: Page) {
 }
 
 async function collectLocalPrice(page: Page) {
+  // 페이지 자체 필터(조회 결과 내 클라이언트 필터)로 전기승용만 남겨 그리드 행 수를 줄인다
+  const filtered = await page.evaluate(() => {
+    const sel = document.querySelector<HTMLSelectElement>("#carTypeFilter, select[name=carTypeFilter]");
+    if (!sel) return "no-filter";
+    const opt = Array.from(sel.options).find((o) => /전기승용/.test(o.text));
+    if (!opt) return "no-option";
+    sel.value = opt.value;
+    sel.dispatchEvent(new Event("change", { bubbles: true }));
+    return `set:${opt.text}`;
+  });
+  log(`local-price carTypeFilter → ${filtered}`);
+  await page.waitForTimeout(1500);
+
   const items = await page.evaluate(() =>
     Array.from(document.querySelectorAll("#localAccordion .accordion-item, .accordion-item")).map((el, i) => ({
       index: i,
@@ -242,14 +255,14 @@ async function collectLocalPrice(page: Page) {
         btn.click();
         return btn.getAttribute("aria-expanded") ?? "clicked";
       }, itemSel);
-      // 그리드 행이 생길 때까지 최대 4초 폴링
+      // 그리드 행이 생길 때까지 최대 3초 폴링
       let rowsInItem = 0;
-      for (let i = 0; i < 8; i++) {
+      for (let i = 0; i < 15; i++) {
         rowsInItem = await page.locator(`${itemSel} .ag-row`).count().catch(() => 0);
         if (rowsInItem > 0) break;
-        await page.waitForTimeout(500);
+        await page.waitForTimeout(200);
       }
-      const grid = await scrapeAgGrid(page, itemSel, 40);
+      const grid = await scrapeAgGrid(page, itemSel, 8);
       if (logged < 3) {
         log(`  [${it.city} ${it.district}] click=${clicked} rows=${grid.rows.length} headers: ${JSON.stringify(grid.headers)} sample: ${JSON.stringify(grid.rows.slice(0, 2))}`);
         logged++;
