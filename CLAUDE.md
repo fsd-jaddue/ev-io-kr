@@ -45,16 +45,18 @@ scripts/gen-guide-figures.mjs    가이드 인포그래픽 SVG 생성기
 - 애드센스 스크립트·메타태그·ads.txt는 `NEXT_PUBLIC_ADSENSE_CLIENT`가 있을 때만 활성화. 광고 자리(AdSlot)는 슬롯 ID 환경변수가 있을 때만 렌더링.
 - 이미지는 전부 직접 그린 SVG(저작권 이슈 없음). 외부 스톡 이미지 사용 안 함. 사용자가 Pixabay 사진을 `public/images/photos/`에 넣어주면 배치할 수 있음.
 
-## 알려진 문제 / 진행 중
-- **ev.or.kr는 일반 HTTP 요청에 봇 검사 페이지(pnp4web, 1MB JS)만 내려준다.** 따라서 Vercel 서버 fetch는 항상 실패(스냅샷 표시)하고, 실제 수집은 GitHub Actions의 헤드리스 크롬(`scripts/fetch-snapshot.ts`)이 담당한다. `/api/ev-status`로 Vercel 측 시도 결과를 볼 수 있다.
-- 2026-09-03 시점: Actions 워크플로 첫 실행은 수집 단계가 15분 넘게 걸려 취소됨. 스크립트에 6분 예산·진단 로그·디버그 스크린샷을 넣어 재실행 중. 결과 확인은 GitHub → Actions → "Refresh ev.or.kr snapshot" 로그와 `snapshot-debug` 아티팩트. 표가 0건이면 로그의 `table#N headers=[...]`를 보고 `lib/ev/parse.ts`의 `classifyHeader` 키워드를 맞춘다. 헤드리스 크롬도 봇 검사에 막히면 사용자 PC에서 `npm run fetch:snapshot`을 주기 실행하는 방식으로 전환한다.
-- 시·군·구별 지방비 수치는 공개 요약 자료 기반 참고값이라 개별 공고와 다를 수 있음. 수집(local-price.json)이 성공하면 자동으로 대체된다.
+## 데이터 수집 구조 (2026-09-03 완성)
+- **ev.or.kr는 일반 HTTP 요청에 봇 검사 페이지(pnp4web, 1MB JS)만 내려주고 AJAX 본문은 암호화**되어 있다. 따라서 Vercel 서버 fetch는 항상 실패하고(`/api/ev-status`로 확인 가능), 실제 수집은 GitHub Actions의 헤드리스 크롬(`scripts/fetch-snapshot.ts`)이 담당한다.
+- ev.or.kr 데이터는 `<table>`이 아니라 **ag-Grid(div, 10행 페이지네이션)**로 그려진다. 현황 페이지 `#myGrid` 열: 지역(sido, "즐겨찾기 서울 마감 서울특별시"처럼 버튼·배지 텍스트 포함) | 차종 | 공고종류 | 접수기간 | 신청마감 | 공고 | 접수 | 선정 | 출고 | 선정잔여 | 출고잔여. 같은 지역이 공고종류(본공고/추경n차)별로 여러 행이며 대수는 누적 동일값 → `lib/ev/aggrid.ts`가 지역·차종당 1행으로 합친다.
+- 차종·모델 페이지는 지자체별 아코디언 161개(`.accordion-item`, `.location__city`=시·도 약칭, `.location__district`=지역명) 안에 ag-Grid(차종/차급·제조사·모델·국비·지방비·소계·전환지원금). 일반 클릭은 타임아웃이 나서 JS click 사용. **"전기승용 일반승용" 행만** 집계한다(택시 행은 지방비가 훨씬 커서 제외).
+- 워크플로 `.github/workflows/snapshot.yml`: 매시 20분(KST 06~23시) + 수동 실행(`probe=1`이면 구조·XHR 탐색만). 수집 성공 시 `data/snapshot/*.json` 커밋 → Vercel 재배포. 소요 약 9분. 결과는 GitHub → Actions → "Refresh ev.or.kr snapshot" 로그로 확인(`remain rows: 160`, `local-price rows: 160`이 정상).
+- 2026-09-03 실제 수집값: 서울·대구·인천·광주·대전·세종 194, 울산 221, 부산 224, 강원 200, 충북 400, 충남 414, 전북 434, 제주 276, 경기 120~380(연천), 전남 200~600(보성·완도), 경북 412(울릉 756), 경남 120~488(합천). 시·도 소개문·가이드 수치·인포그래픽은 이 값 기준으로 맞춰 두었다. `data/snapshot/local-price.ts`는 이 수집값을 옮긴 폴백이다.
 
 ## 다음 할 일 (우선순위 순)
-1. 수집 워크플로가 성공하는지 확인하고 파서 조정 → 지역 페이지 배지가 "누리집 수집"이 되게 한다.
-2. Google Search Console·네이버 서치어드바이저 등록 (`NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION`, `NEXT_PUBLIC_NAVER_SITE_VERIFICATION`), sitemap 제출.
-3. 애드센스 신청 → 게시자 ID를 Vercel 환경변수 `NEXT_PUBLIC_ADSENSE_CLIENT`에 넣고 Redeploy → 승인 후 슬롯 ID 입력.
-4. 가이드·지역 콘텐츠 보강, 2027년 지침 확정 시 수치 갱신(`data/cars.ts`, `local-price.ts`, 가이드 본문).
+1. Google Search Console·네이버 서치어드바이저 등록 (`NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION`, `NEXT_PUBLIC_NAVER_SITE_VERIFICATION`), sitemap 제출.
+2. 애드센스 신청 → 게시자 ID를 Vercel 환경변수 `NEXT_PUBLIC_ADSENSE_CLIENT`에 넣고 Redeploy → 승인 후 슬롯 ID 입력.
+3. 수집 워크플로가 계속 성공하는지 주기적으로 확인(Actions 탭). ev.or.kr 화면 구조가 바뀌면 로그의 `grid headers`를 보고 `lib/ev/aggrid.ts`의 열 정규식을 맞춘다.
+4. 가이드·지역 콘텐츠 보강, 2027년 지침 확정 시 수치 갱신(`data/cars.ts`, 가이드 본문, `scripts/gen-guide-figures.mjs` 후 재생성).
 
 ## 작업 규칙
 - 커밋·푸시는 `claude/adsense-ev-subsidy-site-10f3l9` 브랜치에만. PR은 요청 시에만.
