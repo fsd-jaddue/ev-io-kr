@@ -42,7 +42,7 @@ scripts/gen-guide-figures.mjs    가이드 인포그래픽 SVG 생성기
 - 지방비(시·군·구별 승용 최대액)는 `data/snapshot/local-price.ts`의 취합값이 기본이고, 수집 JSON에 행이 있으면 그것이 우선. 확인 안 된 곳은 `null` → 화면에 "공고 확인".
 - 접수·출고·잔여 대수는 **임의 값 절대 금지**. 수집값이 있을 때만 표시하고 없으면 ev.or.kr 링크만 보여준다. 표는 `RemainTable`(클라이언트)이 `/api/remain?sido=`를 호출해 그리므로 정적 페이지 재빌드와 무관하게 갱신된다.
 - 각 표에 기준 시각·출처 배지("누리집 수집" / "스냅샷")를 표시한다.
-- 애드센스 스크립트·메타태그·ads.txt는 `NEXT_PUBLIC_ADSENSE_CLIENT`가 있을 때만 활성화. 광고 자리(AdSlot)는 슬롯 ID 환경변수가 있을 때만 렌더링.
+- 애드센스 게시자 ID `ca-pub-9408914409364609`는 `lib/site.ts`의 `ADSENSE_CLIENT_DEFAULT`에 박혀 있어 스크립트(`<head>` 직접 삽입)·메타태그·ads.txt가 항상 켜진다. `NEXT_PUBLIC_ADSENSE_CLIENT`로 덮어쓰거나 `off`로 끌 수 있음. 광고 자리(AdSlot)는 슬롯 ID 환경변수가 있을 때만 렌더링.
 - 이미지는 전부 직접 그린 SVG(저작권 이슈 없음). 외부 스톡 이미지 사용 안 함. 사용자가 Pixabay 사진을 `public/images/photos/`에 넣어주면 배치할 수 있음.
 
 ## 데이터 수집 구조 (2026-09-03 완성)
@@ -54,7 +54,7 @@ scripts/gen-guide-figures.mjs    가이드 인포그래픽 SVG 생성기
 
 ## 다음 할 일 (우선순위 순)
 1. Google Search Console·네이버 서치어드바이저 등록 (`NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION`, `NEXT_PUBLIC_NAVER_SITE_VERIFICATION`), sitemap 제출.
-2. 애드센스 신청 → 게시자 ID를 Vercel 환경변수 `NEXT_PUBLIC_ADSENSE_CLIENT`에 넣고 Redeploy → 승인 후 슬롯 ID 입력.
+2. 애드센스 사이트 연결 완료(2026-09-03, 게시자 ID 코드 내장). 애드센스 콘솔에서 "코드 확인" → 심사 요청 → 승인 후 광고 단위 슬롯 ID를 `NEXT_PUBLIC_ADSENSE_SLOT_*` 환경변수에 입력.
 3. 수집 워크플로가 계속 성공하는지 주기적으로 확인(Actions 탭). ev.or.kr 화면 구조가 바뀌면 로그의 `grid headers`를 보고 `lib/ev/aggrid.ts`의 열 정규식을 맞춘다.
 4. 가이드·지역 콘텐츠 보강, 2027년 지침 확정 시 수치 갱신(`data/cars.ts`, 가이드 본문, `scripts/gen-guide-figures.mjs` 후 재생성).
 

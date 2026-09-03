@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -47,16 +46,17 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ko">
-      <body className="min-h-screen bg-white text-slate-800 antialiased">
+      <head>
+        {/* 애드센스 사이트 연결 스니펫. 구글 안내대로 <head>에 그대로 넣는다(메타태그는 metadata.other). */}
         {SITE.adsenseClient && (
-          <Script
-            id="adsense"
+          <script
             async
-            strategy="afterInteractive"
             src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${SITE.adsenseClient}`}
             crossOrigin="anonymous"
           />
         )}
+      </head>
+      <body className="min-h-screen bg-white text-slate-800 antialiased">
         <JsonLd data={websiteJsonLd()} />
         <a
           href="#main"

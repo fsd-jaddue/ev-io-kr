@@ -8,7 +8,7 @@
    | 이름 | 값 | 비고 |
    |---|---|---|
    | `NEXT_PUBLIC_SITE_URL` | `https://ev.io.kr` | 도메인 연결 전엔 `https://<project>.vercel.app` |
-   | `NEXT_PUBLIC_ADSENSE_CLIENT` | (비움) | 애드센스 승인 신청 시 `ca-pub-XXXXXXXXXXXXXXXX` 입력 |
+   | `NEXT_PUBLIC_ADSENSE_CLIENT` | (비움) | 비우면 코드 기본값 `ca-pub-9408914409364609` 사용. 끄려면 `off` |
    | `NEXT_PUBLIC_ADSENSE_SLOT_*` | (비움) | 승인 후 광고 단위 ID |
 4. **Deploy**. 빌드 로그에 `[ev] live fetch failed, using snapshot` 가 찍히면 빌드 환경에서 ev.or.kr 접근이 막힌 것이고, 런타임(ISR)에서 다시 시도하므로 정상.
 5. 배포 후 `https://<project>.vercel.app/region/seoul` 을 열어 표 하단 배지가 **"누리집 수집"** 이면 실시간 수집 성공, **"스냅샷"** 이면 수집 실패(10분 뒤 재시도, 성공 시 1시간 캐시). 계속 스냅샷이면 `https://<도메인>/api/ev-status` 를 열어 원인을 확인한다.
@@ -64,9 +64,10 @@ npm run fetch:snapshot
 
 1. 사이트가 도메인으로 접속되고 콘텐츠(가이드 16편, 지역·차종 페이지, 정책 페이지)가 모두 보이는 상태에서 신청.
 2. https://adsense.google.com → 사이트 추가 → `ev.io.kr`.
-3. 발급된 게시자 ID `ca-pub-…` 를 Vercel 환경변수 `NEXT_PUBLIC_ADSENSE_CLIENT` 에 넣고 **Redeploy**.
-   - `<head>` 에 애드센스 스크립트와 `google-adsense-account` 메타태그가 자동 삽입됩니다.
-   - `https://ev.io.kr/ads.txt` 가 `google.com, pub-…, DIRECT, f08c47fec0942fa0` 을 반환합니다.
+3. 게시자 ID `ca-pub-9408914409364609` 는 `lib/site.ts` 에 기본값으로 들어 있어 별도 환경변수 없이 배포만 하면 연결됩니다. (다른 계정으로 바꾸려면 `NEXT_PUBLIC_ADSENSE_CLIENT` 로 덮어쓰기)
+   - 모든 페이지 `<head>` 에 `adsbygoogle.js?client=ca-pub-…` 스크립트와 `<meta name="google-adsense-account">` 태그가 들어갑니다.
+   - `https://ev.io.kr/ads.txt` 가 `google.com, pub-9408914409364609, DIRECT, f08c47fec0942fa0` 을 반환합니다.
+   - 배포 후 애드센스 화면 **사이트 → ev.io.kr → 코드 확인/ads.txt 확인** 을 눌러 "사이트 연결됨" 이 뜨면 심사 요청.
 4. 승인 후 광고 단위를 만들고 슬롯 ID를 `NEXT_PUBLIC_ADSENSE_SLOT_HOME` 등에 넣어 Redeploy 하면 각 페이지의 광고 자리가 활성화됩니다.
 5. 심사 기간(보통 2주~1개월) 동안은 콘텐츠를 계속 추가하고, 지역 페이지의 "공고 확인" 값을 실제 공고 금액으로 채워 두는 것이 유리합니다.
 

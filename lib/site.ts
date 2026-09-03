@@ -1,3 +1,11 @@
+export const ADSENSE_CLIENT_DEFAULT = "ca-pub-9408914409364609";
+
+function resolveAdsenseClient(env: string | undefined): string {
+  const v = (env ?? "").trim();
+  if (v === "off" || v === "0" || v === "false") return "";
+  return v || ADSENSE_CLIENT_DEFAULT;
+}
+
 export const SITE = {
   name: "전기차보조금 조회",
   tagline: "지자체별 전기차 보조금 현황 한눈에",
@@ -6,7 +14,9 @@ export const SITE = {
     "2026년 전국 17개 시·도, 시·군·구별 전기차 구매 보조금(국비·지방비)과 접수·출고·잔여 현황, 차종별 국고보조금, 신청 절차와 세제 혜택을 정리한 정보 사이트입니다.",
   email: "eviokr@icloud.com",
   operator: "전기차보조금 조회",
-  adsenseClient: process.env.NEXT_PUBLIC_ADSENSE_CLIENT ?? "",
+  // 애드센스 게시자 ID. 공개 값이므로 코드에 기본값을 두고, 환경변수로 덮어쓸 수 있게 한다.
+  // 비우려면 NEXT_PUBLIC_ADSENSE_CLIENT=off 로 설정.
+  adsenseClient: resolveAdsenseClient(process.env.NEXT_PUBLIC_ADSENSE_CLIENT),
   naverVerification: process.env.NEXT_PUBLIC_NAVER_SITE_VERIFICATION ?? "",
   googleVerification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ?? "",
   launchedYear: 2026,

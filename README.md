@@ -37,6 +37,6 @@ npm run fetch:snapshot       # ev.or.kr 수집 → data/snapshot/*.json 갱신 (
 
 - 접수·출고·잔여 대수는 무공해차 통합누리집에서 수집한 값이 있을 때만 표시하고, 없으면 공식 페이지 링크만 보여준다(임의 값 없음).
 - 지방비 스냅샷은 2026년 공개 자료 취합값이며 각 표에 기준일과 출처를 표기한다. 확인되지 않은 시·군·구는 "공고 확인"으로 둔다.
-- 애드센스 스크립트·ads.txt는 `NEXT_PUBLIC_ADSENSE_CLIENT` 가 설정된 경우에만 활성화된다.
+- 애드센스 게시자 ID(`ca-pub-9408914409364609`)는 `lib/site.ts` 기본값으로 항상 켜져 있고, `NEXT_PUBLIC_ADSENSE_CLIENT=off` 로 끌 수 있다. 광고 단위는 슬롯 ID 환경변수가 있을 때만 렌더링된다.
 
 배포·도메인·애드센스 절차는 [DEPLOY.md](./DEPLOY.md) 참고.
