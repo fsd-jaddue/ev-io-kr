@@ -27,8 +27,9 @@ export const metadata: Metadata = {
     title: `${SITE.name} | ${SITE.tagline}`,
     description: SITE.description,
     url: SITE.url,
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: SITE.name }],
   },
-  twitter: { card: "summary_large_image" },
+  twitter: { card: "summary_large_image", images: ["/og.png"] },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 } },
   verification: {
     google: SITE.googleVerification || undefined,

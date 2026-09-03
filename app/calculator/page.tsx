@@ -7,6 +7,7 @@ import { getLocalPriceData } from "@/lib/ev/getData";
 import { pageMetadata } from "@/lib/seo";
 import { SIDO_LIST } from "@/data/regions";
 import { CARS, carName } from "@/data/cars";
+import { CalcArt } from "@/components/illustrations";
 
 export const metadata: Metadata = pageMetadata({
   title: "전기차 보조금 계산기 (지역·차종별 국비+지방비)",
@@ -31,11 +32,16 @@ export default async function CalculatorPage() {
   return (
     <>
       <Breadcrumb items={[{ name: "보조금 계산기", path: "/calculator" }]} />
-      <h1 className="text-3xl font-black text-slate-900">전기차 보조금 계산기</h1>
-      <p className="mt-3 max-w-3xl leading-7 text-slate-600">
-        거주지 시·군·구와 구매 예정 차종을 고르면 국비, 지방비, 전환지원금을 합산한 예상 보조금이 계산됩니다. 지방비는 해당 지역의
-        2026년 승용 최대액에 차종의 국비 비율을 곱해 산정합니다. 기준 {local.updatedAt}.
-      </p>
+      <div className="flex items-start justify-between gap-6">
+        <div>
+          <h1 className="text-3xl font-black text-slate-900">전기차 보조금 계산기</h1>
+          <p className="mt-3 max-w-3xl leading-7 text-slate-600">
+            거주지 시·군·구와 구매 예정 차종을 고르면 국비, 지방비, 전환지원금을 합산한 예상 보조금이 계산됩니다. 지방비는 해당 지역의
+            2026년 승용 최대액에 차종의 국비 비율을 곱해 산정합니다. 기준 {local.updatedAt}.
+          </p>
+        </div>
+        <CalcArt className="hidden w-44 shrink-0 lg:block" />
+      </div>
       <div className="mt-8">
         <Calculator regions={regions} cars={cars} />
       </div>

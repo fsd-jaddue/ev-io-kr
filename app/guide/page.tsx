@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import Breadcrumb from "@/components/Breadcrumb";
+import GuideCard from "@/components/GuideCard";
 import { pageMetadata } from "@/lib/seo";
 import { GUIDES } from "@/content/guides";
 
@@ -31,13 +31,7 @@ export default function GuideIndexPage() {
             <h2 className="text-xl font-bold text-slate-900">{cat}</h2>
             <ul className="mt-3 grid gap-4 md:grid-cols-2">
               {list.map((g) => (
-                <li key={g.slug} className="rounded-xl border border-slate-200 p-4 transition hover:border-emerald-300">
-                  <Link href={`/guide/${g.slug}`} className="block text-base font-bold text-slate-900 hover:underline">
-                    {g.title}
-                  </Link>
-                  <p className="mt-2 line-clamp-3 text-sm leading-6 text-slate-600">{g.description}</p>
-                  <p className="mt-2 text-xs text-slate-400">{g.updated} 업데이트</p>
-                </li>
+                <GuideCard key={g.slug} guide={g} lines={3} />
               ))}
             </ul>
           </section>

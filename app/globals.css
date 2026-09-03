@@ -52,6 +52,15 @@ body {
 .prose-ev blockquote {
   @apply my-5 border-l-4 border-emerald-500 bg-emerald-50 px-4 py-3 text-slate-700;
 }
+.prose-ev figure.fig {
+  @apply my-7 overflow-hidden rounded-xl border border-slate-200 bg-white;
+}
+.prose-ev figure.fig img {
+  @apply block h-auto w-full;
+}
+.prose-ev figure.fig figcaption {
+  @apply border-t border-slate-100 px-4 py-2 text-xs text-slate-500;
+}
 .prose-ev .callout {
   @apply my-5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900;
 }

@@ -6,6 +6,7 @@ import { getLocalPriceData } from "@/lib/ev/getData";
 import { summarizeBySido } from "@/lib/ev/summary";
 import { pageMetadata } from "@/lib/seo";
 import { NATIONAL_MAX } from "@/data/cars";
+import { RegionArt } from "@/components/illustrations";
 
 export const metadata: Metadata = pageMetadata({
   title: "지역별 전기차 보조금 현황 (17개 시·도)",
@@ -23,15 +24,20 @@ export default async function RegionIndexPage() {
   return (
     <>
       <Breadcrumb items={[{ name: "지역별 보조금", path: "/region" }]} />
-      <h1 className="text-3xl font-black text-slate-900">지역별 전기차 보조금 현황</h1>
-      <p className="mt-3 max-w-3xl leading-7 text-slate-600">
-        전기차 보조금은 환경부 국비(승용 최대 {NATIONAL_MAX.large}만원)에 거주지 지자체의 지방비가 더해져 결정됩니다. 지방비는
-        시·도가 아니라 <strong>시·군·구 단위 공고</strong>로 정해지기 때문에, 같은 도 안에서도 수백만 원 차이가 납니다. 아래 카드에서
-        시·도를 선택하면 시·군·구별 지방비와 합산 최대액, 접수·출고·잔여 현황을 볼 수 있습니다.
-      </p>
-      <p className="mt-2 text-sm text-slate-500">
-        기준 {local.updatedAt} · {local.basis}
-      </p>
+      <div className="flex items-start justify-between gap-6">
+        <div>
+          <h1 className="text-3xl font-black text-slate-900">지역별 전기차 보조금 현황</h1>
+          <p className="mt-3 max-w-3xl leading-7 text-slate-600">
+            전기차 보조금은 환경부 국비(승용 최대 {NATIONAL_MAX.large}만원)에 거주지 지자체의 지방비가 더해져 결정됩니다. 지방비는
+            시·도가 아니라 <strong>시·군·구 단위 공고</strong>로 정해지기 때문에, 같은 도 안에서도 수백만 원 차이가 납니다. 아래 카드에서
+            시·도를 선택하면 시·군·구별 지방비와 합산 최대액, 접수·출고·잔여 현황을 볼 수 있습니다.
+          </p>
+          <p className="mt-2 text-sm text-slate-500">
+            기준 {local.updatedAt} · {local.basis}
+          </p>
+        </div>
+        <RegionArt className="hidden w-44 shrink-0 lg:block" />
+      </div>
 
       <div className="mt-8">
         <SidoGrid items={summary} />

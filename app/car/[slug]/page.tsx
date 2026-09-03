@@ -8,6 +8,7 @@ import { estimateTotal, summarizeBySido } from "@/lib/ev/summary";
 import { pageMetadata } from "@/lib/seo";
 import { CARS, NATIONAL_MAX, carName, getCar } from "@/data/cars";
 import { EV_PORTAL } from "@/lib/ev/parse";
+import { CarArt } from "@/components/illustrations";
 
 export function generateStaticParams() {
   return CARS.map((c) => ({ slug: c.slug }));
@@ -36,13 +37,18 @@ export default async function CarPage({ params }: { params: Promise<{ slug: stri
   return (
     <>
       <Breadcrumb items={[{ name: "차종별 국비", path: "/car" }, { name: `${car.brand} ${car.model}`, path: `/car/${slug}` }]} />
-      <p className="text-sm font-medium text-emerald-700">{car.brand}</p>
-      <h1 className="mt-1 text-3xl font-black text-slate-900">{car.model} {car.trim} 보조금 2026</h1>
-      <p className="mt-3 max-w-3xl leading-7 text-slate-600">
-        {car.brand} {car.model} {car.trim}은(는) {car.segment} 승용 전기차로 차량 기본가격 구간이 {car.priceBand}에 해당합니다.
-        {car.range ? ` 1회 충전 주행거리는 약 ${car.range}km(인증 기준)입니다.` : ""}
-        {car.note ? ` ${car.note}.` : ""}
-      </p>
+      <div className="flex items-start justify-between gap-6">
+        <div>
+          <p className="text-sm font-medium text-emerald-700">{car.brand}</p>
+          <h1 className="mt-1 text-3xl font-black text-slate-900">{car.model} {car.trim} 보조금 2026</h1>
+          <p className="mt-3 max-w-3xl leading-7 text-slate-600">
+            {car.brand} {car.model} {car.trim}은(는) {car.segment} 승용 전기차로 차량 기본가격 구간이 {car.priceBand}에 해당합니다.
+            {car.range ? ` 1회 충전 주행거리는 약 ${car.range}km(인증 기준)입니다.` : ""}
+            {car.note ? ` ${car.note}.` : ""}
+          </p>
+        </div>
+        <CarArt className="hidden w-44 shrink-0 lg:block" />
+      </div>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-3">
         <Card label="2026 국비" value={car.national === null ? "트림별 확인" : `${car.national}만원`} sub={`상한 ${car.segment === "중대형" ? NATIONAL_MAX.large : NATIONAL_MAX.small}만원`} />

@@ -13,6 +13,7 @@ import { SIDO_INTRO } from "@/data/sido-intro";
 import { CARS, NATIONAL_MAX, carName } from "@/data/cars";
 import { GUIDES } from "@/content/guides";
 import { EV_PORTAL } from "@/lib/ev/parse";
+import { RegionArt } from "@/components/illustrations";
 
 export const revalidate = 3600;
 
@@ -54,8 +55,13 @@ export default async function SidoPage({ params }: { params: Promise<{ sido: str
   return (
     <>
       <Breadcrumb items={[{ name: "지역별 보조금", path: "/region" }, { name: sido.name, path: `/region/${slug}` }]} />
-      <h1 className="text-3xl font-black text-slate-900">{sido.name} 전기차 보조금 현황 2026</h1>
-      <p className="mt-3 max-w-3xl leading-7 text-slate-600">{intro?.summary}</p>
+      <div className="flex items-start justify-between gap-6">
+        <div>
+          <h1 className="text-3xl font-black text-slate-900">{sido.name} 전기차 보조금 현황 2026</h1>
+          <p className="mt-3 max-w-3xl leading-7 text-slate-600">{intro?.summary}</p>
+        </div>
+        <RegionArt className="hidden w-44 shrink-0 lg:block" />
+      </div>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-3">
         <Card label="승용 지방비" value={max === null ? "공고 확인" : uniform ? won(max) : `${min}~${max}만원`} />

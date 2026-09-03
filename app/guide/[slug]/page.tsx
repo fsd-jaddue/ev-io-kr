@@ -7,6 +7,7 @@ import AdSlot from "@/components/AdSlot";
 import { articleJsonLd, faqJsonLd, pageMetadata } from "@/lib/seo";
 import { GUIDES, getGuide } from "@/content/guides";
 import { SITE } from "@/lib/site";
+import { GuideArt } from "@/components/illustrations";
 
 export function generateStaticParams() {
   return GUIDES.map((g) => ({ slug: g.slug }));
@@ -44,6 +45,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
       />
       <Breadcrumb items={[{ name: "가이드", path: "/guide" }, { name: g.category, path: "/guide" }, { name: g.title, path: `/guide/${slug}` }]} />
       <article className="max-w-3xl">
+        <GuideArt category={g.category} className="mb-6 h-40 w-full rounded-2xl md:h-52" />
         <p className="text-sm font-medium text-emerald-700">{g.category}</p>
         <h1 className="mt-1 text-3xl font-black leading-tight text-slate-900">{g.title}</h1>
         <p className="mt-3 text-sm text-slate-500">

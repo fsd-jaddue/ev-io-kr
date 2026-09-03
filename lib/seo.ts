@@ -29,6 +29,7 @@ export function pageMetadata(m: PageMeta): Metadata {
       siteName: SITE.name,
       locale: "ko_KR",
       type: m.type ?? "website",
+      images: [{ url: "/og.png", width: 1200, height: 630, alt: SITE.name }],
       ...(m.type === "article"
         ? { publishedTime: m.publishedTime, modifiedTime: m.modifiedTime }
         : {}),
@@ -37,6 +38,7 @@ export function pageMetadata(m: PageMeta): Metadata {
       card: "summary_large_image",
       title: fullTitle,
       description: m.description,
+      images: ["/og.png"],
     },
   };
 }

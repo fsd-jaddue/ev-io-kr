@@ -21,6 +21,7 @@ export const GUIDES_REGION_CAR: Guide[] = [
 <li><strong>대기환경 정책</strong> — 미세먼지 관리 특별법 대상 지역, 탄소중립 선도 지자체(제주 등)는 정책적으로 높게 유지합니다.</li>
 </ol>
 
+<figure class="fig"><img src="/images/guides/sido-range.svg" alt="경북 1,224만원부터 서울·부산·대구·인천 194만원까지 2026년 시·도별 승용 지방비 최대액 가로 막대 차트" loading="lazy" /><figcaption>시·도별 승용 지방비 최대액(시·도 내 가장 높은 시·군·구 기준).</figcaption></figure>
 <h2>2026년 시·도별 승용 지방비 범위</h2>
 <table>
 <thead><tr><th>구간</th><th>지역</th><th>지방비</th></tr></thead>
@@ -48,6 +49,7 @@ export const GUIDES_REGION_CAR: Guide[] = [
 </ul>
 <p>(지방비는 국비 비율 98.3%를 곱한 값)</p>
 
+<figure class="fig"><img src="/images/guides/region-compare.svg" alt="아이오닉 6 롱레인지 기준 경북 울릉군 1,773만원, 전남 완도군 1,525만원, 경기 파주시 1,012만원, 충남 천안시 963만원, 경기 성남시 865만원, 서울 강남구 761만원 비교 막대" loading="lazy" /><figcaption>같은 차, 같은 국비인데 지역에 따라 1,000만원 넘게 차이 납니다.</figcaption></figure>
 <h2>지방비 높은 곳으로 이사하면 되지 않나</h2>
 <p>이론상 가능하지만 현실적 장벽이 큽니다.</p>
 <ul>
@@ -85,6 +87,7 @@ export const GUIDES_REGION_CAR: Guide[] = [
 </tbody>
 </table>
 
+<figure class="fig"><img src="/images/guides/tesla-factors.svg" alt="가격계수 0.5, LFP 배터리 계수, 사후관리계수 세 가지 요인을 정리한 그림" loading="lazy" /><figcaption>테슬라 국비를 낮추는 세 요인. 곱으로 작용하며 지방비도 비례해 줄어듭니다.</figcaption></figure>
 <h2>원인 1. 가격계수: 모델 Y는 절반 구간</h2>
 <p>모델 Y 프리미엄 롱레인지의 기본가격은 5,300만원을 넘어 가격계수 0.5가 적용됩니다. 산정액이 420만원이라도 절반인 210만원만 지급되는 구조입니다. 모델 3 프리미엄 롱레인지는 5,300만원 미만이라 100%를 받아 420만원입니다. 같은 배터리, 비슷한 주행거리인데 두 배 차이가 나는 첫 번째 이유입니다.</p>
 
@@ -105,6 +108,7 @@ export const GUIDES_REGION_CAR: Guide[] = [
 </tbody>
 </table>
 
+<figure class="fig"><img src="/images/guides/tesla-compare.svg" alt="서울·경기 파주·경북 울릉에서 아이오닉 6 롱레인지와 모델 Y 프리미엄 롱레인지의 합산 보조금 비교 막대 차트" loading="lazy" /><figcaption>지역별 합산 보조금 비교. 국비 차이가 지방비 비례로 증폭됩니다.</figcaption></figure>
 <h2>그래도 테슬라를 산다면</h2>
 <ul>
 <li><strong>트림 선택</strong> — 모델 3 프리미엄 롱레인지(420만원)는 NCM에 5,300만원 미만이라 테슬라 중 가장 유리합니다.</li>
@@ -144,6 +148,7 @@ export const GUIDES_REGION_CAR: Guide[] = [
 </table>
 <p>상위 5개는 모두 국산 NCM 배터리에 주행거리 400km 이상, 기본가격 5,300만원 미만, 직영 정비망을 갖춘 차종입니다. 국비 상한 580만원에 거의 근접해 있어 사실상 '만점' 그룹입니다.</p>
 
+<figure class="fig"><img src="/images/guides/top-ranking.svg" alt="2026년 승용 전기차 국비 순위 가로 막대 차트, 아이오닉 6와 EV6 570만원부터 모델 3 스탠다드 168만원까지" loading="lazy" /><figcaption>2026년 국비 순위. 상위 5개는 국산 NCM 배터리에 주행거리 400km 이상, 5,300만원 미만 차종입니다.</figcaption></figure>
 <h2>지역별 합산 최대액(전환지원금 미적용)</h2>
 <table>
 <thead><tr><th>차종(국비)</th><th>서울(194)</th><th>경기 파주(450)</th><th>전남 완도(972)</th><th>경북 울릉(1,224)</th></tr></thead>

@@ -5,6 +5,7 @@ import AdSlot from "@/components/AdSlot";
 import { pageMetadata } from "@/lib/seo";
 import { CARS, NATIONAL_MAX, carName } from "@/data/cars";
 import { EV_PORTAL } from "@/lib/ev/parse";
+import { CarArt } from "@/components/illustrations";
 
 export const metadata: Metadata = pageMetadata({
   title: "2026 차종별 전기차 국비 보조금",
@@ -20,13 +21,18 @@ export default function CarIndexPage() {
   return (
     <>
       <Breadcrumb items={[{ name: "차종별 국비", path: "/car" }]} />
-      <h1 className="text-3xl font-black text-slate-900">2026 차종별 전기차 국비 보조금</h1>
-      <p className="mt-3 max-w-3xl leading-7 text-slate-600">
-        환경부는 매년 초 차종·트림별 국고보조금을 확정 공고합니다. 2026년 중·대형 승용 상한은 {NATIONAL_MAX.large}만원, 소형·경형은{" "}
-        {NATIONAL_MAX.small}만원이며, 주행거리·에너지효율·배터리 안전성·사후관리 체계·차량 가격에 따라 차등 산정됩니다. 아래 표는 확정 공고와
-        언론 보도를 기준으로 정리한 승용 대표 트림의 국비입니다. 지방비는 국비 비율에 비례하므로, 국비가 높은 차종일수록 지역 합산액도
-        커집니다.
-      </p>
+      <div className="flex items-start justify-between gap-6">
+        <div>
+          <h1 className="text-3xl font-black text-slate-900">2026 차종별 전기차 국비 보조금</h1>
+          <p className="mt-3 max-w-3xl leading-7 text-slate-600">
+            환경부는 매년 초 차종·트림별 국고보조금을 확정 공고합니다. 2026년 중·대형 승용 상한은 {NATIONAL_MAX.large}만원, 소형·경형은{" "}
+            {NATIONAL_MAX.small}만원이며, 주행거리·에너지효율·배터리 안전성·사후관리 체계·차량 가격에 따라 차등 산정됩니다. 아래 표는 확정 공고와
+            언론 보도를 기준으로 정리한 승용 대표 트림의 국비입니다. 지방비는 국비 비율에 비례하므로, 국비가 높은 차종일수록 지역 합산액도
+            커집니다.
+          </p>
+        </div>
+        <CarArt className="hidden w-44 shrink-0 lg:block" />
+      </div>
 
       <section className="mt-8">
         <h2 className="text-xl font-bold text-slate-900">국비 확정 차종</h2>
