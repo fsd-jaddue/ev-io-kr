@@ -42,6 +42,7 @@ next-env.d.ts
 
 # snapshot debug dumps
 data/snapshot/*.debug.html
+data/snapshot/*.debug.png
 
 # keep example env
 !.env.example
