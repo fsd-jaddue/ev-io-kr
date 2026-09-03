@@ -21,7 +21,7 @@ concurrency:
 jobs:
   snapshot:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -39,7 +39,7 @@ jobs:
       - name: Fetch snapshot from ev.or.kr
         id: fetch
         run: npm run fetch:snapshot
-        timeout-minutes: 8
+        timeout-minutes: 14
         env:
           CI: "1"
           EV_PROBE: ${{ github.event.inputs.probe || '0' }}
