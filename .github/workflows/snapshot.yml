@@ -1,10 +1,15 @@
 name: Refresh ev.or.kr snapshot
 
 on:
+  workflow_dispatch:
+    inputs:
+      probe:
+        description: "EV_PROBE=1 로 구조·네트워크 탐색만 수행"
+        required: false
+        default: "0"
   schedule:
     # 매시 20분 (UTC) → KST 06:20 ~ 23:20 사이만 실행 (21시~14시 UTC)
     - cron: "20 21-23,0-14 * * *"
-  workflow_dispatch:
 
 permissions:
   contents: write
@@ -37,6 +42,7 @@ jobs:
         timeout-minutes: 8
         env:
           CI: "1"
+          EV_PROBE: ${{ github.event.inputs.probe || '0' }}
         continue-on-error: true
 
       - name: Upload debug html (when parsing failed)
