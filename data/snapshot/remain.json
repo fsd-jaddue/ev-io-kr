@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-03T16:32:11.201Z",
+  "fetchedAt": "2026-09-03T23:20:11.841Z",
   "note": "무공해차 통합누리집 '지자체별 보조금 현황' 수집 결과. scripts/fetch-snapshot.ts 실행으로 갱신됩니다. rows가 비어 있으면 화면에는 누리집 링크만 표시됩니다.",
   "rows": [
     {
@@ -48,8 +48,8 @@
       "vehicleType": "승용",
       "announced": 2606,
       "applied": 2725,
-      "released": 2478,
-      "remaining": 128,
+      "released": 2480,
+      "remaining": 126,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.08.20 13:46"
     },
     {
@@ -718,8 +718,8 @@
       "vehicleType": "승용",
       "announced": 1154,
       "applied": 1737,
-      "released": 922,
-      "remaining": 232,
+      "released": 925,
+      "remaining": 229,
       "note": "본공고·추경1차·추경2차 · 마감 2026.11.27 18:00"
     },
     {
@@ -868,8 +868,8 @@
       "vehicleType": "승용",
       "announced": 388,
       "applied": 534,
-      "released": 271,
-      "remaining": 117,
+      "released": 272,
+      "remaining": 116,
       "note": "본공고·추경1차·추경2차·추경3차 · 신청마감 · 마감 2026.08.25 18:00"
     },
     {
@@ -1138,8 +1138,8 @@
       "vehicleType": "승용",
       "announced": 208,
       "applied": 175,
-      "released": 123,
-      "remaining": 85,
+      "released": 124,
+      "remaining": 84,
       "note": "본공고·추경1차 · 신청마감 · 마감 2026.08.28 18:00"
     },
     {
@@ -1598,7 +1598,7 @@
       "vehicleType": "승용",
       "announced": 4200,
       "applied": 4987,
-      "released": 4369,
+      "released": 4370,
       "remaining": 0,
       "note": "본공고·추경1차 · 신청마감 · 마감 2026.08.12 18:00"
     }
