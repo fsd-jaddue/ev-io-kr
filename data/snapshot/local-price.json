@@ -1,5 +1,546 @@
 {
-  "updatedAt": "",
+  "updatedAt": "2026-09-03",
   "note": "scripts/fetch-snapshot.ts 가 ev.or.kr '지자체별 차종·모델 보조금'을 수집해 채웁니다. rows가 비어 있으면 data/snapshot/local-price.ts 의 취합값이 사용됩니다.",
-  "rows": []
+  "rows": [
+    {
+      "sido": "seoul",
+      "sigungu": "전체",
+      "amount": 700
+    },
+    {
+      "sido": "busan",
+      "sigungu": "전체",
+      "amount": 1100
+    },
+    {
+      "sido": "daegu",
+      "sigungu": "전체",
+      "amount": 1000
+    },
+    {
+      "sido": "incheon",
+      "sigungu": "전체",
+      "amount": 1000
+    },
+    {
+      "sido": "gwangju",
+      "sigungu": "전체",
+      "amount": 850
+    },
+    {
+      "sido": "daejeon",
+      "sigungu": "전체",
+      "amount": 1000
+    },
+    {
+      "sido": "ulsan",
+      "sigungu": "전체",
+      "amount": 1150
+    },
+    {
+      "sido": "sejong",
+      "sigungu": "전체",
+      "amount": 1000
+    },
+    {
+      "sido": "gyeonggi",
+      "sigungu": "수원시",
+      "amount": 1000
+    },
+    {
+      "sido": "gyeonggi",
+      "sigungu": "성남시",
+      "amount": 1250
+    },
+    {
+      "sido": "gyeonggi",
+      "sigungu": "의정부시",
+      "amount": 146
+    },
+    {
+      "sido": "gyeonggi",
+      "sigungu": "안양시",
+      "amount": 170
+    },
+    {
+      "sido": "gyeonggi",
+      "sigungu": "부천시",
+      "amount": 120
+    },
+    {
+      "sido": "gyeonggi",
+      "sigungu": "광명시",
+      "amount": 280
+    },
+    {
+      "sido": "gyeonggi",
+      "sigungu": "평택시",
+      "amount": 200
+    },
+    {
+      "sido": "gyeonggi",
+      "sigungu": "동두천시",
+      "amount": 224
+    },
+    {
+      "sido": "gyeonggi",
+      "sigungu": "안산시",
+      "amount": 160
+    },
+    {
+      "sido": "gyeonggi",
+      "sigungu": "고양시",
+      "amount": 160
+    },
+    {
+      "sido": "gyeonggi",
+      "sigungu": "과천시",
+      "amount": 200
+    },
+    {
+      "sido": "gyeonggi",
+      "sigungu": "구리시",
+      "amount": 200
+    },
+    {
+      "sido": "gyeonggi",
+      "sigungu": "남양주시",
+      "amount": 120
+    },
+    {
+      "sido": "gyeonggi",
+      "sigungu": "오산시",
+      "amount": 186
+    },
+    {
+      "sido": "gyeonggi",
+      "sigungu": "시흥시",
+      "amount": 160
+    },
+    {
+      "sido": "gyeonggi",
+      "sigungu": "군포시",
+      "amount": 193
+    },
+    {
+      "sido": "gyeonggi",
+      "sigungu": "의왕시",
+      "amount": 200
+    },
+    {
+      "sido": "gyeonggi",
+      "sigungu": "하남시",
+      "amount": 120
+    },
+    {
+      "sido": "gyeonggi",
+      "sigungu": "용인시",
+      "amount": 173
+    },
+    {
+      "sido": "gyeonggi",
+      "sigungu": "파주시",
+      "amount": 200
+    },
+    {
+      "sido": "gyeonggi",
+      "sigungu": "이천시",
+      "amount": 200
+    },
+    {
+      "sido": "gyeonggi",
+      "sigungu": "안성시",
+      "amount": 240
+    },
+    {
+      "sido": "gyeonggi",
+      "sigungu": "김포시",
+      "amount": 160
+    },
+    {
+      "sido": "gyeonggi",
+      "sigungu": "화성시",
+      "amount": 133
+    },
+    {
+      "sido": "gyeonggi",
+      "sigungu": "광주시",
+      "amount": 120
+    },
+    {
+      "sido": "gyeonggi",
+      "sigungu": "양주시",
+      "amount": 166
+    },
+    {
+      "sido": "gyeonggi",
+      "sigungu": "포천시",
+      "amount": 160
+    },
+    {
+      "sido": "gyeonggi",
+      "sigungu": "여주시",
+      "amount": 275
+    },
+    {
+      "sido": "gyeonggi",
+      "sigungu": "연천군",
+      "amount": 380
+    },
+    {
+      "sido": "gyeonggi",
+      "sigungu": "가평군",
+      "amount": 133
+    },
+    {
+      "sido": "gyeonggi",
+      "sigungu": "양평군",
+      "amount": 266
+    },
+    {
+      "sido": "gangwon",
+      "sigungu": "춘천시",
+      "amount": 200
+    },
+    {
+      "sido": "gangwon",
+      "sigungu": "원주시",
+      "amount": 200
+    },
+    {
+      "sido": "gangwon",
+      "sigungu": "강릉시",
+      "amount": 200
+    },
+    {
+      "sido": "gangwon",
+      "sigungu": "동해시",
+      "amount": 200
+    },
+    {
+      "sido": "gangwon",
+      "sigungu": "태백시",
+      "amount": 200
+    },
+    {
+      "sido": "gangwon",
+      "sigungu": "속초시",
+      "amount": 200
+    },
+    {
+      "sido": "gangwon",
+      "sigungu": "삼척시",
+      "amount": 200
+    },
+    {
+      "sido": "gangwon",
+      "sigungu": "홍천군",
+      "amount": 200
+    },
+    {
+      "sido": "gangwon",
+      "sigungu": "횡성군",
+      "amount": 200
+    },
+    {
+      "sido": "gangwon",
+      "sigungu": "영월군",
+      "amount": 200
+    },
+    {
+      "sido": "gangwon",
+      "sigungu": "평창군",
+      "amount": 200
+    },
+    {
+      "sido": "gangwon",
+      "sigungu": "정선군",
+      "amount": 200
+    },
+    {
+      "sido": "gangwon",
+      "sigungu": "철원군",
+      "amount": 200
+    },
+    {
+      "sido": "gangwon",
+      "sigungu": "화천군",
+      "amount": 200
+    },
+    {
+      "sido": "gangwon",
+      "sigungu": "양구군",
+      "amount": 200
+    },
+    {
+      "sido": "gangwon",
+      "sigungu": "인제군",
+      "amount": 200
+    },
+    {
+      "sido": "gangwon",
+      "sigungu": "고성군",
+      "amount": 200
+    },
+    {
+      "sido": "gangwon",
+      "sigungu": "양양군",
+      "amount": 200
+    },
+    {
+      "sido": "chungbuk",
+      "sigungu": "청주시",
+      "amount": 400
+    },
+    {
+      "sido": "chungbuk",
+      "sigungu": "충주시",
+      "amount": 400
+    },
+    {
+      "sido": "chungbuk",
+      "sigungu": "제천시",
+      "amount": 400
+    },
+    {
+      "sido": "chungbuk",
+      "sigungu": "보은군",
+      "amount": 400
+    },
+    {
+      "sido": "chungbuk",
+      "sigungu": "옥천군",
+      "amount": 400
+    },
+    {
+      "sido": "chungbuk",
+      "sigungu": "증평군",
+      "amount": 400
+    },
+    {
+      "sido": "chungbuk",
+      "sigungu": "영동군",
+      "amount": 400
+    },
+    {
+      "sido": "chungbuk",
+      "sigungu": "진천군",
+      "amount": 400
+    },
+    {
+      "sido": "chungbuk",
+      "sigungu": "괴산군",
+      "amount": 400
+    },
+    {
+      "sido": "chungbuk",
+      "sigungu": "음성군",
+      "amount": 400
+    },
+    {
+      "sido": "chungbuk",
+      "sigungu": "단양군",
+      "amount": 400
+    },
+    {
+      "sido": "chungnam",
+      "sigungu": "천안시",
+      "amount": 414
+    },
+    {
+      "sido": "chungnam",
+      "sigungu": "공주시",
+      "amount": 414
+    },
+    {
+      "sido": "chungnam",
+      "sigungu": "보령시",
+      "amount": 414
+    },
+    {
+      "sido": "chungnam",
+      "sigungu": "아산시",
+      "amount": 414
+    },
+    {
+      "sido": "chungnam",
+      "sigungu": "서산시",
+      "amount": 414
+    },
+    {
+      "sido": "chungnam",
+      "sigungu": "논산시",
+      "amount": 414
+    },
+    {
+      "sido": "chungnam",
+      "sigungu": "계룡시",
+      "amount": 414
+    },
+    {
+      "sido": "chungnam",
+      "sigungu": "당진시",
+      "amount": 414
+    },
+    {
+      "sido": "chungnam",
+      "sigungu": "금산군",
+      "amount": 414
+    },
+    {
+      "sido": "chungnam",
+      "sigungu": "부여군",
+      "amount": 414
+    },
+    {
+      "sido": "chungnam",
+      "sigungu": "서천군",
+      "amount": 414
+    },
+    {
+      "sido": "chungnam",
+      "sigungu": "청양군",
+      "amount": 414
+    },
+    {
+      "sido": "chungnam",
+      "sigungu": "홍성군",
+      "amount": 414
+    },
+    {
+      "sido": "chungnam",
+      "sigungu": "예산군",
+      "amount": 414
+    },
+    {
+      "sido": "chungnam",
+      "sigungu": "태안군",
+      "amount": 414
+    },
+    {
+      "sido": "jeonbuk",
+      "sigungu": "전주시",
+      "amount": 434
+    },
+    {
+      "sido": "jeonbuk",
+      "sigungu": "군산시",
+      "amount": 434
+    },
+    {
+      "sido": "jeonbuk",
+      "sigungu": "익산시",
+      "amount": 434
+    },
+    {
+      "sido": "jeonbuk",
+      "sigungu": "정읍시",
+      "amount": 434
+    },
+    {
+      "sido": "jeonbuk",
+      "sigungu": "남원시",
+      "amount": 434
+    },
+    {
+      "sido": "jeonbuk",
+      "sigungu": "김제시",
+      "amount": 434
+    },
+    {
+      "sido": "jeonbuk",
+      "sigungu": "완주군",
+      "amount": 434
+    },
+    {
+      "sido": "jeonbuk",
+      "sigungu": "진안군",
+      "amount": 434
+    },
+    {
+      "sido": "jeonbuk",
+      "sigungu": "무주군",
+      "amount": 434
+    },
+    {
+      "sido": "jeonbuk",
+      "sigungu": "장수군",
+      "amount": 434
+    },
+    {
+      "sido": "jeonbuk",
+      "sigungu": "임실군",
+      "amount": 434
+    },
+    {
+      "sido": "jeonbuk",
+      "sigungu": "순창군",
+      "amount": 434
+    },
+    {
+      "sido": "jeonbuk",
+      "sigungu": "고창군",
+      "amount": 434
+    },
+    {
+      "sido": "jeonbuk",
+      "sigungu": "부안군",
+      "amount": 434
+    },
+    {
+      "sido": "jeonnam",
+      "sigungu": "목포시",
+      "amount": 280
+    },
+    {
+      "sido": "jeonnam",
+      "sigungu": "여수시",
+      "amount": 280
+    },
+    {
+      "sido": "jeonnam",
+      "sigungu": "순천시",
+      "amount": 280
+    },
+    {
+      "sido": "jeonnam",
+      "sigungu": "나주시",
+      "amount": 280
+    },
+    {
+      "sido": "jeonnam",
+      "sigungu": "광양시",
+      "amount": 200
+    },
+    {
+      "sido": "jeonnam",
+      "sigungu": "담양군",
+      "amount": 533
+    },
+    {
+      "sido": "jeonnam",
+      "sigungu": "곡성군",
+      "amount": 400
+    },
+    {
+      "sido": "jeonnam",
+      "sigungu": "구례군",
+      "amount": 517
+    },
+    {
+      "sido": "jeonnam",
+      "sigungu": "고흥군",
+      "amount": 466
+    },
+    {
+      "sido": "jeonnam",
+      "sigungu": "보성군",
+      "amount": 600
+    },
+    {
+      "sido": "jeonnam",
+      "sigungu": "화순군",
+      "amount": 400
+    }
+  ]
 }
