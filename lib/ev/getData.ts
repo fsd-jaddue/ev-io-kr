@@ -6,7 +6,7 @@ import { decodeBody, parseRemainHtml } from "./parse";
 import { LOCAL_PRICE_BASIS, LOCAL_PRICE_ROWS, LOCAL_PRICE_UPDATED_AT } from "@/data/snapshot/local-price";
 import remainSnapshot from "@/data/snapshot/remain.json";
 import localPriceJson from "@/data/snapshot/local-price.json";
-import { getSido, getSidoByShort } from "@/data/regions";
+import { SIDO_LIST, getSido, getSidoByShort } from "@/data/regions";
 
 export { formatFetchedAt } from "./format";
 
@@ -132,11 +132,29 @@ export async function getRemainForSido(slug: string): Promise<RemainData> {
 export async function getLocalPriceData(): Promise<LocalPriceData> {
   const collected = localPriceJson as { updatedAt: string; rows: LocalPriceData["rows"] };
   if (collected.rows?.length) {
+    // 수집값을 시·군·구 목록에 맞춰 정규화: 시·도 단일 공고("전체")는 모든 시·군·구에 복제,
+    // 수집되지 않은 시·군·구는 수기 취합값으로 보완
+    const manual = new Map(LOCAL_PRICE_ROWS.map((r) => [`${r.sido}|${r.sigungu}`, r]));
+    const rows: LocalPriceData["rows"] = [];
+    for (const sido of SIDO_LIST) {
+      const mine = collected.rows.filter((r) => r.sido === sido.slug);
+      const whole = mine.find((r) => r.sigungu === "전체");
+      for (const name of sido.sigungu) {
+        const exact = mine.find((r) => r.sigungu === name || name.startsWith(r.sigungu) || r.sigungu.startsWith(name));
+        const fallback = manual.get(`${sido.slug}|${name}`);
+        rows.push({
+          sido: sido.slug,
+          sigungu: name,
+          amount: exact?.amount ?? whole?.amount ?? fallback?.amount ?? null,
+          note: exact || whole ? "누리집 수집값" : fallback?.note,
+        });
+      }
+    }
     return {
       source: "snapshot",
       basis: "무공해차 통합누리집 '지자체별 차종·모델 보조금' 수집값 (승용 지방비 최대, 만원)",
       updatedAt: collected.updatedAt,
-      rows: collected.rows,
+      rows,
     };
   }
   return {

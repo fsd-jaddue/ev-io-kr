@@ -4,7 +4,7 @@ const REMAIN_URL = "https://ev.or.kr/nportal/buySupprt/initSubsidyPaymentCheckAc
 export const EV_PORTAL = {
   /** 수집 대상. 테스트용으로 EV_REMAIN_URL 환경변수로 바꿔칠 수 있다(서버 전용) */
   remain: process.env.EV_REMAIN_URL || REMAIN_URL,
-  localPrice: "https://ev.or.kr/nportal/buySupprt/initPsLocalCarPirceAction.do",
+  localPrice: process.env.EV_LOCAL_PRICE_URL || "https://ev.or.kr/nportal/buySupprt/initPsLocalCarPirceAction.do",
   localPricePopup: (localCd: string) =>
     `https://ev.or.kr/nportal/buySupprt/psPopupLocalCarPirce.do?localCd=${localCd}`,
   targetVehicle: "https://ev.or.kr/nportal/buySupprt/initSubsidyTargetVehicleAction.do",
