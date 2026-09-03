@@ -1,4 +1,7 @@
-import { EV_PORTAL } from "@/lib/ev/parse";
+"use client";
+
+import { useEffect, useState } from "react";
+import { EV_PORTAL } from "@/lib/ev/portal";
 import type { RemainData } from "@/lib/ev/types";
 import SourceNote from "./SourceNote";
 
@@ -6,12 +9,49 @@ function num(n: number | null) {
   return n === null ? "-" : n.toLocaleString("ko-KR");
 }
 
-export default function RemainTable({ data, title = "접수·출고·잔여 현황" }: { data: RemainData; title?: string }) {
-  const rows = data.rows.filter((r) => /승용/.test(r.vehicleType) || !r.vehicleType);
+interface Props {
+  title?: string;
+  /** 시·도 slug (없으면 전국) */
+  sido?: string;
+  /** 시·군·구명 — 해당 지역 행만 표시 */
+  regionFilter?: string;
+  /** 시·도 정식 명칭 — 시·도 단일 공고 행도 함께 표시 */
+  sidoName?: string;
+}
+
+/**
+ * 접수·출고·잔여 현황. 정적 페이지에 실리지 않고 브라우저에서 /api/remain 을 호출해
+ * 서버가 1시간 단위로 수집한 값을 보여준다(빌드 시점과 무관하게 최신 유지).
+ */
+export default function RemainTable({ title = "접수·출고·잔여 현황", sido, regionFilter, sidoName }: Props) {
+  const [data, setData] = useState<RemainData | null>(null);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    const ctrl = new AbortController();
+    const url = sido ? `/api/remain?sido=${encodeURIComponent(sido)}` : "/api/remain";
+    fetch(url, { signal: ctrl.signal })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+      .then((d: RemainData) => setData(d))
+      .catch(() => setFailed(true));
+    return () => ctrl.abort();
+  }, [sido]);
+
+  let rows = (data?.rows ?? []).filter((r) => /승용/.test(r.vehicleType) || !r.vehicleType);
+  if (regionFilter) {
+    const key = regionFilter.replace(/(시|군|구)$/, "");
+    rows = rows.filter((r) => r.region.includes(key) || (sidoName ? r.region === sidoName : false));
+  }
+  const loading = !data && !failed;
+
   return (
     <section className="mt-10">
       <h2 className="text-xl font-bold text-slate-900">{title}</h2>
-      {rows.length === 0 ? (
+      {loading ? (
+        <div className="mt-3 animate-pulse rounded-lg border border-slate-200 bg-slate-50 p-5 text-sm text-slate-400" aria-busy="true">
+          무공해차 통합누리집 수집값을 불러오는 중…
+        </div>
+      ) : rows.length === 0 ? (
         <div className="mt-3 rounded-lg border border-dashed border-slate-300 bg-slate-50 p-5 text-sm text-slate-600">
           <p>
             접수·출고·잔여 대수는 환경부 무공해차 통합누리집에서 수집한 값이 있을 때만 표시됩니다. 지금은 표시할 수집값이
@@ -59,7 +99,7 @@ export default function RemainTable({ data, title = "접수·출고·잔여 현�
           </table>
         </div>
       )}
-      <SourceNote source={data.source} fetchedAt={data.fetchedAt} />
+      {data && <SourceNote source={data.source} fetchedAt={data.fetchedAt} />}
     </section>
   );
 }

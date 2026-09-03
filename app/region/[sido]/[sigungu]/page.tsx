@@ -4,14 +4,12 @@ import { notFound } from "next/navigation";
 import Breadcrumb from "@/components/Breadcrumb";
 import RemainTable from "@/components/RemainTable";
 import AdSlot from "@/components/AdSlot";
-import { getLocalPriceData, getRemainForSido } from "@/lib/ev/getData";
+import { getLocalPriceData } from "@/lib/ev/getData";
 import { estimateTotal, won } from "@/lib/ev/summary";
 import { pageMetadata } from "@/lib/seo";
 import { SIDO_LIST, decodeSigungu, getSido, sigunguSlug } from "@/data/regions";
 import { CARS, NATIONAL_MAX, carName } from "@/data/cars";
 import { EV_PORTAL } from "@/lib/ev/parse";
-
-export const revalidate = 3600;
 
 export function generateStaticParams() {
   return SIDO_LIST.flatMap((s) => s.sigungu.map((g) => ({ sido: s.slug, sigungu: sigunguSlug(g) })));
@@ -45,11 +43,6 @@ export default async function SigunguPage({ params }: { params: Params }) {
   const d = await load(params);
   if (!d) notFound();
   const { sido, name, local, row } = d;
-  const remainAll = await getRemainForSido(sido.slug);
-  const remain = {
-    ...remainAll,
-    rows: remainAll.rows.filter((r) => r.region.includes(name.replace(/(시|군|구)$/, "")) || r.region === sido.name),
-  };
   const siblings = local.rows.filter((r) => r.sido === sido.slug && r.sigungu !== name);
   const cars = CARS.filter((c) => c.national !== null);
 
@@ -131,7 +124,7 @@ export default async function SigunguPage({ params }: { params: Params }) {
 
       <AdSlot slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_REGION} />
 
-      <RemainTable data={remain} title={`${name} 접수·출고·잔여 현황`} />
+      <RemainTable sido={sido.slug} regionFilter={name} sidoName={sido.name} title={`${name} 접수·출고·잔여 현황`} />
 
       <section className="prose-ev mt-10 max-w-3xl">
         <h2>{name} 보조금 신청 전 체크리스트</h2>

@@ -4,7 +4,7 @@ import SidoGrid from "@/components/SidoGrid";
 import RemainTable from "@/components/RemainTable";
 import JsonLd from "@/components/JsonLd";
 import AdSlot from "@/components/AdSlot";
-import { getLocalPriceData, getRemainData } from "@/lib/ev/getData";
+import { getLocalPriceData } from "@/lib/ev/getData";
 import { summarizeBySido } from "@/lib/ev/summary";
 import { faqJsonLd, pageMetadata } from "@/lib/seo";
 import { SITE } from "@/lib/site";
@@ -12,8 +12,6 @@ import { CARS, NATIONAL_MAX, carName } from "@/data/cars";
 import { GUIDES } from "@/content/guides";
 import GuideCard from "@/components/GuideCard";
 import { HeroIllustration, IconCalc, IconGift, IconPercent } from "@/components/illustrations";
-
-export const revalidate = 3600;
 
 export const metadata: Metadata = pageMetadata({
   title: SITE.name,
@@ -41,7 +39,7 @@ const FAQ = [
 ];
 
 export default async function HomePage() {
-  const [local, remain] = await Promise.all([getLocalPriceData(), getRemainData()]);
+  const local = await getLocalPriceData();
   const summary = summarizeBySido(local.rows);
   const topCars = CARS.filter((c) => c.national !== null)
     .sort((a, b) => (b.national ?? 0) - (a.national ?? 0))
@@ -133,7 +131,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <RemainTable data={remain} title="전국 접수·출고·잔여 현황 (승용)" />
+      <RemainTable title="전국 접수·출고·잔여 현황 (승용)" />
 
       <section className="mt-12">
         <h2 className="text-2xl font-bold text-slate-900">보조금은 이렇게 계산됩니다</h2>

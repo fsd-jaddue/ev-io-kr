@@ -3,14 +3,7 @@ import iconv from "iconv-lite";
 import type { LocalPriceRow, RemainRow } from "./types";
 import { getSidoByShort } from "@/data/regions";
 
-export const EV_PORTAL = {
-  remain: "https://ev.or.kr/nportal/buySupprt/initSubsidyPaymentCheckAction.do",
-  localPrice: "https://ev.or.kr/nportal/buySupprt/initPsLocalCarPirceAction.do",
-  localPricePopup: (localCd: string) =>
-    `https://ev.or.kr/nportal/buySupprt/psPopupLocalCarPirce.do?localCd=${localCd}`,
-  targetVehicle: "https://ev.or.kr/nportal/buySupprt/initSubsidyTargetVehicleAction.do",
-  inquiries: "https://ev.or.kr/nportal/buySupprt/initPsLocalInquiriesAction.do",
-} as const;
+export { EV_PORTAL } from "./portal";
 
 /** 응답 바이트를 charset에 맞게 문자열로 디코딩 (EUC-KR 대비) */
 export function decodeBody(buf: ArrayBuffer, contentType: string | null): string {

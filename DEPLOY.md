@@ -11,7 +11,10 @@
    | `NEXT_PUBLIC_ADSENSE_CLIENT` | (비움) | 애드센스 승인 신청 시 `ca-pub-XXXXXXXXXXXXXXXX` 입력 |
    | `NEXT_PUBLIC_ADSENSE_SLOT_*` | (비움) | 승인 후 광고 단위 ID |
 4. **Deploy**. 빌드 로그에 `[ev] live fetch failed, using snapshot` 가 찍히면 빌드 환경에서 ev.or.kr 접근이 막힌 것이고, 런타임(ISR)에서 다시 시도하므로 정상.
-5. 배포 후 `https://<project>.vercel.app/region/seoul` 을 열어 표 하단 배지가 **"누리집 수집"** 이면 실시간 수집 성공, **"스냅샷"** 이면 수집 실패(1시간마다 재시도). 계속 스냅샷이면 `lib/ev/parse.ts` 의 표 파서를 실제 HTML에 맞게 조정해야 함 (아래 5절).
+5. 배포 후 `https://<project>.vercel.app/region/seoul` 을 열어 표 하단 배지가 **"누리집 수집"** 이면 실시간 수집 성공, **"스냅샷"** 이면 수집 실패(10분 뒤 재시도, 성공 시 1시간 캐시). 계속 스냅샷이면 `https://<도메인>/api/ev-status` 를 열어 원인을 확인한다.
+   - `attempts[].status` 가 403 또는 접속 오류 → ev.or.kr 가 Vercel IP를 차단. 국내 서버·PC에서 `npm run fetch:snapshot` 으로 스냅샷을 주기적으로 갱신하는 방식으로 전환.
+   - `status` 200 인데 `parsedRows` 0 → 표 구조가 다름. `tables[].headers` 문구를 보고 `lib/ev/parse.ts` 의 `classifyHeader` 키워드를 맞춘다.
+   - 접수·출고·잔여 표는 브라우저에서 `/api/remain` 을 호출해 그리므로, 정적 페이지 재빌드 없이 서버 캐시(1시간)만 갱신되면 바로 반영된다.
 
 > 리전은 `vercel.json` 에서 `icn1`(서울)로 고정했습니다. ev.or.kr 가 해외 IP를 차단하는 경우에 대비한 설정입니다.
 

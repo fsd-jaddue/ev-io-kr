@@ -5,7 +5,7 @@ import Breadcrumb from "@/components/Breadcrumb";
 import LocalPriceTable from "@/components/LocalPriceTable";
 import RemainTable from "@/components/RemainTable";
 import AdSlot from "@/components/AdSlot";
-import { getLocalPriceData, getRemainForSido } from "@/lib/ev/getData";
+import { getLocalPriceData } from "@/lib/ev/getData";
 import { estimateTotal, won } from "@/lib/ev/summary";
 import { pageMetadata } from "@/lib/seo";
 import { SIDO_LIST, getSido } from "@/data/regions";
@@ -14,8 +14,6 @@ import { CARS, NATIONAL_MAX, carName } from "@/data/cars";
 import { GUIDES } from "@/content/guides";
 import { EV_PORTAL } from "@/lib/ev/parse";
 import { RegionArt } from "@/components/illustrations";
-
-export const revalidate = 3600;
 
 export function generateStaticParams() {
   return SIDO_LIST.map((s) => ({ sido: s.slug }));
@@ -42,7 +40,7 @@ export default async function SidoPage({ params }: { params: Promise<{ sido: str
   const { sido: slug } = await params;
   const sido = getSido(slug);
   if (!sido) notFound();
-  const [local, remain] = await Promise.all([getLocalPriceData(), getRemainForSido(slug)]);
+  const local = await getLocalPriceData();
   const rows = local.rows.filter((r) => r.sido === slug);
   const amounts = rows.map((r) => r.amount).filter((a): a is number => a !== null);
   const max = amounts.length ? Math.max(...amounts) : null;
@@ -91,7 +89,7 @@ export default async function SidoPage({ params }: { params: Promise<{ sido: str
 
       <AdSlot slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_REGION} />
 
-      <RemainTable data={remain} title={`${sido.short} 접수·출고·잔여 현황`} />
+      <RemainTable sido={slug} title={`${sido.short} 접수·출고·잔여 현황`} />
 
       {max !== null && (
         <section className="mt-10">

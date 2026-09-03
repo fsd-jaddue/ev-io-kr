@@ -1,5 +1,5 @@
-import { EV_PORTAL } from "@/lib/ev/parse";
-import { formatFetchedAt } from "@/lib/ev/getData";
+import { EV_PORTAL } from "@/lib/ev/portal";
+import { formatFetchedAt } from "@/lib/ev/format";
 import type { DataSource } from "@/lib/ev/types";
 
 export default function SourceNote({
