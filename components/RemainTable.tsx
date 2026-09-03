@@ -77,6 +77,7 @@ export default function RemainTable({ title = "접수·출고·잔여 현황", s
                 <th className="px-3 py-2 text-right font-semibold">접수</th>
                 <th className="px-3 py-2 text-right font-semibold">출고</th>
                 <th className="px-3 py-2 text-right font-semibold">잔여</th>
+                <th className="hidden px-3 py-2 font-semibold md:table-cell">공고·마감</th>
               </tr>
             </thead>
             <tbody>
@@ -92,6 +93,7 @@ export default function RemainTable({ title = "접수·출고·잔여 현황", s
                     <td className={`px-3 py-2 text-right font-semibold tabular-nums ${soldOut ? "text-rose-600" : "text-emerald-700"}`}>
                       {soldOut ? "소진" : num(r.remaining)}
                     </td>
+                    <td className="hidden px-3 py-2 text-xs text-slate-500 md:table-cell">{r.note ?? ""}</td>
                   </tr>
                 );
               })}
