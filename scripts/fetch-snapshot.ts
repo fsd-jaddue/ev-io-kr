@@ -152,12 +152,65 @@ async function scrapeAgGrid(page: Page, rootSel: string, maxSteps = 120): Promis
   return { headers, rows };
 }
 
+/**
+ * 페이지네이션(ag-Grid 내장 또는 사이트 공통 pagination__button)이 있으면 다음 페이지로 넘긴다.
+ * 넘길 수 없으면 false.
+ */
+async function nextPage(page: Page, rootSel: string): Promise<boolean> {
+  return page.evaluate((sel) => {
+    const root = document.querySelector(sel) ?? document;
+    const candidates = [
+      ...Array.from(root.querySelectorAll('.ag-paging-button[ref="btNext"], .ag-paging-button.ag-paging-next, [aria-label*="다음"], [aria-label*="Next"]')),
+      ...Array.from(document.querySelectorAll(".pagination__button, .pagination__link, .pagination a, .pagination button")).filter((el) =>
+        /다음|next|›|>/i.test((el.textContent ?? "") + (el.getAttribute("aria-label") ?? "") + (el.getAttribute("class") ?? "")),
+      ),
+    ] as HTMLElement[];
+    for (const el of candidates) {
+      const disabled =
+        el.classList.contains("ag-disabled") ||
+        el.getAttribute("aria-disabled") === "true" ||
+        (el as HTMLButtonElement).disabled ||
+        el.classList.contains("is-disabled") ||
+        el.classList.contains("disabled");
+      if (disabled) continue;
+      el.click();
+      return true;
+    }
+    return false;
+  }, rootSel);
+}
+
+/** 그리드 전체(스크롤 + 페이지 넘김) 수집 */
+async function scrapeAgGridAllPages(page: Page, rootSel: string, maxPages = 60): Promise<AgGridData> {
+  const first = await scrapeAgGrid(page, rootSel);
+  const all: Record<string, string>[] = [...first.rows];
+  const seen = new Set(first.rows.map((r) => JSON.stringify(r)));
+  for (let p = 1; p < maxPages; p++) {
+    const moved = await nextPage(page, rootSel);
+    if (!moved) break;
+    await page.waitForTimeout(700);
+    const next = await scrapeAgGrid(page, rootSel);
+    let added = 0;
+    for (const r of next.rows) {
+      const k = JSON.stringify(r);
+      if (seen.has(k)) continue;
+      seen.add(k);
+      all.push(r);
+      added++;
+    }
+    if (added === 0) break;
+  }
+  return { headers: first.headers, rows: all };
+}
+
 async function collectRemain(page: Page) {
   const gridSel = (await page.locator("#myGrid").count()) > 0 ? "#myGrid" : ".ag-root-wrapper";
-  const grid = await scrapeAgGrid(page, gridSel);
+  const grid = await scrapeAgGridAllPages(page, gridSel);
   log(`remain grid headers: ${JSON.stringify(grid.headers)}`);
-  log(`remain grid rows: ${grid.rows.length}; sample: ${JSON.stringify(grid.rows.slice(0, 2))}`);
-  return agRowsToRemain(grid);
+  log(`remain grid raw rows: ${grid.rows.length}; sample: ${JSON.stringify(grid.rows.slice(0, 2))}`);
+  const rows = agRowsToRemain(grid);
+  log(`remain parsed sample: ${JSON.stringify(rows.slice(0, 3))}`);
+  return rows;
 }
 
 async function collectLocalPrice(page: Page) {
@@ -179,25 +232,43 @@ async function collectLocalPrice(page: Page) {
     }
     const itemSel = `.accordion-item:nth-of-type(${it.index + 1})`;
     try {
-      const btn = page.locator(`${itemSel} .accordion-button`).first();
-      const expanded = await btn.getAttribute("aria-expanded").catch(() => null);
-      if (expanded !== "true") await btn.click({ timeout: 5000 });
-      await page
-        .locator(`${itemSel} .ag-row`)
-        .first()
-        .waitFor({ state: "attached", timeout: 5000 })
-        .catch(() => {});
-      const grid = await scrapeAgGrid(page, itemSel, 30);
-      if (logged < 2 && grid.rows.length) {
-        log(`  [${it.district} ${it.city}] headers: ${JSON.stringify(grid.headers)} sample: ${JSON.stringify(grid.rows.slice(0, 2))}`);
+      // 일반 클릭은 오버레이/가시성 문제로 타임아웃이 나므로 JS 로 직접 클릭
+      const clicked = await page.evaluate((sel) => {
+        const item = document.querySelector(sel);
+        if (!item) return "no-item";
+        const btn = (item.querySelector(".accordion-button") ?? item.querySelector(".accordion-header button") ?? item.querySelector(".accordion-header")) as HTMLElement | null;
+        if (!btn) return "no-button";
+        item.scrollIntoView({ block: "center" });
+        btn.click();
+        return btn.getAttribute("aria-expanded") ?? "clicked";
+      }, itemSel);
+      // 그리드 행이 생길 때까지 최대 4초 폴링
+      let rowsInItem = 0;
+      for (let i = 0; i < 8; i++) {
+        rowsInItem = await page.locator(`${itemSel} .ag-row`).count().catch(() => 0);
+        if (rowsInItem > 0) break;
+        await page.waitForTimeout(500);
+      }
+      const grid = await scrapeAgGrid(page, itemSel, 40);
+      if (logged < 3) {
+        log(`  [${it.city} ${it.district}] click=${clicked} rows=${grid.rows.length} headers: ${JSON.stringify(grid.headers)} sample: ${JSON.stringify(grid.rows.slice(0, 2))}`);
         logged++;
       }
-      const rows = agRowsToLocalPrice(grid, it.district, it.city);
+      // .location__city = 시·도 약칭, .location__district = 지역명 (광역시는 시·도명)
+      const rows = agRowsToLocalPrice(grid, it.city, it.district);
       out.push(...rows);
-      // 다음 항목을 위해 접기 (DOM 크기 유지)
-      await btn.click({ timeout: 3000 }).catch(() => {});
+      if (rows.length === 0 && logged < 6) {
+        log(`  [${it.city} ${it.district}] no local-price row (rows=${grid.rows.length})`);
+        logged++;
+      }
+      // 접어서 DOM 크기 유지
+      await page.evaluate((sel) => {
+        const item = document.querySelector(sel);
+        const btn = item?.querySelector(".accordion-button") as HTMLElement | null;
+        if (btn && btn.getAttribute("aria-expanded") === "true") btn.click();
+      }, itemSel).catch(() => {});
     } catch (e) {
-      log(`  [${it.district} ${it.city}] failed: ${(e as Error).message.split("\n")[0]}`);
+      log(`  [${it.city} ${it.district}] failed: ${(e as Error).message.split("\n")[0]}`);
     }
   }
   return out;
