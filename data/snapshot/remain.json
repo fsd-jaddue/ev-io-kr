@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-05T05:50:46.357Z",
+  "fetchedAt": "2026-09-05T10:43:14.227Z",
   "note": "무공해차 통합누리집 '지자체별 보조금 현황' 수집 결과. scripts/fetch-snapshot.ts 실행으로 갱신됩니다. rows가 비어 있으면 화면에는 누리집 링크만 표시됩니다.",
   "rows": [
     {
@@ -757,7 +757,7 @@
       "region": "당진시",
       "vehicleType": "승용",
       "announced": 721,
-      "applied": 396,
+      "applied": 393,
       "released": 361,
       "remaining": 360,
       "note": "본공고·추경1차·추경2차 · 마감 2026.09.10 18:00"
