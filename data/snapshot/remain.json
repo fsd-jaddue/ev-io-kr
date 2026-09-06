@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-06T06:02:36.590Z",
+  "fetchedAt": "2026-09-06T11:05:09.874Z",
   "note": "무공해차 통합누리집 '지자체별 보조금 현황' 수집 결과. scripts/fetch-snapshot.ts 실행으로 갱신됩니다. rows가 비어 있으면 화면에는 누리집 링크만 표시됩니다.",
   "rows": [
     {
@@ -8,8 +8,8 @@
       "vehicleType": "승용",
       "announced": 15430,
       "applied": 15277,
-      "released": 14915,
-      "remaining": 515,
+      "released": 14916,
+      "remaining": 514,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.08.07 13:00"
     },
     {
@@ -868,8 +868,8 @@
       "vehicleType": "승용",
       "announced": 388,
       "applied": 532,
-      "released": 292,
-      "remaining": 96,
+      "released": 295,
+      "remaining": 93,
       "note": "본공고·추경1차·추경2차·추경3차 · 신청마감 · 마감 2026.08.25 18:00"
     },
     {
@@ -937,7 +937,7 @@
       "region": "임실군",
       "vehicleType": "승용",
       "announced": 94,
-      "applied": 109,
+      "applied": 108,
       "released": 101,
       "remaining": 0,
       "note": "본공고·추경1차 · 신청마감 · 마감 2026.07.09 12:00"
