@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-05",
+  "updatedAt": "2026-09-06",
   "note": "scripts/fetch-snapshot.ts 가 ev.or.kr '지자체별 차종·모델 보조금'을 수집해 채웁니다. rows가 비어 있으면 data/snapshot/local-price.ts 의 취합값이 사용됩니다.",
   "rows": [
     {
