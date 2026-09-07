@@ -1,17 +1,17 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import SidoGrid from "@/components/SidoGrid";
-import RemainTable from "@/components/RemainTable";
+import RemainHero from "@/components/remain/RemainHero";
 import JsonLd from "@/components/JsonLd";
 import AdSlot from "@/components/AdSlot";
-import { getLocalPriceData } from "@/lib/ev/getData";
+import { getLocalPriceData, getRemainSnapshot } from "@/lib/ev/getData";
 import { summarizeBySido } from "@/lib/ev/summary";
 import { faqJsonLd, pageMetadata } from "@/lib/seo";
 import { SITE } from "@/lib/site";
 import { CARS, NATIONAL_MAX, carName } from "@/data/cars";
 import { GUIDES } from "@/content/guides";
 import GuideCard from "@/components/GuideCard";
-import { HeroIllustration, IconCalc, IconGift, IconPercent } from "@/components/illustrations";
+import { IconCalc, IconGift, IconPercent } from "@/components/illustrations";
 
 export const metadata: Metadata = pageMetadata({
   title: SITE.name,
@@ -40,6 +40,7 @@ const FAQ = [
 
 export default async function HomePage() {
   const local = await getLocalPriceData();
+  const remain = getRemainSnapshot();
   const summary = summarizeBySido(local.rows);
   const topCars = CARS.filter((c) => c.national !== null)
     .sort((a, b) => (b.national ?? 0) - (a.national ?? 0))
@@ -50,30 +51,25 @@ export default async function HomePage() {
   return (
     <>
       <JsonLd data={faqJsonLd(FAQ)} />
-      <section className="overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-600 to-emerald-800 text-white">
-        <div className="grid items-center gap-6 px-6 py-10 md:grid-cols-[1.2fr_1fr] md:px-10 md:py-12">
-          <div>
-            <p className="text-sm font-medium text-emerald-100">2026년 지자체별 전기차 보조금 현황</p>
-            <h1 className="mt-2 text-3xl font-black leading-tight md:text-4xl">
-              내 지역 전기차 보조금,
-              <br className="md:hidden" /> 국비·지방비 합산으로 한눈에
-            </h1>
-            <p className="mt-4 max-w-2xl text-emerald-50">
-              전국 17개 시·도와 시·군·구별 승용 전기차 지방비, 차종별 국고보조금, 접수·출고·잔여 현황과 신청 절차를 정리했습니다.
-              거주지와 차종을 고르면 예상 지원액을 바로 계산할 수 있습니다.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Link href="/calculator" className="rounded-lg bg-white px-4 py-2.5 text-sm font-bold text-emerald-700 hover:bg-emerald-50">
-                보조금 계산기
-              </Link>
-              <Link href="/region" className="rounded-lg border border-emerald-300/60 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700">
-                지역별 보조금 보기
-              </Link>
-            </div>
-          </div>
-          <HeroIllustration className="mx-auto hidden w-full max-w-md md:block" />
+      <RemainHero initial={remain}>
+        <p className="text-sm font-medium text-emerald-100">2026년 지자체별 전기차 보조금 현황</p>
+        <h1 className="mt-2 text-3xl font-black leading-tight md:text-4xl">
+          내 지역 전기차 보조금,
+          <br className="md:hidden" /> 국비·지방비 합산으로 한눈에
+        </h1>
+        <p className="mt-4 max-w-2xl text-emerald-50">
+          전국 17개 시·도와 시·군·구별 승용 전기차 지방비, 차종별 국고보조금, 접수·출고·잔여 현황과 신청 절차를 정리했습니다.
+          거주지와 차종을 고르면 예상 지원액을 바로 계산할 수 있습니다.
+        </p>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Link href="/calculator" className="rounded-lg bg-white px-4 py-2.5 text-sm font-bold text-emerald-700 hover:bg-emerald-50">
+            보조금 계산기
+          </Link>
+          <Link href="/region" className="rounded-lg border border-emerald-300/60 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700">
+            지역별 보조금 보기
+          </Link>
         </div>
-      </section>
+      </RemainHero>
 
       <section className="mt-8 grid gap-3 sm:grid-cols-3">
         <Stat label="승용 국비 최대" value={`${NATIONAL_MAX.large}만원`} sub={`소형 ${NATIONAL_MAX.small}만원`} />
@@ -130,8 +126,6 @@ export default async function HomePage() {
           </table>
         </div>
       </section>
-
-      <RemainTable title="전국 접수·출고·잔여 현황 (승용)" />
 
       <section className="mt-12">
         <h2 className="text-2xl font-bold text-slate-900">보조금은 이렇게 계산됩니다</h2>

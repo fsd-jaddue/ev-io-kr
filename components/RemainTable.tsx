@@ -17,25 +17,34 @@ interface Props {
   regionFilter?: string;
   /** 시·도 정식 명칭 — 시·도 단일 공고 행도 함께 표시 */
   sidoName?: string;
+  /** 이미 받아 둔 데이터 — 있으면 /api/remain 을 호출하지 않는다 */
+  data?: RemainData;
+  /** 섹션·제목·출처 배지 없이 표만 렌더 (패널 내장용) */
+  embedded?: boolean;
 }
 
 /**
  * 접수·출고·잔여 현황. 정적 페이지에 실리지 않고 브라우저에서 /api/remain 을 호출해
  * 서버가 1시간 단위로 수집한 값을 보여준다(빌드 시점과 무관하게 최신 유지).
  */
-export default function RemainTable({ title = "접수·출고·잔여 현황", sido, regionFilter, sidoName }: Props) {
-  const [data, setData] = useState<RemainData | null>(null);
+export default function RemainTable({ title = "접수·출고·잔여 현황", sido, regionFilter, sidoName, data: external, embedded = false }: Props) {
+  const [fetched, setFetched] = useState<RemainData | null>(null);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
+    if (external) return;
     const ctrl = new AbortController();
     const url = sido ? `/api/remain?sido=${encodeURIComponent(sido)}` : "/api/remain";
     fetch(url, { signal: ctrl.signal })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
-      .then((d: RemainData) => setData(d))
-      .catch(() => setFailed(true));
+      .then((d: RemainData) => setFetched(d))
+      .catch((err: unknown) => {
+        if ((err as Error)?.name !== "AbortError") setFailed(true);
+      });
     return () => ctrl.abort();
-  }, [sido]);
+  }, [sido, external]);
+
+  const data = external ?? fetched;
 
   let rows = (data?.rows ?? []).filter((r) => /승용/.test(r.vehicleType) || !r.vehicleType);
   if (regionFilter) {
@@ -44,9 +53,8 @@ export default function RemainTable({ title = "접수·출고·잔여 현황", s
   }
   const loading = !data && !failed;
 
-  return (
-    <section className="mt-10">
-      <h2 className="text-xl font-bold text-slate-900">{title}</h2>
+  const body = (
+    <>
       {loading ? (
         <div className="mt-3 animate-pulse rounded-lg border border-slate-200 bg-slate-50 p-5 text-sm text-slate-400" aria-busy="true">
           무공해차 통합누리집 수집값을 불러오는 중…
@@ -101,6 +109,15 @@ export default function RemainTable({ title = "접수·출고·잔여 현황", s
           </table>
         </div>
       )}
+    </>
+  );
+
+  if (embedded) return body;
+
+  return (
+    <section className="mt-10">
+      <h2 className="text-xl font-bold text-slate-900">{title}</h2>
+      {body}
       {data && <SourceNote source={data.source} fetchedAt={data.fetchedAt} />}
     </section>
   );
