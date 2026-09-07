@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { LocalPriceRow } from "@/lib/ev/types";
 import { NATIONAL_MAX } from "@/data/cars";
-import { sigunguSlug } from "@/data/regions";
+import { sigunguPath } from "@/data/regions";
 import { won } from "@/lib/ev/summary";
 
 export default function LocalPriceTable({ sidoSlug, rows }: { sidoSlug: string; rows: LocalPriceRow[] }) {
@@ -21,7 +21,7 @@ export default function LocalPriceTable({ sidoSlug, rows }: { sidoSlug: string; 
           {rows.map((r) => (
             <tr key={r.sigungu} className="border-t border-slate-100 hover:bg-emerald-50/40">
               <td className="px-3 py-2 font-medium">
-                <Link href={`/region/${sidoSlug}/${sigunguSlug(r.sigungu)}`} className="text-slate-900 hover:text-emerald-700 hover:underline">
+                <Link href={sigunguPath(sidoSlug, r.sigungu)} className="text-slate-900 hover:text-emerald-700 hover:underline">
                   {r.sigungu}
                 </Link>
               </td>

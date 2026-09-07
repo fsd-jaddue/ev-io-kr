@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { SITE } from "@/lib/site";
-import { SIDO_LIST, sigunguSlug } from "@/data/regions";
+import { SIDO_LIST, sigunguPath } from "@/data/regions";
 import { CARS } from "@/data/cars";
 import { GUIDES } from "@/content/guides";
 
@@ -27,7 +27,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }));
   const sigungus: MetadataRoute.Sitemap = SIDO_LIST.flatMap((s) =>
     s.sigungu.map((g) => ({
-      url: `${base}/region/${s.slug}/${sigunguSlug(g)}`,
+      url: `${base}${sigunguPath(s.slug, g)}`,
       lastModified: now,
       changeFrequency: "weekly" as const,
       priority: 0.6,

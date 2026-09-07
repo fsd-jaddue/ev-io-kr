@@ -162,15 +162,29 @@ export function getSidoByShort(short: string): Sido | undefined {
   return SIDO_LIST.find((x) => x.short === s || x.name === s || x.name.startsWith(s));
 }
 
-/** 시·군·구명을 URL slug로 (한글 유지, 공백 제거) */
+/**
+ * 시·군·구명을 라우트 파라미터(slug)로 (한글 유지, 공백만 제거).
+ * generateStaticParams 에는 이 "디코딩된" 값을 그대로 넘긴다. 미리 퍼센트 인코딩해서 넘기면 Next/Vercel 이 한 번 더 인코딩해
+ * 프리렌더 경로가 이중 인코딩되고, 실제 요청 경로(/region/busan/중구)와 어긋나 404 가 난다.
+ */
 export function sigunguSlug(name: string): string {
-  return encodeURIComponent(name.replace(/\s/g, ""));
+  return name.replace(/\s/g, "");
 }
 
+/** 시·군·구 페이지 경로 (href·canonical·sitemap 용, 퍼센트 인코딩 적용) */
+export function sigunguPath(sidoSlug: string, name: string): string {
+  return `/region/${sidoSlug}/${encodeURIComponent(sigunguSlug(name))}`;
+}
+
+/** 라우트 파라미터 → 시·군·구명. 디코딩 여부·중복 인코딩과 무관하게 원문을 돌려준다. */
 export function decodeSigungu(slug: string): string {
-  try {
-    return decodeURIComponent(slug);
-  } catch {
-    return slug;
+  let out = slug;
+  for (let i = 0; i < 2 && /%[0-9A-Fa-f]{2}/.test(out); i++) {
+    try {
+      out = decodeURIComponent(out);
+    } catch {
+      break;
+    }
   }
+  return out.replace(/\s/g, "");
 }

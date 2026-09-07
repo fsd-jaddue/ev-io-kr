@@ -7,7 +7,7 @@ import AdSlot from "@/components/AdSlot";
 import { getLocalPriceData } from "@/lib/ev/getData";
 import { estimateTotal, won } from "@/lib/ev/summary";
 import { pageMetadata } from "@/lib/seo";
-import { SIDO_LIST, decodeSigungu, getSido, sigunguSlug } from "@/data/regions";
+import { SIDO_LIST, decodeSigungu, getSido, sigunguPath, sigunguSlug } from "@/data/regions";
 import { CARS, NATIONAL_MAX, carName } from "@/data/cars";
 import { EV_PORTAL } from "@/lib/ev/parse";
 
@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   return pageMetadata({
     title: `${d.sido.short} ${d.name} 전기차 보조금 2026`,
     description: `2026년 ${d.sido.name} ${d.name} 승용 전기차 보조금: 지방비 ${won(d.row.amount)}${total ? `, 국비 ${NATIONAL_MAX.large}만원 합산 최대 ${total.toLocaleString()}만원` : ""}. 차종별 예상 지원액, 전환지원금, 신청 방법 정리.`,
-    path: `/region/${d.sido.slug}/${sigunguSlug(d.name)}`,
+    path: sigunguPath(d.sido.slug, d.name),
     keywords: [`${d.name} 전기차 보조금`, `${d.sido.short} ${d.name} 전기차 보조금`, `${d.name} 전기차 지방비`],
   });
 }
@@ -52,7 +52,7 @@ export default async function SigunguPage({ params }: { params: Params }) {
         items={[
           { name: "지역별 보조금", path: "/region" },
           { name: sido.name, path: `/region/${sido.slug}` },
-          { name, path: `/region/${sido.slug}/${sigunguSlug(name)}` },
+          { name, path: sigunguPath(sido.slug, name) },
         ]}
       />
       <h1 className="text-3xl font-black text-slate-900">
@@ -146,7 +146,7 @@ export default async function SigunguPage({ params }: { params: Params }) {
           {siblings.map((s) => (
             <li key={s.sigungu}>
               <Link
-                href={`/region/${sido.slug}/${sigunguSlug(s.sigungu)}`}
+                href={sigunguPath(sido.slug, s.sigungu)}
                 className="rounded-full border border-slate-200 px-3 py-1 text-sm text-slate-700 hover:border-emerald-300 hover:text-emerald-700"
               >
                 {s.sigungu} {s.amount !== null && <span className="text-slate-400">{s.amount}</span>}

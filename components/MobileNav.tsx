@@ -35,7 +35,7 @@ export default function MobileNav() {
         <nav
           id="mobile-menu"
           aria-label="모바일 메뉴"
-          className="absolute inset-x-0 top-14 border-b border-slate-200 bg-white shadow-md"
+          className="absolute inset-x-0 top-16 border-b border-slate-200 bg-white shadow-md"
         >
           <ul className="mx-auto max-w-6xl px-2 py-2">
             {NAV.map((n) => (
