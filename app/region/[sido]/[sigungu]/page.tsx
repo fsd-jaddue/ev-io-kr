@@ -142,14 +142,18 @@ export default async function SigunguPage({ params }: { params: Params }) {
 
       <section className="mt-10">
         <h2 className="text-lg font-bold text-slate-900">{sido.short} 다른 시·군·구</h2>
+        <p className="mt-1 text-sm text-slate-500">지역명 옆 금액은 2026년 승용 전기차 지방비 최대액입니다. 국비 최대 {won(NATIONAL_MAX.large)}은 별도로 더해집니다.</p>
         <ul className="mt-3 flex flex-wrap gap-2">
           {siblings.map((s) => (
             <li key={s.sigungu}>
               <Link
                 href={sigunguPath(sido.slug, s.sigungu)}
-                className="rounded-full border border-slate-200 px-3 py-1 text-sm text-slate-700 hover:border-emerald-300 hover:text-emerald-700"
+                className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1 text-sm text-slate-700 hover:border-emerald-300 hover:text-emerald-700"
               >
-                {s.sigungu} {s.amount !== null && <span className="text-slate-400">{s.amount}</span>}
+                <span className="font-medium">{s.sigungu}</span>
+                <span className="text-xs text-slate-500">
+                  {s.amount === null ? "공고 확인" : `지방비 ${won(s.amount)}`}
+                </span>
               </Link>
             </li>
           ))}
