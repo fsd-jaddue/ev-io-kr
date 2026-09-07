@@ -96,19 +96,20 @@ let failUntil = 0;
  * 1) ev.or.kr 수집(성공 시 1시간 캐시) → 2) 실패 시 리포지토리 스냅샷.
  */
 export async function getRemainData(): Promise<RemainData> {
-  if (process.env.EV_DISABLE_LIVE_FETCH === "1") return snapshotRemain();
-  if (Date.now() < failUntil) return snapshotRemain();
+  if (process.env.EV_DISABLE_LIVE_FETCH === "1") return getRemainSnapshot();
+  if (Date.now() < failUntil) return getRemainSnapshot();
   try {
     const live = await getCachedLiveRemain();
     return { source: "live", fetchedAt: live.fetchedAt, rows: live.rows };
   } catch (err) {
     failUntil = Date.now() + FAIL_BACKOFF_MS;
     console.warn("[ev] live fetch failed, using snapshot:", (err as Error).message.slice(0, 500));
-    return snapshotRemain();
+    return getRemainSnapshot();
   }
 }
 
-function snapshotRemain(): RemainData {
+/** 저장소에 커밋된 스냅샷(동기). 빌드 시 첫 페인트·SEO 용으로 페이지에서 직접 쓴다 — 라이브 시도 없음 */
+export function getRemainSnapshot(): RemainData {
   const snap = remainSnapshot as { fetchedAt: string; rows: RemainRow[] };
   return { source: "snapshot", fetchedAt: snap.fetchedAt, rows: snap.rows ?? [] };
 }

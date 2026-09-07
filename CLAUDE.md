@@ -25,6 +25,11 @@ app/                 라우트. /, /region, /region/[sido], /region/[sido]/[sigu
                      sitemap.ts robots.ts ads.txt/route.ts, api/remain, api/ev-status
 components/          Header Footer MobileNav AdSlot Breadcrumb JsonLd SidoGrid LocalPriceTable RemainTable(client)
                      SourceNote Calculator(client) GuideCard illustrations.tsx(원본 SVG)
+components/remain/   홈 히어로 잔여 현황 보드(전부 client). RemainHero(상태 소유·fetch) KoreaMap(데스크톱 SVG 지도)
+                     TileMap(모바일 타일) RegionPanel(도킹 패널: 전국 TOP8 / 시·군·구 타일 / 단일 공고 카드 / 표)
+                     SidoChips MapLegend FreshnessBadge EmptyRemainNotice useCountUp
+data/korea-map.ts    직접 잡은 좌표의 한국 지도: 교차점(NODES)+경계선(ARCS, 인접 시·도가 공유)을 Catmull-Rom 곡선으로 그려 시·도 면을 조립. 광역시 둥근 박스, 제주 인셋, 모바일 타일 배치
+lib/ev/remainSummary.ts  접수·출고·잔여 시·도 합계·잔여 수준(레벨)·TOP N 등 순수 함수 + 레벨별 색/클래스(LEVEL_META)
 content/guides/      가이드 16편 (basic/apply/benefit/region-car .ts, HTML 본문 + faq). index.ts 가 합침
 data/regions.ts      17개 시·도 + 시·군·구 목록, slug 헬퍼
 data/cars.ts         차종별 2026 국비 (null = 확정치 미확인)
@@ -42,7 +47,8 @@ scripts/gen-guide-figures.mjs    가이드 인포그래픽 SVG 생성기
 ## 데이터 흐름과 핵심 결정
 - 지방비(시·군·구별 승용 최대액)는 `data/snapshot/local-price.ts`의 취합값이 기본이고, 수집 JSON에 행이 있으면 그것이 우선. 확인 안 된 곳은 `null` → 화면에 "공고 확인".
 - 접수·출고·잔여 대수는 **임의 값 절대 금지**. 수집값이 있을 때만 표시하고 없으면 ev.or.kr 링크만 보여준다. 표는 `RemainTable`(클라이언트)이 `/api/remain?sido=`를 호출해 그리므로 정적 페이지 재빌드와 무관하게 갱신된다.
-- 각 표에 기준 시각·출처 배지("누리집 수집" / "스냅샷")를 표시한다.
+- 각 표에 기준 시각·출처 배지("누리집 수집" / "스냅샷")를 표시한다. 기준 시각은 `formatFetchedAt()`이 `2026.09.07 10:05` 형식(숫자만 조합)으로 만든다 — 로케일 오전/오후 표기는 Node(`AM`)와 Chrome(`오전`)이 달라 hydration 오류가 났던 이력이 있으니 로케일 문구를 SSR 텍스트에 쓰지 않는다.
+- **홈 히어로 = 잔여 현황 지도 보드**(2026-09-07). 배너 일러스트를 지도로 대체: PC는 `data/korea-map.ts`의 간략화 윤곽 지도(SVG; 두께 레이어+그림자+광택+rotateX 기울기로 입체감, 선택 시 블록이 떠오름), 모바일은 4열 타일 카토그램. 둘 다 렌더하고 CSS(`hidden md:block` / `md:hidden`)로 토글해 hydration 불일치를 피한다. 첫 페인트·SEO는 빌드 시 `getRemainSnapshot()`(동기 스냅샷, 라이브 시도 없음)으로 채우고, 마운트 후 `/api/remain`을 한 번 호출해 더 새로우면 교체한다. 지역 선택 → 아래 도킹 `RegionPanel`에서 시·군·구 타일(도) / 단일 공고 카드(특별·광역시·세종·제주) / `RemainTable embedded` 표로 드릴다운. 잔여 수준은 잔여/공고 기준 소진(≤0)·적음(<5%)·보통(5~15%)·여유(≥15%)·미수집 5단계이며 색은 마스크 재고 지도 관례(초록·노랑·주황·빨강). `RemainTable`은 `data`(재요청 생략)·`embedded`(표만) prop을 받는다.
 - 시·군·구 페이지 slug는 **한글 원문**(`sigunguSlug`, 공백만 제거)을 `generateStaticParams`에 넘긴다. 미리 퍼센트 인코딩하면 Next/Vercel이 한 번 더 인코딩해 프리렌더 경로가 이중 인코딩되고 실제 요청(/region/busan/중구)이 404가 난다(2026-09-07 수정). 링크·canonical·sitemap은 `sigunguPath()`로만 만든다.
 - 애드센스 게시자 ID `ca-pub-9408914409364609`는 `lib/site.ts`의 `ADSENSE_CLIENT_DEFAULT`에 박혀 있어 스크립트(`<head>` 직접 삽입)·메타태그·ads.txt가 항상 켜진다. `NEXT_PUBLIC_ADSENSE_CLIENT`로 덮어쓰거나 `off`로 끌 수 있음. 광고 자리(AdSlot)는 슬롯 ID 환경변수가 있을 때만 렌더링.
 - 이미지는 전부 직접 그린 SVG(저작권 이슈 없음). 외부 스톡 이미지 사용 안 함. 사용자가 Pixabay 사진을 `public/images/photos/`에 넣어주면 배치할 수 있음.
@@ -62,6 +68,6 @@ scripts/gen-guide-figures.mjs    가이드 인포그래픽 SVG 생성기
 
 ## 작업 규칙
 - 배포 브랜치는 `main` 하나만 쓴다. 세션에 작업용 `claude/…` 브랜치가 지정돼 있으면 거기서 작업한 뒤 `main`에 병합하고 작업 브랜치는 지운다. PR은 요청 시에만.
-- 변경 후 `npm run lint && npm run typecheck && npm run build` 통과 확인. 화면 확인은 Playwright(`/opt/pw-browsers/chromium` 같은 로컬 크롬)로 스크린샷.
+- 변경 후 `npm run lint && npm run typecheck && npm run build` 통과 확인. 화면 확인은 Playwright(`/opt/pw-browsers/chromium` 같은 로컬 크롬)로 스크린샷. 로컬·샌드박스에서는 `EV_DISABLE_LIVE_FETCH=1`을 주면 `/api/remain`이 12초 라이브 시도 없이 스냅샷을 바로 돌려준다.
 - 이 작업 환경(Claude 원격 세션)에서는 ev.or.kr, ev.io.kr, vercel.com, 가비아 등 외부 사이트 접속이 차단된다. 배포 결과 확인은 사용자 캡처/JSON 붙여넣기 또는 GitHub Actions 로그(MCP)로 한다.
 - 한국어로 소통. 금액 단위는 만원. 연도 표기 2026 기준.

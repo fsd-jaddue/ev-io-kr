@@ -4,6 +4,65 @@
   --font-sans:
     "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto,
     "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+
+  /* 홈 히어로 지도·패널 모션 (animate-fade-up / animate-bar-grow / animate-pulse-dot) */
+  --animate-fade-up: ev-fade-up 0.35s ease-out both;
+  --animate-bar-grow: ev-bar-grow 0.6s ease-out both;
+  --animate-pulse-dot: ev-pulse-dot 1.8s ease-in-out infinite;
+  --animate-lift: ev-lift 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+
+  @keyframes ev-fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes ev-bar-grow {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+  @keyframes ev-lift {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(-6px);
+    }
+  }
+  @keyframes ev-pulse-dot {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 0.9;
+    }
+    50% {
+      transform: scale(2.2);
+      opacity: 0;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up,
+  .animate-bar-grow,
+  .animate-pulse-dot {
+    animation: none !important;
+  }
+  .animate-lift {
+    animation: none !important;
+    transform: translateY(-6px);
+  }
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 html {
