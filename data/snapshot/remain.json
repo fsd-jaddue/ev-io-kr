@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-07T18:17:16.262Z",
+  "fetchedAt": "2026-09-07T23:34:21.810Z",
   "note": "무공해차 통합누리집 '지자체별 보조금 현황' 수집 결과. scripts/fetch-snapshot.ts 실행으로 갱신됩니다. rows가 비어 있으면 화면에는 누리집 링크만 표시됩니다.",
   "rows": [
     {
@@ -8,8 +8,8 @@
       "vehicleType": "승용",
       "announced": 15430,
       "applied": 15274,
-      "released": 14929,
-      "remaining": 501,
+      "released": 14931,
+      "remaining": 499,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.08.07 13:00"
     },
     {
@@ -137,7 +137,7 @@
       "region": "광명시",
       "vehicleType": "승용",
       "announced": 750,
-      "applied": 629,
+      "applied": 627,
       "released": 600,
       "remaining": 150,
       "note": "본공고·추경1차 · 신청마감 · 마감 2026.07.01 10:14"
@@ -328,7 +328,7 @@
       "vehicleType": "승용",
       "announced": 326,
       "applied": 1356,
-      "released": 1048,
+      "released": 1049,
       "remaining": 0,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.09.01 10:04"
     },
@@ -718,8 +718,8 @@
       "vehicleType": "승용",
       "announced": 1154,
       "applied": 1724,
-      "released": 1012,
-      "remaining": 142,
+      "released": 1018,
+      "remaining": 136,
       "note": "본공고·추경1차·추경2차 · 마감 2026.11.27 18:00"
     },
     {
@@ -908,8 +908,8 @@
       "vehicleType": "승용",
       "announced": 91,
       "applied": 156,
-      "released": 87,
-      "remaining": 4,
+      "released": 88,
+      "remaining": 3,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.08.21 18:00"
     },
     {
@@ -1138,8 +1138,8 @@
       "vehicleType": "승용",
       "announced": 208,
       "applied": 175,
-      "released": 142,
-      "remaining": 66,
+      "released": 143,
+      "remaining": 65,
       "note": "본공고·추경1차 · 신청마감 · 마감 2026.08.28 18:00"
     },
     {
@@ -1218,8 +1218,8 @@
       "vehicleType": "승용",
       "announced": 960,
       "applied": 1012,
-      "released": 922,
-      "remaining": 38,
+      "released": 923,
+      "remaining": 37,
       "note": "본공고·추경1차 · 마감 2026.12.25 18:00"
     },
     {
@@ -1598,7 +1598,7 @@
       "vehicleType": "승용",
       "announced": 4200,
       "applied": 4984,
-      "released": 4505,
+      "released": 4507,
       "remaining": 0,
       "note": "본공고·추경1차 · 신청마감 · 마감 2026.08.12 18:00"
     }
