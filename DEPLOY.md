@@ -25,9 +25,10 @@ GitHub 기본 브랜치와 Vercel Production Branch는 모두 **`main`** 이다.
 예전 배포 브랜치 `claude/adsense-ev-subsidy-site-10f3l9` 를 `main` 으로 바꾸는 절차 (2026-09-07):
 
 1. GitHub 저장소 → **Settings → General → Default branch** → 연필 아이콘 → `main` 선택 → **Update**. (또는 **Branches** 탭에서 `main` 옆 "Switch to default" 아이콘)
-2. Vercel 프로젝트 → **Settings → Git → Production Branch** 를 `main` 으로 바꾸고 **Save**. 이후 **Deployments** 에서 `main` 의 최신 커밋을 **Redeploy** 하거나 `main` 에 아무 커밋이나 푸시해 Production 배포를 한 번 만든다.
-3. `https://ev.io.kr` 이 정상이고 Vercel Production 배포의 브랜치가 `main` 으로 표시되면, GitHub **Branches** 에서 `claude/adsense-ev-subsidy-site-10f3l9` 를 삭제한다. (Vercel 전환 전에 지우면 Production 이 끊기므로 순서를 지킨다.)
-4. 다음 정시 20분에 Actions → "Refresh ev.or.kr snapshot" 이 `main` 에서 실행돼 `chore(snapshot)` 커밋이 `main` 에 쌓이는지 확인한다.
+2. `main` 에 커밋을 하나 푸시해 Vercel 배포(Preview)를 먼저 만든다. Vercel 은 배포 이력이 없는 브랜치를 Production 브랜치로 지정하지 못한다("No deployments found for main" 오류).
+3. Vercel 프로젝트 → **Settings → Environments → Production → Branch Tracking** 에 `main` 을 넣고 **Save**. (예전 UI 는 Settings → Git → Production Branch.) Save 뒤 **Deployments** 에서 `main` 배포가 Preview 로 남아 있으면 ⋯ 메뉴 → **Promote to Production** 또는 **Redeploy**.
+4. `https://ev.io.kr` 이 정상이고 Vercel Production 배포의 브랜치가 `main` 으로 표시되면, GitHub **Branches** 에서 `claude/adsense-ev-subsidy-site-10f3l9` 를 삭제한다. (Vercel 전환 전에 지우면 Production 이 끊기므로 순서를 지킨다.)
+5. 다음 정시 20분에 Actions → "Refresh ev.or.kr snapshot" 이 `main` 에서 실행돼 `chore(snapshot)` 커밋이 `main` 에 쌓이는지 확인한다.
 
 ## 2. 가비아에서 ev.io.kr 구입
 
