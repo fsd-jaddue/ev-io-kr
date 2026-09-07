@@ -18,6 +18,17 @@
 
 > 리전은 `vercel.json` 에서 `icn1`(서울)로 고정했습니다. ev.or.kr 가 해외 IP를 차단하는 경우에 대비한 설정입니다.
 
+### 1-1. 배포 브랜치는 `main`
+
+GitHub 기본 브랜치와 Vercel Production Branch는 모두 **`main`** 이다. `main` 에 푸시하면 Production 배포, 다른 브랜치에 푸시하면 Preview 배포가 된다. 매시간 도는 수집 워크플로(`.github/workflows/snapshot.yml`)는 GitHub 기본 브랜치에서 실행되어 그 브랜치에 JSON을 커밋하므로, 기본 브랜치가 `main` 이어야 배포 사이트의 자료가 갱신된다.
+
+예전 배포 브랜치 `claude/adsense-ev-subsidy-site-10f3l9` 를 `main` 으로 바꾸는 절차 (2026-09-07):
+
+1. GitHub 저장소 → **Settings → General → Default branch** → 연필 아이콘 → `main` 선택 → **Update**. (또는 **Branches** 탭에서 `main` 옆 "Switch to default" 아이콘)
+2. Vercel 프로젝트 → **Settings → Git → Production Branch** 를 `main` 으로 바꾸고 **Save**. 이후 **Deployments** 에서 `main` 의 최신 커밋을 **Redeploy** 하거나 `main` 에 아무 커밋이나 푸시해 Production 배포를 한 번 만든다.
+3. `https://ev.io.kr` 이 정상이고 Vercel Production 배포의 브랜치가 `main` 으로 표시되면, GitHub **Branches** 에서 `claude/adsense-ev-subsidy-site-10f3l9` 를 삭제한다. (Vercel 전환 전에 지우면 Production 이 끊기므로 순서를 지킨다.)
+4. 다음 정시 20분에 Actions → "Refresh ev.or.kr snapshot" 이 `main` 에서 실행돼 `chore(snapshot)` 커밋이 `main` 에 쌓이는지 확인한다.
+
 ## 2. 가비아에서 ev.io.kr 구입
 
 1. https://www.gabia.com → 도메인 검색창에 `ev.io.kr` 입력 → 등록 가능 여부 확인 후 구매(`.io.kr` 는 2단계 국가 도메인으로 1년 단위 등록).

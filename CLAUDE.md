@@ -11,8 +11,9 @@
 - `npm run fetch:snapshot` — Playwright 헤드리스 크롬으로 ev.or.kr 표를 수집해 `data/snapshot/*.json` 갱신 (로컬에선 `npx playwright install chromium` 필요, 또는 `PW_CHROMIUM_PATH=경로`)
 - 이미지 인포그래픽 재생성: `node scripts/gen-guide-figures.mjs` → `public/images/guides/*.svg`
 
-## 배포 상태 (2026-09-03 기준)
-- GitHub: `fsd-jaddue/ev-io-kr`, 작업/기본 브랜치 `claude/adsense-ev-subsidy-site-10f3l9` (Vercel Production 브랜치이기도 함). 이 브랜치에 푸시하면 Vercel이 자동 배포한다.
+## 배포 상태 (2026-09-07 기준)
+- GitHub: `fsd-jaddue/ev-io-kr`, 기본·배포 브랜치는 **`main`** (Vercel Production 브랜치). `main`에 푸시하면 Vercel이 자동 배포하고, 수집 워크플로도 `main`에서 돌며 `main`에 커밋한다.
+  - 2026-09-07 브랜치 정리: 예전 배포 브랜치 `claude/adsense-ev-subsidy-site-10f3l9`를 `main`으로 바꿨다. GitHub 기본 브랜치·Vercel Production Branch를 `main`으로 전환한 뒤 옛 브랜치는 삭제한다(절차는 `DEPLOY.md` 1-1 참고).
 - Vercel 프로젝트 `ev-io-kr`, 리전 `icn1`(vercel.json). 환경변수는 `NEXT_PUBLIC_SITE_URL=https://ev.io.kr` 만 설정됨. 애드센스 관련 변수는 아직 비어 있음(승인 전).
 - 도메인: 가비아에서 `ev.io.kr` 구입 완료, DNS A `@`→76.76.21.21, CNAME `www`→cname.vercel-dns.com 설정 완료. www→ev.io.kr 308 리다이렉트 설정. Vercel이 "DNS Change Recommended"(새 IP 권장)를 표시하지만 동작에는 문제 없음.
 - 절차 문서: `DEPLOY.md` (Vercel·가비아·애드센스·자료 갱신 루틴).
@@ -59,7 +60,7 @@ scripts/gen-guide-figures.mjs    가이드 인포그래픽 SVG 생성기
 4. 가이드·지역 콘텐츠 보강, 2027년 지침 확정 시 수치 갱신(`data/cars.ts`, 가이드 본문, `scripts/gen-guide-figures.mjs` 후 재생성).
 
 ## 작업 규칙
-- 커밋·푸시는 `claude/adsense-ev-subsidy-site-10f3l9` 브랜치에만. PR은 요청 시에만.
+- 배포 브랜치는 `main` 하나만 쓴다. 세션에 작업용 `claude/…` 브랜치가 지정돼 있으면 거기서 작업한 뒤 `main`에 병합하고 작업 브랜치는 지운다. PR은 요청 시에만.
 - 변경 후 `npm run lint && npm run typecheck && npm run build` 통과 확인. 화면 확인은 Playwright(`/opt/pw-browsers/chromium` 같은 로컬 크롬)로 스크린샷.
 - 이 작업 환경(Claude 원격 세션)에서는 ev.or.kr, ev.io.kr, vercel.com, 가비아 등 외부 사이트 접속이 차단된다. 배포 결과 확인은 사용자 캡처/JSON 붙여넣기 또는 GitHub Actions 로그(MCP)로 한다.
 - 한국어로 소통. 금액 단위는 만원. 연도 표기 2026 기준.
