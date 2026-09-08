@@ -1,8 +1,8 @@
 export const ADSENSE_CLIENT_DEFAULT = "ca-pub-9408914409364609";
 /** 네이버 서치어드바이저 소유확인 값 (<meta name="naver-site-verification">). 공개 값이라 코드에 둔다 (2026-09-08 발급) */
 export const NAVER_SITE_VERIFICATION_DEFAULT = "2a20be80aeb22e2dbd62581cf07d46ca3cbc1d09";
-/** Bing 웹마스터 도구 소유확인 값 (<meta name="msvalidate.01">). 발급 전에는 빈 문자열 → 태그 미출력 */
-export const BING_SITE_VERIFICATION_DEFAULT = "";
+/** Bing 웹마스터 도구 소유확인 값 (<meta name="msvalidate.01">). 공개 값이라 코드에 둔다 (2026-09-08 발급) */
+export const BING_SITE_VERIFICATION_DEFAULT = "D57CFC07162E92464C0C00774529B9F3";
 
 /** 환경변수가 있으면 우선, off/0/false 면 끔, 비어 있으면 코드 기본값 */
 function resolveWithDefault(env: string | undefined, fallback: string): string {
