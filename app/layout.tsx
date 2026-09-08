@@ -33,7 +33,11 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 } },
   verification: {
     google: SITE.googleVerification || undefined,
-    other: SITE.naverVerification ? { "naver-site-verification": SITE.naverVerification } : undefined,
+    // 네이버·Bing 은 Next 가 전용 키를 제공하지 않으므로 other 로 <meta name="…"> 출력
+    other: {
+      ...(SITE.naverVerification ? { "naver-site-verification": SITE.naverVerification } : {}),
+      ...(SITE.bingVerification ? { "msvalidate.01": SITE.bingVerification } : {}),
+    },
   },
   other: SITE.adsenseClient ? { "google-adsense-account": SITE.adsenseClient } : undefined,
 };
