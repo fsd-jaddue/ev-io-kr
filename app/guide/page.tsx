@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Breadcrumb from "@/components/Breadcrumb";
 import GuideCard from "@/components/GuideCard";
-import { pageMetadata } from "@/lib/seo";
+import { itemListJsonLd, pageMetadata } from "@/lib/seo";
+import JsonLd from "@/components/JsonLd";
 import { GUIDES } from "@/content/guides";
 
 export const metadata: Metadata = pageMetadata({
@@ -16,6 +17,7 @@ const CATEGORIES = ["기본", "신청", "혜택", "지역", "차종", "전망"] 
 export default function GuideIndexPage() {
   return (
     <>
+      <JsonLd data={itemListJsonLd("전기차 보조금 가이드", GUIDES.map((g) => ({ name: g.title, path: `/guide/${g.slug}` })))} />
       <Breadcrumb items={[{ name: "가이드", path: "/guide" }]} />
       <h1 className="text-3xl font-black text-slate-900">전기차 보조금 가이드</h1>
       <p className="mt-3 max-w-3xl leading-7 text-slate-600">

@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { EV_PORTAL } from "@/lib/ev/portal";
 import type { RemainData } from "@/lib/ev/types";
-import SourceNote from "./SourceNote";
+import { matchRemainRows, passengerRows } from "@/lib/ev/remainSummary";
+import FreshnessBadge from "./remain/FreshnessBadge";
 
 function num(n: number | null) {
   return n === null ? "-" : n.toLocaleString("ko-KR");
@@ -19,15 +20,20 @@ interface Props {
   sidoName?: string;
   /** 이미 받아 둔 데이터 — 있으면 /api/remain 을 호출하지 않는다 */
   data?: RemainData;
+  /**
+   * 서버에서 미리 넣은 스냅샷 — 첫 HTML(검색엔진·첫 페인트)에 표를 그리고, 마운트 후 /api/remain 이 더 새로우면 교체한다.
+   * 지역 페이지 SSR 용. data 와 달리 재요청을 막지 않는다.
+   */
+  initial?: RemainData;
   /** 섹션·제목·출처 배지 없이 표만 렌더 (패널 내장용) */
   embedded?: boolean;
 }
 
 /**
- * 접수·출고·잔여 현황. 정적 페이지에 실리지 않고 브라우저에서 /api/remain 을 호출해
- * 서버가 1시간 단위로 수집한 값을 보여준다(빌드 시점과 무관하게 최신 유지).
+ * 접수·출고·잔여 현황. 브라우저에서 /api/remain 을 호출해 서버가 1시간 단위로 수집한 값을 보여준다
+ * (빌드 시점과 무관하게 최신 유지). initial 이 있으면 그 스냅샷으로 먼저 그린 뒤 더 새로운 값으로 교체한다.
  */
-export default function RemainTable({ title = "접수·출고·잔여 현황", sido, regionFilter, sidoName, data: external, embedded = false }: Props) {
+export default function RemainTable({ title = "접수·출고·잔여 현황", sido, regionFilter, sidoName, data: external, initial, embedded = false }: Props) {
   const [fetched, setFetched] = useState<RemainData | null>(null);
   const [failed, setFailed] = useState(false);
 
@@ -37,20 +43,20 @@ export default function RemainTable({ title = "접수·출고·잔여 현황", s
     const url = sido ? `/api/remain?sido=${encodeURIComponent(sido)}` : "/api/remain";
     fetch(url, { signal: ctrl.signal })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
-      .then((d: RemainData) => setFetched(d))
+      .then((d: RemainData) => {
+        // 서버가 돌려준 값이 미리 넣어 둔 스냅샷보다 오래됐으면(재배포 직후 캐시 등) 스냅샷을 유지
+        if (initial && d.source !== "live" && Date.parse(d.fetchedAt) < Date.parse(initial.fetchedAt)) return;
+        setFetched(d);
+      })
       .catch((err: unknown) => {
         if ((err as Error)?.name !== "AbortError") setFailed(true);
       });
     return () => ctrl.abort();
-  }, [sido, external]);
+  }, [sido, external, initial]);
 
-  const data = external ?? fetched;
+  const data = external ?? fetched ?? initial ?? null;
 
-  let rows = (data?.rows ?? []).filter((r) => /승용/.test(r.vehicleType) || !r.vehicleType);
-  if (regionFilter) {
-    const key = regionFilter.replace(/(시|군|구)$/, "");
-    rows = rows.filter((r) => r.region.includes(key) || (sidoName ? r.region === sidoName : false));
-  }
+  const rows = regionFilter ? matchRemainRows(data?.rows ?? [], regionFilter, sidoName) : passengerRows(data?.rows ?? []);
   const loading = !data && !failed;
 
   const body = (
@@ -118,7 +124,7 @@ export default function RemainTable({ title = "접수·출고·잔여 현황", s
     <section className="mt-10">
       <h2 className="text-xl font-bold text-slate-900">{title}</h2>
       {body}
-      {data && <SourceNote source={data.source} fetchedAt={data.fetchedAt} />}
+      {data && <FreshnessBadge variant="light" source={data.source} fetchedAt={data.fetchedAt} refresh={failed ? "failed" : undefined} className="mt-3" />}
     </section>
   );
 }

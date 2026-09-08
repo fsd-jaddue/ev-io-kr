@@ -114,6 +114,16 @@ export function getRemainSnapshot(): RemainData {
   return { source: "snapshot", fetchedAt: snap.fetchedAt, rows: snap.rows ?? [] };
 }
 
+/** 사이트맵 lastmod 용 스냅샷 기준 시각. remain.json fetchedAt(ISO), local-price.json updatedAt(YYYY-MM-DD, KST) */
+export function getSnapshotDates(): { remainFetchedAt: Date; localPriceUpdatedAt: Date; latest: Date } {
+  const remainFetchedAt = new Date((remainSnapshot as { fetchedAt?: string }).fetchedAt ?? LOCAL_PRICE_UPDATED_AT);
+  const lp = (localPriceJson as { updatedAt?: string }).updatedAt || LOCAL_PRICE_UPDATED_AT;
+  const localPriceUpdatedAt = new Date(`${lp}T00:00:00+09:00`);
+  const valid = [remainFetchedAt, localPriceUpdatedAt].filter((d) => !Number.isNaN(d.getTime()));
+  const latest = valid.length ? new Date(Math.max(...valid.map((d) => d.getTime()))) : new Date();
+  return { remainFetchedAt: Number.isNaN(remainFetchedAt.getTime()) ? latest : remainFetchedAt, localPriceUpdatedAt, latest };
+}
+
 /** 시·도 slug 기준 현황 필터 */
 export function filterRemainBySido(all: RemainData, slug: string): RemainData {
   const sido = getSido(slug);

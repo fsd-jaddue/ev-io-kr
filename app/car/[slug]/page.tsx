@@ -5,7 +5,8 @@ import Breadcrumb from "@/components/Breadcrumb";
 import AdSlot from "@/components/AdSlot";
 import { getLocalPriceData } from "@/lib/ev/getData";
 import { estimateTotal, summarizeBySido } from "@/lib/ev/summary";
-import { pageMetadata } from "@/lib/seo";
+import { pageMetadata, webPageJsonLd } from "@/lib/seo";
+import JsonLd from "@/components/JsonLd";
 import { CARS, NATIONAL_MAX, carName, getCar } from "@/data/cars";
 import { EV_PORTAL } from "@/lib/ev/parse";
 import { CarArt } from "@/components/illustrations";
@@ -17,9 +18,9 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const car = getCar(slug);
-  if (!car) return {};
+  if (!car) notFound();
   return pageMetadata({
-    title: `${carName(car)} 보조금 2026 (국비·지역별 합산)`,
+    title: `${car.brand} ${car.model} ${car.trim.replace(/\s*\(.*\)\s*$/, "")} 보조금 2026`,
     description: `2026년 ${car.brand} ${car.model} ${car.trim} 전기차 보조금: 국비 ${car.national === null ? "트림별 확인" : `${car.national}만원`}, 전환지원금 +100만원, 서울·경기·경북 등 지역별 지방비 합산 예상액과 가격 구간(${car.priceBand}) 정리.`,
     path: `/car/${slug}`,
     keywords: [`${car.model} 보조금`, `${car.brand} ${car.model} 보조금 2026`, `${car.model} 국비`],
@@ -36,6 +37,14 @@ export default async function CarPage({ params }: { params: Promise<{ slug: stri
 
   return (
     <>
+      <JsonLd
+        data={webPageJsonLd({
+          name: `${carName(car)} 보조금 2026`,
+          description: `${carName(car)} 2026년 국비 보조금과 시·도별 지방비 합산 예상액`,
+          path: `/car/${slug}`,
+          dateModified: local.updatedAt,
+        })}
+      />
       <Breadcrumb items={[{ name: "차종별 국비", path: "/car" }, { name: `${car.brand} ${car.model}`, path: `/car/${slug}` }]} />
       <div className="flex items-start justify-between gap-6">
         <div>

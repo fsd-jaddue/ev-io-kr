@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Breadcrumb from "@/components/Breadcrumb";
 import AdSlot from "@/components/AdSlot";
-import { pageMetadata } from "@/lib/seo";
+import { itemListJsonLd, pageMetadata } from "@/lib/seo";
+import JsonLd from "@/components/JsonLd";
 import { CARS, CARS_SNAPSHOT, NATIONAL_MAX, carName } from "@/data/cars";
 import { EV_PORTAL } from "@/lib/ev/parse";
 import { CarArt } from "@/components/illustrations";
@@ -20,6 +21,7 @@ export default function CarIndexPage() {
   const unknown = CARS.filter((c) => c.national === null);
   return (
     <>
+      <JsonLd data={itemListJsonLd("2026 차종별 전기차 국비 보조금", [...known, ...unknown].map((c) => ({ name: `${carName(c)} 보조금`, path: `/car/${c.slug}` })))} />
       <Breadcrumb items={[{ name: "차종별 국비", path: "/car" }]} />
       <div className="flex items-start justify-between gap-6">
         <div>

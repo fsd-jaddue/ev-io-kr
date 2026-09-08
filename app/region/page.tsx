@@ -4,7 +4,8 @@ import Breadcrumb from "@/components/Breadcrumb";
 import SidoGrid from "@/components/SidoGrid";
 import { getLocalPriceData } from "@/lib/ev/getData";
 import { summarizeBySido } from "@/lib/ev/summary";
-import { pageMetadata } from "@/lib/seo";
+import { itemListJsonLd, pageMetadata } from "@/lib/seo";
+import JsonLd from "@/components/JsonLd";
 import { NATIONAL_MAX } from "@/data/cars";
 import { RegionArt } from "@/components/illustrations";
 
@@ -23,6 +24,7 @@ export default async function RegionIndexPage() {
 
   return (
     <>
+      <JsonLd data={itemListJsonLd("시·도별 전기차 보조금", summary.map((s) => ({ name: `${s.name} 전기차 보조금`, path: `/region/${s.slug}` })))} />
       <Breadcrumb items={[{ name: "지역별 보조금", path: "/region" }]} />
       <div className="flex items-start justify-between gap-6">
         <div>
