@@ -13,6 +13,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 concurrency:
   group: snapshot
@@ -56,17 +57,30 @@ jobs:
           if-no-files-found: ignore
           retention-days: 3
 
+      # 커밋 전에 직전 값(HEAD)과 비교해 의미 있는 변경만 보고서로 만든다
+      - name: Detect material changes
+        id: diff
+        run: npx tsx scripts/snapshot-diff.ts --base HEAD --out snapshot-diff.md
+
       - name: Commit updated snapshot
         run: |
           git config user.name "ev-snapshot-bot"
           git config user.email "eviokr@icloud.com"
-          git add data/snapshot/remain.json data/snapshot/local-price.json
+          git add data/snapshot/remain.json data/snapshot/local-price.json data/snapshot/cars.json
           if git diff --cached --quiet; then
             echo "no changes"
             exit 0
           fi
           git commit -m "chore(snapshot): refresh ev.or.kr data $(date -u +'%Y-%m-%dT%H:%MZ')"
           git push
+
+      - name: Open issue for material changes
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create data-change --color 0E8A16 --description "수집값(지방비·공고·국비)이 바뀌어 콘텐츠 확인이 필요함" --force
+          gh issue create --title "$(cat snapshot-diff-title.txt)" --body-file snapshot-diff.md --label data-change
 
       - name: Fail job if fetch failed
         if: steps.fetch.outcome == 'failure'

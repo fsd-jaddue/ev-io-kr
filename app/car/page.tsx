@@ -3,7 +3,7 @@ import Link from "next/link";
 import Breadcrumb from "@/components/Breadcrumb";
 import AdSlot from "@/components/AdSlot";
 import { pageMetadata } from "@/lib/seo";
-import { CARS, NATIONAL_MAX, carName } from "@/data/cars";
+import { CARS, CARS_SNAPSHOT, NATIONAL_MAX, carName } from "@/data/cars";
 import { EV_PORTAL } from "@/lib/ev/parse";
 import { CarArt } from "@/components/illustrations";
 
@@ -93,6 +93,40 @@ export default function CarIndexPage() {
           ))}
         </ul>
       </section>
+
+      {CARS_SNAPSHOT.rows.length > 0 && (
+        <section className="mt-10">
+          <h2 className="text-xl font-bold text-slate-900">누리집 등록 승용 전기차 국비 전체 목록 ({CARS_SNAPSHOT.rows.length}종)</h2>
+          <p className="mt-1 text-sm text-slate-500">
+            무공해차 통합누리집 &lsquo;지자체별 차종·모델 보조금&rsquo;에서 {CARS_SNAPSHOT.updatedAt} 수집한 일반승용 모델별 국비입니다. 지방비는 거주 지역에 따라
+            달라지므로 <Link href="/calculator" className="text-emerald-700 underline">계산기</Link>에서 지역을 골라 확인하세요. 단위: 만원.
+          </p>
+          <div className="table-wrap mt-3">
+            <table className="w-full text-sm">
+              <thead className="bg-slate-50 text-left text-slate-700">
+                <tr>
+                  <th className="px-3 py-2 font-semibold">제조사</th>
+                  <th className="px-3 py-2 font-semibold">모델</th>
+                  <th className="px-3 py-2 text-right font-semibold">국비</th>
+                  <th className="hidden px-3 py-2 text-right font-semibold md:table-cell">전환지원금(국비)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[...CARS_SNAPSHOT.rows]
+                  .sort((a, b) => a.maker.localeCompare(b.maker, "ko") || (b.national ?? 0) - (a.national ?? 0))
+                  .map((r) => (
+                    <tr key={`${r.maker}-${r.model}`} className="border-t border-slate-100">
+                      <td className="px-3 py-2 text-slate-600">{r.maker}</td>
+                      <td className="px-3 py-2 font-medium text-slate-900">{r.model}</td>
+                      <td className="px-3 py-2 text-right font-semibold tabular-nums text-emerald-700">{r.national === null ? "-" : r.national.toLocaleString()}</td>
+                      <td className="hidden px-3 py-2 text-right tabular-nums text-slate-600 md:table-cell">{r.conversionNational === null ? "-" : r.conversionNational}</td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
 
       <section className="prose-ev mt-10 max-w-3xl">
         <h2>국비가 차종마다 다른 이유</h2>

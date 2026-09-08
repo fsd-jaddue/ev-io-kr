@@ -1,0 +1,58 @@
+name: Watch policy notices
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 매일 00:30 UTC = KST 09:30
+    - cron: "30 0 * * *"
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: notices
+  cancel-in-progress: false
+
+jobs:
+  notices:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npx playwright install --with-deps chromium
+
+      - name: Scan 환경부 보도자료 · 누리집 공지
+        id: scan
+        run: npm run watch:notices
+        timeout-minutes: 6
+
+      - name: Commit seen list
+        run: |
+          git config user.name "ev-snapshot-bot"
+          git config user.email "eviokr@icloud.com"
+          git add data/snapshot/notices.json
+          if git diff --cached --quiet; then
+            echo "no changes"
+            exit 0
+          fi
+          git commit -m "chore(notices): update seen policy notices $(date -u +'%Y-%m-%dT%H:%MZ')"
+          git push
+
+      - name: Open issue for new notices
+        if: steps.scan.outputs.found == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create policy-notice --color D93F0B --description "환경부·누리집에 보조금 정책 관련 새 글이 올라옴" --force
+          gh issue create --title "$(cat notices-new-title.txt)" --body-file notices-new.md --label policy-notice

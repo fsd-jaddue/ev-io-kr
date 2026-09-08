@@ -1,12 +1,15 @@
-import type { Car } from "@/lib/ev/types";
+import type { Car, CarsSnapshot } from "@/lib/ev/types";
+import carsSnapshot from "@/data/snapshot/cars.json";
+import { applyCollectedNational } from "@/lib/ev/carsOverlay";
 
 /**
  * 2026년 차종별 국비 보조금(승용). 환경부 확정 공고 및 언론 보도 기준.
  * null 은 트림별 편차가 크거나 확정치 확인이 필요한 경우입니다.
  */
-export const CARS: Car[] = [
+const CARS_BASE: Car[] = [
   {
     slug: "ioniq6-long-range",
+    evMatch: "아이오닉6롱레인지(?!.*n$)",
     brand: "현대",
     model: "아이오닉 6",
     trim: "롱레인지 (18·20인치, AWD 포함)",
@@ -18,6 +21,7 @@ export const CARS: Car[] = [
   },
   {
     slug: "ioniq5-long-range",
+    evMatch: "아이오닉5롱레인지2wd",
     brand: "현대",
     model: "아이오닉 5",
     trim: "롱레인지 2WD",
@@ -28,6 +32,7 @@ export const CARS: Car[] = [
   },
   {
     slug: "kona-electric-long-range",
+    evMatch: "코나.*롱레인지",
     brand: "현대",
     model: "코나 일렉트릭",
     trim: "롱레인지",
@@ -38,6 +43,7 @@ export const CARS: Car[] = [
   },
   {
     slug: "ev6-long-range",
+    evMatch: "ev6롱레인지2wd19",
     brand: "기아",
     model: "더 뉴 EV6",
     trim: "롱레인지 2WD 19인치",
@@ -48,6 +54,7 @@ export const CARS: Car[] = [
   },
   {
     slug: "ev3-long-range",
+    evMatch: "ev3롱레인지",
     brand: "기아",
     model: "EV3",
     trim: "롱레인지",
@@ -58,6 +65,7 @@ export const CARS: Car[] = [
   },
   {
     slug: "ev4",
+    evMatch: "ev4롱레인지",
     brand: "기아",
     model: "EV4",
     trim: "롱레인지",
@@ -69,6 +77,7 @@ export const CARS: Car[] = [
   },
   {
     slug: "ev5",
+    evMatch: "ev5롱레인지",
     brand: "기아",
     model: "EV5",
     trim: "롱레인지",
@@ -79,6 +88,7 @@ export const CARS: Car[] = [
   },
   {
     slug: "ev9",
+    evMatch: "ev9롱레인지2wd",
     brand: "기아",
     model: "EV9",
     trim: "롱레인지 2WD",
@@ -90,6 +100,7 @@ export const CARS: Car[] = [
   },
   {
     slug: "ioniq9",
+    evMatch: "아이오닉9롱레인지2wd",
     brand: "현대",
     model: "아이오닉 9",
     trim: "롱레인지 2WD",
@@ -101,6 +112,7 @@ export const CARS: Car[] = [
   },
   {
     slug: "casper-electric",
+    evMatch: "캐스퍼.*롱레인지",
     brand: "현대",
     model: "캐스퍼 일렉트릭",
     trim: "롱레인지",
@@ -112,6 +124,7 @@ export const CARS: Car[] = [
   },
   {
     slug: "ray-ev",
+    evMatch: "레이ev.*4인승",
     brand: "기아",
     model: "레이 EV",
     trim: "4인승",
@@ -123,6 +136,7 @@ export const CARS: Car[] = [
   },
   {
     slug: "niro-ev",
+    evMatch: "니로ev.*롱레인지",
     brand: "기아",
     model: "더 뉴 니로 EV",
     trim: "롱레인지",
@@ -133,6 +147,7 @@ export const CARS: Car[] = [
   },
   {
     slug: "model3-premium-long-range",
+    evMatch: "model3longrangerwd|모델3롱레인지rwd",
     brand: "테슬라",
     model: "모델 3",
     trim: "프리미엄 롱레인지 RWD",
@@ -144,6 +159,7 @@ export const CARS: Car[] = [
   },
   {
     slug: "model3-standard",
+    evMatch: "model3rwd$|model3standard|모델3rwd$|모델3스탠다드",
     brand: "테슬라",
     model: "모델 3",
     trim: "스탠다드 RWD",
@@ -154,6 +170,7 @@ export const CARS: Car[] = [
   },
   {
     slug: "modely-premium-long-range",
+    evMatch: "modely(premium)?longrange(rwd)?$|모델y(프리미엄)?롱레인지(rwd)?$",
     brand: "테슬라",
     model: "모델 Y",
     trim: "프리미엄 롱레인지",
@@ -165,6 +182,7 @@ export const CARS: Car[] = [
   },
   {
     slug: "polestar4",
+    evMatch: "polestar4.*single|폴스타4.*싱글",
     brand: "폴스타",
     model: "폴스타 4",
     trim: "롱레인지 싱글모터",
@@ -175,6 +193,7 @@ export const CARS: Car[] = [
   },
   {
     slug: "byd-atto3",
+    evMatch: "atto3|아토3",
     brand: "BYD",
     model: "아토 3",
     trim: "기본형",
@@ -186,6 +205,7 @@ export const CARS: Car[] = [
   },
   {
     slug: "volvo-ex30",
+    evMatch: "ex30.*core.*single|ex30.*코어",
     brand: "볼보",
     model: "EX30",
     trim: "코어 싱글모터",
@@ -196,6 +216,7 @@ export const CARS: Car[] = [
   },
   {
     slug: "torres-evx",
+    evMatch: "토레스evx.*2wd|torresevx",
     brand: "KGM",
     model: "토레스 EVX",
     trim: "2WD",
@@ -206,6 +227,7 @@ export const CARS: Car[] = [
   },
   {
     slug: "musso-ev",
+    evMatch: "무쏘ev|mussoev",
     brand: "KGM",
     model: "무쏘 EV",
     trim: "2WD",
@@ -218,6 +240,11 @@ export const CARS: Car[] = [
 ];
 
 export const NATIONAL_MAX = { large: 580, small: 530, conversion: 100 } as const;
+
+/** 누리집 수집 국비(data/snapshot/cars.json)를 덮어씌운 목록. 매칭·검증 규칙은 lib/ev/carsOverlay.ts */
+export const CARS: Car[] = applyCollectedNational(CARS_BASE, carsSnapshot as CarsSnapshot);
+/** 누리집 모델별 국비 수집 스냅샷 (전체 목록·수집일) */
+export const CARS_SNAPSHOT = carsSnapshot as CarsSnapshot;
 
 export function getCar(slug: string): Car | undefined {
   return CARS.find((c) => c.slug === slug);

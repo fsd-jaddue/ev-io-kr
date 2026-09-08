@@ -1,6 +1,6 @@
 /**
  * 무공해차 통합누리집(ev.or.kr)에서 지자체별 현황과 차종·모델 보조금을 수집해
- * data/snapshot/remain.json, data/snapshot/local-price.json 을 갱신한다.
+ * data/snapshot/remain.json, data/snapshot/local-price.json, data/snapshot/cars.json(모델별 국비) 을 갱신한다.
  *
  * ev.or.kr 특성
  * - 봇 차단용 자바스크립트 검사(pnp4web)를 거쳐야 실제 페이지가 나오고, AJAX 본문은 암호화되어 있다.
@@ -17,7 +17,8 @@ import { writeFileSync, readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { chromium, type Browser, type Page } from "playwright";
 import { EV_PORTAL } from "../lib/ev/portal";
-import { agRowsToLocalPrice, agRowsToRemain, type AgGridData } from "../lib/ev/aggrid";
+import { agRowsToCarSubsidy, agRowsToLocalPrice, agRowsToRemain, type AgGridData } from "../lib/ev/aggrid";
+import type { CarSubsidyRow } from "../lib/ev/types";
 
 const ROOT = resolve(__dirname, "..");
 const SNAP = resolve(ROOT, "data/snapshot");
@@ -237,6 +238,9 @@ async function collectLocalPrice(page: Page) {
   );
   log(`local-price accordion items: ${items.length}; first: ${JSON.stringify(items.slice(0, 3))}`);
   const out: ReturnType<typeof agRowsToLocalPrice> = [];
+  /** 모델별 국비(전국 공통) — 첫 지자체(서울) 그리드에서 한 번만 읽는다 */
+  let carRows: CarSubsidyRow[] = [];
+  let carRegion = "";
   let logged = 0;
   for (const it of items) {
     if (elapsed() > TOTAL_BUDGET_MS * 0.92) {
@@ -262,7 +266,13 @@ async function collectLocalPrice(page: Page) {
         if (rowsInItem > 0) break;
         await page.waitForTimeout(200);
       }
-      const grid = await scrapeAgGrid(page, itemSel, 8);
+      // 첫 지자체는 모델별 국비 목록까지 전부 필요하므로 스크롤 한도를 넉넉히 준다
+      const grid = await scrapeAgGrid(page, itemSel, carRows.length === 0 ? 60 : 8);
+      if (carRows.length === 0) {
+        carRows = agRowsToCarSubsidy(grid);
+        carRegion = it.district || it.city;
+        log(`  [${it.city} ${it.district}] car subsidy rows: ${carRows.length}; sample: ${JSON.stringify(carRows.slice(0, 3))}`);
+      }
       if (logged < 3) {
         log(`  [${it.city} ${it.district}] click=${clicked} rows=${grid.rows.length} headers: ${JSON.stringify(grid.headers)} sample: ${JSON.stringify(grid.rows.slice(0, 2))}`);
         logged++;
@@ -284,7 +294,7 @@ async function collectLocalPrice(page: Page) {
       log(`  [${it.city} ${it.district}] failed: ${(e as Error).message.split("\n")[0]}`);
     }
   }
-  return out;
+  return { rows: out, carRows, carRegion };
 }
 
 async function main() {
@@ -321,12 +331,17 @@ async function main() {
     if (elapsed() < TOTAL_BUDGET_MS * 0.5) {
       try {
         const page = await openPage(browser, EV_PORTAL.localPrice, "local-price");
-        const rows = await collectLocalPrice(page);
+        const { rows, carRows, carRegion } = await collectLocalPrice(page);
         log(`local-price rows: ${rows.length}; sample: ${JSON.stringify(rows.slice(0, 3))}`);
         if (rows.length > 0) {
           save("local-price.json", { ...readJson("local-price.json"), updatedAt: now.slice(0, 10), rows });
         } else {
           await dumpDebug(page, "local-price");
+        }
+        // 모델별 국비: 20행 이상 읽혔을 때만 갱신 (부분 수집으로 목록이 줄어드는 것을 방지)
+        log(`car subsidy rows: ${carRows.length} (from ${carRegion})`);
+        if (carRows.length >= 20) {
+          save("cars.json", { ...readJson("cars.json"), updatedAt: now.slice(0, 10), region: carRegion, rows: carRows });
         }
         await page.context().close();
       } catch (e) {

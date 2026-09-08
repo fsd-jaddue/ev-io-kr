@@ -7,7 +7,7 @@
  * 지역 셀 텍스트 예: "즐겨찾기 서울 마감 서울특별시", "즐겨찾기 경기 수원시" (버튼 라벨 + 시도 약칭 + 배지 + 지역명)
  * 같은 지역이 공고종류(본공고/추경n차)별로 여러 행 나오며 대수는 누적 동일값이다.
  */
-import type { LocalPriceRow, RemainRow } from "./types";
+import type { CarSubsidyRow, LocalPriceRow, RemainRow } from "./types";
 import { getSidoByShort } from "@/data/regions";
 
 export interface AgGridData {
@@ -147,4 +147,46 @@ export function agRowsToLocalPrice(grid: AgGridData, sidoText: string, regionTex
   const region = regionText.replace(/\s/g, "");
   const isWholeSido = !region || region === sido.name || region === sido.short || getSidoByShort(region)?.slug === sido.slug;
   return [{ sido: sido.slug, sigungu: isWholeSido ? "전체" : region, amount: max }];
+}
+
+/**
+ * 차종·모델 그리드(지자체 1곳) → 모델별 국비 목록. 2026-09 열: 차종/차급(carNm) | 제조사(maker) | 모델(model) | 국비(gov)
+ *   | 지방비(local) | 소계(total) | 전환지원금(국비)(exGov) | 전환지원금(지방비)(exLocal)
+ * 승용 일반승용 행만 남긴다(택시·법인 제외). 국비는 전국 공통이므로 한 지자체만 읽으면 된다.
+ */
+export function agRowsToCarSubsidy(grid: AgGridData): CarSubsidyRow[] {
+  const H = grid.headers;
+  const cGov = findCol(H, [/^국비$/, /국비|국고/]);
+  const cModel = findCol(H, [/^모델$/, /모델|차량명|차명/]);
+  if (!cGov || !cModel) return [];
+  const cClass = findCol(H, [/^차급$/, /^차종$/, /차종\/차급/, /^구분$/, /차급|차종/]);
+  const cMaker = findCol(H, [/^제조사$/, /제조사|브랜드|메이커/]);
+  const cLocal = findCol(H, [/^지방비$/, /^지방비/]);
+  const cExGov = findCol(H, [/전환지원금\(국비\)/, /전환.*국비/]);
+  const classOf = (r: Record<string, string>) => (cClass ? r[cClass] ?? "" : "").replace(/\s/g, "");
+  const hasGeneral = grid.rows.some((r) => /일반승용/.test(classOf(r)));
+  const out: CarSubsidyRow[] = [];
+  const seen = new Set<string>();
+  for (const r of grid.rows) {
+    const cls = classOf(r);
+    if (cClass && cls) {
+      if (!/승용/.test(cls)) continue;
+      if (hasGeneral ? !/일반승용/.test(cls) : /택시|법인|영업|초소형/.test(cls)) continue;
+    }
+    const model = (r[cModel] ?? "").replace(/\s+/g, " ").trim();
+    if (!model) continue;
+    const maker = cMaker ? (r[cMaker] ?? "").replace(/\s+/g, " ").trim() : "";
+    const key = `${maker}|${model}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({
+      carClass: cClass ? (r[cClass] ?? "").replace(/\s+/g, " ").trim() : "",
+      maker,
+      model,
+      national: toNum(r[cGov]),
+      local: cLocal ? toNum(r[cLocal]) : null,
+      conversionNational: cExGov ? toNum(r[cExGov]) : null,
+    });
+  }
+  return out;
 }

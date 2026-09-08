@@ -11,7 +11,7 @@
    | `NEXT_PUBLIC_ADSENSE_CLIENT` | (비움) | 비우면 코드 기본값 `ca-pub-9408914409364609` 사용. 끄려면 `off` |
    | `NEXT_PUBLIC_ADSENSE_SLOT_*` | (비움) | 승인 후 광고 단위 ID |
 4. **Deploy**. 빌드 로그에 `[ev] live fetch failed, using snapshot` 가 찍히면 빌드 환경에서 ev.or.kr 접근이 막힌 것이고, 런타임(ISR)에서 다시 시도하므로 정상.
-5. 배포 후 `https://<project>.vercel.app/region/seoul` 을 열어 표 하단 배지가 **"누리집 수집"** 이면 실시간 수집 성공, **"스냅샷"** 이면 수집 실패(10분 뒤 재시도, 성공 시 1시간 캐시). 계속 스냅샷이면 `https://<도메인>/api/ev-status` 를 열어 원인을 확인한다.
+5. 배포 후 `https://<project>.vercel.app/region/seoul` 을 열어 표 하단 배지가 **"누리집 수집"** 이면 실시간 수집 성공, **"스냅샷"** 이면 수집 실패(10분 뒤 재시도, 성공 시 1시간 캐시). 계속 스냅샷이면 GitHub Actions 수집 워크플로 로그(Actions → Refresh ev.or.kr snapshot)에서 원인을 확인한다. (Vercel 런타임 수집은 ev.or.kr 봇 검사 때문에 항상 실패하는 것이 확인돼 진단 라우트 `/api/ev-status` 는 2026-09-08 제거했다.)
    - `attempts[].status` 가 403 또는 접속 오류 → ev.or.kr 가 Vercel IP를 차단. 국내 서버·PC에서 `npm run fetch:snapshot` 으로 스냅샷을 주기적으로 갱신하는 방식으로 전환.
    - `status` 200 인데 `parsedRows` 0 → 표 구조가 다름. `tables[].headers` 문구를 보고 `lib/ev/parse.ts` 의 `classifyHeader` 키워드를 맞춘다.
    - 접수·출고·잔여 표는 브라우저에서 `/api/remain` 을 호출해 그리므로, 정적 페이지 재빌드 없이 서버 캐시(1시간)만 갱신되면 바로 반영된다.
@@ -85,6 +85,7 @@ npm run fetch:snapshot
 
 ## 7. 자료 갱신 루틴
 
-- 매년 1~2월: 환경부 지침 확정 후 `data/cars.ts` 국비, `data/snapshot/local-price.ts` 지방비, 가이드 본문의 연도·금액 갱신.
-- 수시: `npm run fetch:snapshot` 으로 접수·출고·잔여 현황 스냅샷 갱신 (Vercel 런타임 수집이 정상이면 생략 가능).
-- 공고 변경 제보가 오면 해당 시·군·구 값을 `local-price.ts` 에서 수정 후 `LOCAL_PRICE_UPDATED_AT` 갱신.
+- **자동**: 매시간 수집 워크플로가 접수·출고·잔여, 시·군·구 지방비, 누리집 모델별 국비(`cars.json`)를 갱신·배포한다. 지방비 금액, 공고 물량·종류, 소진/재개, 국비가 바뀌면 GitHub Issue(`data-change`)가 열린다. 매일 09:30 정책 공지 감시가 환경부 보도자료·누리집 공지의 보조금 관련 새 글을 Issue(`policy-notice`)로 올린다. Issue 알림은 GitHub 계정 이메일로 온다(Settings → Notifications 에서 확인).
+- **사람이 하는 일**: Issue 를 보고 가이드 본문·시·도 소개문·차종 설명이 새 수치와 어긋나면 세션에서 갱신. `data-change` Issue 에 ⚠️/❌ 매칭 항목이 있으면 `data/cars.ts` 의 `evMatch` 를 보정.
+- 매년 1~2월: 환경부 지침 확정 후 `NATIONAL_MAX`(`data/cars.ts`), 가격 구간, 가이드 본문의 연도·금액, 인포그래픽(`scripts/gen-guide-figures.mjs`) 갱신.
+- 공고 변경 제보가 오면 수집값이 우선이므로 다음 수집을 기다리거나, 수집 실패 시 `local-price.ts` 를 수정 후 `LOCAL_PRICE_UPDATED_AT` 갱신.
