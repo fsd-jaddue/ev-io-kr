@@ -1,14 +1,25 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type ReactNode,
+} from "react";
 import type { RemainData } from "@/lib/ev/types";
-import { LEVEL_ORDER, nationalTotals, summarizeRemainBySido, type RemainTotals } from "@/lib/ev/remainSummary";
+import {
+  LEVEL_ORDER,
+  nationalTotals,
+  summarizeRemainBySido,
+  type RemainTotals,
+} from "@/lib/ev/remainSummary";
 import EmptyRemainNotice from "./EmptyRemainNotice";
 import FreshnessBadge, { type RefreshState } from "./FreshnessBadge";
 import KoreaMap from "./KoreaMap";
 import MapLegend from "./MapLegend";
 import RegionPanel from "./RegionPanel";
-import TileMap from "./TileMap";
 import { CountUp } from "./useCountUp";
 
 interface Props {
@@ -25,7 +36,9 @@ interface Props {
 export default function RemainHero({ initial, children }: Props) {
   const [data, setData] = useState<RemainData>(initial);
   const [refresh, setRefresh] = useState<RefreshState>("idle");
-  const [sel, setSel] = useState<{ sido: string | null; region?: string }>({ sido: null });
+  const [sel, setSel] = useState<{ sido: string | null; region?: string }>({
+    sido: null,
+  });
   const panelRef = useRef<HTMLElement>(null);
 
   const summary = useMemo(() => summarizeRemainBySido(data.rows), [data.rows]);
@@ -36,11 +49,15 @@ export default function RemainHero({ initial, children }: Props) {
     const ctrl = new AbortController();
     setRefresh("loading");
     fetch("/api/remain", { signal: ctrl.signal })
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+      .then((r) =>
+        r.ok ? r.json() : Promise.reject(new Error(String(r.status))),
+      )
       .then((d: RemainData) => {
         setData((prev) => {
           if (!d.rows?.length) return prev;
-          const newer = d.source === "live" || Date.parse(d.fetchedAt) >= Date.parse(prev.fetchedAt);
+          const newer =
+            d.source === "live" ||
+            Date.parse(d.fetchedAt) >= Date.parse(prev.fetchedAt);
           return newer ? d : prev;
         });
         setRefresh("done");
@@ -53,15 +70,19 @@ export default function RemainHero({ initial, children }: Props) {
 
   const select = (sido: string | null, region?: string) => {
     setSel({ sido, region });
-    if (!sido) return;
-    // 모바일에서만: 패널이 화면 밖이면 패널 상단으로 스크롤 (사용자 조작 직후에만 호출된다)
+  };
+
+  /** 모바일 팝업의 "시·군·구별 보기": 아래 도킹 패널로 스크롤 (사용자 조작 직후에만 호출된다) */
+  const drillDown = () => {
     const el = panelRef.current;
-    if (!el || window.innerWidth >= 768) return;
-    const rect = el.getBoundingClientRect();
-    if (rect.top > window.innerHeight * 0.6 || rect.top < 0) {
-      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      el.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
-    }
+    if (!el) return;
+    const reduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    el.scrollIntoView({
+      behavior: reduced ? "auto" : "smooth",
+      block: "start",
+    });
   };
 
   const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
@@ -78,16 +99,34 @@ export default function RemainHero({ initial, children }: Props) {
           <div>
             {children}
             {!empty && <KpiStrip totals={totals} />}
-            <FreshnessBadge variant="dark" source={data.source} fetchedAt={data.fetchedAt} refresh={refresh} className="mt-4" />
+            <FreshnessBadge
+              variant="dark"
+              source={data.source}
+              fetchedAt={data.fetchedAt}
+              refresh={refresh}
+              className="mt-4"
+            />
           </div>
           <div className="rounded-2xl bg-emerald-950/25 p-3 ring-1 ring-white/10 md:p-4">
             {empty ? (
               <EmptyRemainNotice variant="dark" />
             ) : (
               <>
-                <KoreaMap summary={summary} selected={sel.sido} onSelect={select} className="hidden md:block" />
-                <TileMap summary={summary} selected={sel.sido} onSelect={select} className="md:hidden" />
-                <MapLegend variant="dark" className="mt-3" levels={summary.some((s) => s.level === "unknown") ? LEVEL_ORDER : undefined} />
+                <KoreaMap
+                  summary={summary}
+                  selected={sel.sido}
+                  onSelect={select}
+                  onDrillDown={drillDown}
+                />
+                <MapLegend
+                  variant="dark"
+                  className="mt-3"
+                  levels={
+                    summary.some((s) => s.level === "unknown")
+                      ? LEVEL_ORDER
+                      : undefined
+                  }
+                />
               </>
             )}
           </div>
@@ -119,13 +158,21 @@ function KpiStrip({ totals }: { totals: RemainTotals }) {
   return (
     <div className="mt-6">
       <p className="text-xs font-medium text-emerald-100">
-        전국 승용 접수·출고·잔여 <span className="text-emerald-200/80">(단위: 대)</span>
+        전국 승용 접수·출고·잔여{" "}
+        <span className="text-emerald-200/80">(단위: 대)</span>
       </p>
       <dl className="mt-2 grid grid-cols-4 gap-1.5 sm:gap-2">
         {items.map(([label, v]) => (
-          <div key={label} className="rounded-lg bg-white/10 px-1.5 py-2 ring-1 ring-white/15 sm:px-3">
-            <dt className="text-[11px] font-medium text-emerald-100">{label}</dt>
-            <dd className={`whitespace-nowrap text-xs font-black tabular-nums sm:text-lg ${label === "잔여" ? "text-emerald-200" : "text-white"}`}>
+          <div
+            key={label}
+            className="rounded-lg bg-white/10 px-1.5 py-2 ring-1 ring-white/15 sm:px-3"
+          >
+            <dt className="text-[11px] font-medium text-emerald-100">
+              {label}
+            </dt>
+            <dd
+              className={`whitespace-nowrap text-xs font-black tabular-nums sm:text-lg ${label === "잔여" ? "text-emerald-200" : "text-white"}`}
+            >
               <CountUp value={v} />
             </dd>
           </div>
