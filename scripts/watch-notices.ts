@@ -60,6 +60,8 @@ export interface ExtractResult {
   anchors: number;
   keywordHits: number;
   samples: string[];
+  /** 진단용: 게시글형 링크(키워드 무관) 샘플 — 목록 구조 파악용 */
+  articleSamples: string[];
 }
 
 /**
@@ -72,12 +74,16 @@ export function extractCandidates(html: string, baseUrl: string): ExtractResult 
   const items: { title: string; href: string }[] = [];
   const seen = new Set<string>();
   const samples: string[] = [];
+  const articleSamples: string[] = [];
   let keywordHits = 0;
   const anchors = $("a[href]").length;
   $("a[href]").each((_, a) => {
     const title = $(a).text().replace(/\s+/g, " ").trim();
     const raw = ($(a).attr("href") ?? "").trim();
     if (title.length < 6 || !raw || /^mailto:/i.test(raw)) return;
+    if (articleSamples.length < 5 && title.length >= 10 && (ARTICLE_HREF.test(raw) || /^javascript:/i.test(raw)) && $(a).closest(CHROME_SELECTOR).length === 0) {
+      articleSamples.push(`${title.slice(0, 40)} | ${raw.slice(0, 80)}`);
+    }
     if (!STRONG.test(title) || !(WEAK.test(title) || /보조금/.test(title))) return;
     keywordHits++;
     if (samples.length < 6) samples.push(`${title.slice(0, 40)} | ${raw.slice(0, 80)}`);
@@ -95,7 +101,7 @@ export function extractCandidates(html: string, baseUrl: string): ExtractResult 
     seen.add(key);
     items.push({ title, href });
   });
-  return { items, anchors, keywordHits, samples };
+  return { items, anchors, keywordHits, samples, articleSamples };
 }
 
 function readState(): State {
@@ -159,10 +165,11 @@ async function main() {
     for (const src of SOURCES) {
       try {
         const { html, url } = await loadHtml(browser, src);
-        const { items: cands, anchors, keywordHits, samples } = extractCandidates(html, url);
+        const { items: cands, anchors, keywordHits, samples, articleSamples } = extractCandidates(html, url);
         const seeded = state.items.some((it) => it.source === src.id);
         log(`${src.id}: ${cands.length} candidate links at ${url} (anchors ${anchors}, keyword titles ${keywordHits})${seeded ? "" : " (first run — seeding only)"}`);
-        for (const smp of samples) log(`  sample: ${smp}`);
+        for (const smp of samples) log(`  keyword sample: ${smp}`);
+        for (const smp of articleSamples) log(`  article-link sample: ${smp}`);
         for (const c of cands.slice(0, 40)) {
           const key = `${src.id}|${c.title}|${c.href}`;
           if (known.has(key)) continue;
