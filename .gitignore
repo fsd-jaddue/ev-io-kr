@@ -46,3 +46,9 @@ data/snapshot/*.debug.png
 
 # keep example env
 !.env.example
+
+# 워크플로가 만드는 변경 보고서 (Issue 본문)
+snapshot-diff.md
+snapshot-diff-title.txt
+notices-new.md
+notices-new-title.txt

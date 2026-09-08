@@ -64,4 +64,35 @@ export interface Car {
   /** 1회 충전 주행거리(km) 참고 */
   range?: number;
   note?: string;
+  /**
+   * 누리집 차종·모델 그리드의 "제조사+모델" 문자열(공백 제거·소문자)에 맞출 정규식.
+   * 맞는 행이 1개 이상이고 국비가 모두 같을 때만 수집값으로 national 을 덮어쓴다(lib/ev/carsOverlay.ts).
+   */
+  evMatch?: string;
+  /** national 의 출처: 수기(manual) / 누리집 수집값(collected) */
+  nationalSource?: "manual" | "collected";
+  /** 수집값을 적용했을 때 매칭된 누리집 모델명 */
+  evModels?: string[];
+}
+
+/** 무공해차 통합누리집 "지자체별 차종·모델 보조금" 그리드 1행(승용 일반승용). 국비는 전국 공통이라 서울 1곳에서 수집 */
+export interface CarSubsidyRow {
+  /** 차종/차급 (예: "전기승용 일반승용") */
+  carClass: string;
+  maker: string;
+  model: string;
+  /** 국비 (만원) */
+  national: number | null;
+  /** 수집 지자체의 지방비 (만원, 참고용) */
+  local: number | null;
+  /** 전환지원금 국비 (만원) */
+  conversionNational: number | null;
+}
+
+export interface CarsSnapshot {
+  /** YYYY-MM-DD */
+  updatedAt: string;
+  /** 수집한 지자체 (예: "서울특별시") */
+  region: string;
+  rows: CarSubsidyRow[];
 }

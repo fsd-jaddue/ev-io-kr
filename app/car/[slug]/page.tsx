@@ -51,7 +51,15 @@ export default async function CarPage({ params }: { params: Promise<{ slug: stri
       </div>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-3">
-        <Card label="2026 국비" value={car.national === null ? "트림별 확인" : `${car.national}만원`} sub={`상한 ${car.segment === "중대형" ? NATIONAL_MAX.large : NATIONAL_MAX.small}만원`} />
+        <Card
+          label="2026 국비"
+          value={car.national === null ? "트림별 확인" : `${car.national}만원`}
+          sub={
+            car.nationalSource === "collected" && car.evModels?.length
+              ? `누리집 수집값 · ${car.evModels.join(", ")}`
+              : `상한 ${car.segment === "중대형" ? NATIONAL_MAX.large : NATIONAL_MAX.small}만원`
+          }
+        />
         <Card label="전환지원금 포함" value={car.national === null ? "-" : `${car.national + NATIONAL_MAX.conversion}만원`} sub="내연기관차 처분 시" />
         <Card label="가격 구간" value={car.priceBand} sub="5,300만원 미만 100% · 8,500만원 미만 50%" />
       </div>

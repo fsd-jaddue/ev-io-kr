@@ -22,7 +22,7 @@
 ```
 app/                 라우트. /, /region, /region/[sido], /region/[sido]/[sigungu](한글 slug), /car, /car/[slug],
                      /calculator, /guide, /guide/[slug], /about /privacy /terms /disclaimer /contact,
-                     sitemap.ts robots.ts ads.txt/route.ts, api/remain, api/ev-status
+                     sitemap.ts robots.ts ads.txt/route.ts feed.xml/route.ts, api/remain
 components/          Header Footer MobileNav AdSlot Breadcrumb JsonLd SidoGrid LocalPriceTable RemainTable(client)
                      SourceNote Calculator(client) GuideCard illustrations.tsx(원본 SVG)
 components/remain/   홈 히어로 잔여 현황 보드(전부 client). RemainHero(상태 소유·fetch) KoreaMap(SVG 지도, PC·모바일 공용 + 모바일 탭 팝업)
@@ -35,18 +35,24 @@ data/regions.ts      17개 시·도 + 시·군·구 목록, slug 헬퍼
 data/cars.ts         차종별 2026 국비 (null = 확정치 미확인)
 data/sido-intro.ts   시·도 소개 문단
 data/snapshot/       local-price.ts(지방비 취합값, 수기) · local-price.json(수집값, 우선) · remain.json(접수·출고·잔여 수집값)
+                     cars.json(누리집 모델별 국비 수집값) · notices.json(정책 공지 감시가 본 글 목록)
+lib/ev/carsOverlay.ts  data/cars.ts 수기 국비 위에 cars.json 수집값을 덮는 규칙(evMatch 정규식, 매칭 행 국비가 모두 같을 때만 적용)
 lib/ev/portal.ts     ev.or.kr URL 상수 (의존성 없음, 클라이언트 import 가능)
 lib/ev/parse.ts      cheerio 파서 (다단 헤더·rowspan 처리, 헤더 키워드 기반)
 lib/ev/getData.ts    서버 전용. 수집(unstable_cache 1h) → 실패 시 스냅샷. 지방비 데이터 로더
 lib/seo.ts lib/site.ts  메타데이터·JSON-LD 헬퍼, 사이트 상수·메뉴
-scripts/fetch-snapshot.ts        Playwright 수집 스크립트
+scripts/fetch-snapshot.ts        Playwright 수집 스크립트 (remain·local-price·cars.json)
+scripts/snapshot-diff.ts         커밋 전 직전 값과 비교해 지방비·공고·국비 변경만 보고서로 (→ GitHub Issue "data-change")
+scripts/watch-notices.ts         환경부 보도자료·누리집 공지에서 보조금 키워드 새 글 감지 (→ Issue "policy-notice")
 scripts/gen-guide-figures.mjs    가이드 인포그래픽 SVG 생성기
-.github/workflows/snapshot.yml   매시간(KST 06~23시) 수집 → JSON 커밋 → Vercel 자동 재배포
+.github/workflows/snapshot.yml   매시간(KST 06~23시) 수집 → 변경 감지 → JSON 커밋 → Vercel 자동 재배포 → 변경 시 Issue
+.github/workflows/notices.yml    매일 KST 09:30 정책 공지 감시 → 새 글 있으면 Issue
 ```
 
 ## 데이터 흐름과 핵심 결정
 - 지방비(시·군·구별 승용 최대액)는 `data/snapshot/local-price.ts`의 취합값이 기본이고, 수집 JSON에 행이 있으면 그것이 우선. 확인 안 된 곳은 `null` → 화면에 "공고 확인".
 - 접수·출고·잔여 대수는 **임의 값 절대 금지**. 수집값이 있을 때만 표시하고 없으면 ev.or.kr 링크만 보여준다. 표는 `RemainTable`(클라이언트)이 `/api/remain?sido=`를 호출해 그리므로 정적 페이지 재빌드와 무관하게 갱신된다.
+- **차종별 국비 자동 반영**(2026-09-08): `data/cars.ts`의 `CARS`는 수기 목록(`CARS_BASE`)에 `data/snapshot/cars.json`(누리집 서울 그리드의 일반승용 모델별 국비, 매시간 수집)을 `applyCollectedNational()`로 덮은 결과다. 각 차종의 `evMatch` 정규식이 "제조사+모델"(공백 제거·소문자)에 맞는 행이 1개 이상이고 그 국비가 모두 같을 때만 수집값을 쓰고(`nationalSource: "collected"`, `evModels`), 아니면 수기값 유지. 매칭 결과는 cars.json이 바뀐 회차의 Issue에 ✅/⚠️/❌로 첨부되니 그걸 보고 `evMatch`를 좁힌다. `/car`에는 수집 목록 전체 표가 붙는다.
 - 각 표에 기준 시각·출처 배지("누리집 수집" / "스냅샷")를 표시한다. 기준 시각은 `formatFetchedAt()`이 `2026.09.07 10:05` 형식(숫자만 조합)으로 만든다 — 로케일 오전/오후 표기는 Node(`AM`)와 Chrome(`오전`)이 달라 hydration 오류가 났던 이력이 있으니 로케일 문구를 SSR 텍스트에 쓰지 않는다.
 - **홈 히어로 = 잔여 현황 지도 보드**(2026-09-07). 배너 일러스트를 지도로 대체: `data/korea-map.ts`의 간략화 윤곽 지도(SVG; 두께 레이어+그림자+광택+세로 압축으로 입체감, 선택 시 블록이 떠오름)를 PC·모바일 공용으로 쓴다. 라벨은 PC=약칭+잔여 대수, 모바일=약칭만(CSS `md:` 토글, 둘 다 렌더해 hydration 안전). 모바일은 탭하면 지도 하단에 요약 팝업(잔여·공고·접수·출고·소진 지역 수, "시·군·구별 보기"로 패널 스크롤). **CSS 3D(rotateX/perspective)는 SVG 글자를 흐리게 만드니 쓰지 않는다.** 첫 페인트·SEO는 빌드 시 `getRemainSnapshot()`(동기 스냅샷, 라이브 시도 없음)으로 채우고, 마운트 후 `/api/remain`을 한 번 호출해 더 새로우면 교체한다. 지역 선택 → 아래 도킹 `RegionPanel`에서 시·군·구 타일(도) / 단일 공고 카드(특별·광역시·세종·제주) / `RemainTable embedded` 표로 드릴다운. 잔여 수준은 잔여/공고 기준 소진(≤0)·적음(<5%)·보통(5~15%)·여유(≥15%)·미수집 5단계이며 색은 마스크 재고 지도 관례(초록·노랑·주황·빨강). `RemainTable`은 `data`(재요청 생략)·`embedded`(표만) prop을 받는다.
 - 시·군·구 페이지 slug는 **한글 원문**(`sigunguSlug`, 공백만 제거)을 `generateStaticParams`에 넘긴다. 미리 퍼센트 인코딩하면 Next/Vercel이 한 번 더 인코딩해 프리렌더 경로가 이중 인코딩되고 실제 요청(/region/busan/중구)이 404가 난다(2026-09-07 수정). 링크·canonical·sitemap은 `sigunguPath()`로만 만든다.
@@ -55,14 +61,15 @@ scripts/gen-guide-figures.mjs    가이드 인포그래픽 SVG 생성기
 - 이미지는 전부 직접 그린 SVG(저작권 이슈 없음). 외부 스톡 이미지 사용 안 함. 사용자가 Pixabay 사진을 `public/images/photos/`에 넣어주면 배치할 수 있음.
 
 ## 데이터 수집 구조 (2026-09-03 완성)
-- **ev.or.kr는 일반 HTTP 요청에 봇 검사 페이지(pnp4web, 1MB JS)만 내려주고 AJAX 본문은 암호화**되어 있다. 따라서 Vercel 서버 fetch는 항상 실패하고(`/api/ev-status`로 확인 가능), 실제 수집은 GitHub Actions의 헤드리스 크롬(`scripts/fetch-snapshot.ts`)이 담당한다.
+- **ev.or.kr는 일반 HTTP 요청에 봇 검사 페이지(pnp4web, 1MB JS)만 내려주고 AJAX 본문은 암호화**되어 있다. 따라서 Vercel 서버 fetch는 항상 실패하고(진단 라우트 `/api/ev-status`는 외부에서 호출해 서버가 누리집을 두드리게 만들 수 있어 2026-09-08 제거), 실제 수집은 GitHub Actions의 헤드리스 크롬(`scripts/fetch-snapshot.ts`)이 담당한다.
 - ev.or.kr 데이터는 `<table>`이 아니라 **ag-Grid(div, 10행 페이지네이션)**로 그려진다. 현황 페이지 `#myGrid` 열: 지역(sido, "즐겨찾기 서울 마감 서울특별시"처럼 버튼·배지 텍스트 포함) | 차종 | 공고종류 | 접수기간 | 신청마감 | 공고 | 접수 | 선정 | 출고 | 선정잔여 | 출고잔여. 같은 지역이 공고종류(본공고/추경n차)별로 여러 행이며 대수는 누적 동일값 → `lib/ev/aggrid.ts`가 지역·차종당 1행으로 합친다.
 - 차종·모델 페이지는 지자체별 아코디언 161개(`.accordion-item`, `.location__city`=시·도 약칭, `.location__district`=지역명) 안에 ag-Grid(차종/차급·제조사·모델·국비·지방비·소계·전환지원금). 일반 클릭은 타임아웃이 나서 JS click 사용. **"전기승용 일반승용" 행만** 집계한다(택시 행은 지방비가 훨씬 커서 제외).
-- 워크플로 `.github/workflows/snapshot.yml`: 매시 20분(KST 06~23시) + 수동 실행(`probe=1`이면 구조·XHR 탐색만). 수집 성공 시 `data/snapshot/*.json` 커밋 → Vercel 재배포. 소요 약 9분. 결과는 GitHub → Actions → "Refresh ev.or.kr snapshot" 로그로 확인(`remain rows: 160`, `local-price rows: 160`이 정상).
+- 워크플로 `.github/workflows/snapshot.yml`: 매시 20분(KST 06~23시) + 수동 실행(`probe=1`이면 구조·XHR 탐색만). 수집 성공 시 `data/snapshot/*.json` 커밋 → Vercel 재배포. 소요 약 9분. 결과는 GitHub → Actions → "Refresh ev.or.kr snapshot" 로그로 확인(`remain rows: 160`, `local-price rows: 160`, `car subsidy rows: 100+`이 정상).
+- **변경 알림**(2026-09-08): 커밋 직전 `scripts/snapshot-diff.ts`가 `git show HEAD:` 값과 비교해 지방비 금액, 공고 물량·종류, 소진/재개, 신청마감 전환, 모델별 국비 변경만 추려 Issue(라벨 `data-change`)를 만든다. 접수·출고·잔여의 단순 증감은 보고하지 않는다. `scripts/watch-notices.ts`(`notices.yml`, 매일 09:30)는 환경부 보도자료 목록과 누리집 공지에서 보조금·지침·개편 키워드 새 글을 찾아 Issue(라벨 `policy-notice`)를 만든다. 소스별 첫 실행은 현재 글을 `notices.json`에 저장만 한다. 지침 개정 같은 큰 변경은 Issue를 보고 세션에서 가이드·`data/cars.ts`·인포그래픽을 사람이 확인해 갱신한다(완전 자동 갱신은 오정보 위험 때문에 하지 않기로 결정).
 - 2026-09-03 실제 수집값: 서울·대구·인천·광주·대전·세종 194, 울산 221, 부산 224, 강원 200, 충북 400, 충남 414, 전북 434, 제주 276, 경기 120~380(연천), 전남 200~600(보성·완도), 경북 412(울릉 756), 경남 120~488(합천). 시·도 소개문·가이드 수치·인포그래픽은 이 값 기준으로 맞춰 두었다. `data/snapshot/local-price.ts`는 이 수집값을 옮긴 폴백이다.
 
 ## 다음 할 일 (우선순위 순)
-1. Google Search Console·네이버 서치어드바이저 등록 (`NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION`, `NEXT_PUBLIC_NAVER_SITE_VERIFICATION`), sitemap 제출.
+1. 검색엔진 등록은 2026-09-08 완료(구글 DNS TXT, 네이버·Bing 메타태그, 다음 검색등록). 남은 일: GSC·서치어드바이저 색인 보고서 확인, `/feed.xml` RSS 제출 확인. 첫 `cars.json` 수집 뒤 Issue의 매칭 표를 보고 `data/cars.ts` `evMatch` 정규식 보정.
 2. 애드센스 사이트 연결 완료(2026-09-03, 게시자 ID 코드 내장). 애드센스 콘솔에서 "코드 확인" → 심사 요청 → 승인 후 광고 단위 슬롯 ID를 `NEXT_PUBLIC_ADSENSE_SLOT_*` 환경변수에 입력.
 3. 수집 워크플로가 계속 성공하는지 주기적으로 확인(Actions 탭). ev.or.kr 화면 구조가 바뀌면 로그의 `grid headers`를 보고 `lib/ev/aggrid.ts`의 열 정규식을 맞춘다.
 4. 가이드·지역 콘텐츠 보강, 2027년 지침 확정 시 수치 갱신(`data/cars.ts`, 가이드 본문, `scripts/gen-guide-figures.mjs` 후 재생성).

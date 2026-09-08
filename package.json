@@ -8,6 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "fetch:snapshot": "tsx scripts/fetch-snapshot.ts",
+    "snapshot:diff": "tsx scripts/snapshot-diff.ts",
+    "watch:notices": "tsx scripts/watch-notices.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
