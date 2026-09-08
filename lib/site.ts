@@ -1,9 +1,12 @@
 export const ADSENSE_CLIENT_DEFAULT = "ca-pub-9408914409364609";
+/** 네이버 서치어드바이저 소유확인 값 (<meta name="naver-site-verification">). 공개 값이라 코드에 둔다 (2026-09-08 발급) */
+export const NAVER_SITE_VERIFICATION_DEFAULT = "2a20be80aeb22e2dbd62581cf07d46ca3cbc1d09";
 
-function resolveAdsenseClient(env: string | undefined): string {
+/** 환경변수가 있으면 우선, off/0/false 면 끔, 비어 있으면 코드 기본값 */
+function resolveWithDefault(env: string | undefined, fallback: string): string {
   const v = (env ?? "").trim();
   if (v === "off" || v === "0" || v === "false") return "";
-  return v || ADSENSE_CLIENT_DEFAULT;
+  return v || fallback;
 }
 
 export const SITE = {
@@ -16,9 +19,11 @@ export const SITE = {
   operator: "전기차보조금 조회",
   // 애드센스 게시자 ID. 공개 값이므로 코드에 기본값을 두고, 환경변수로 덮어쓸 수 있게 한다.
   // 비우려면 NEXT_PUBLIC_ADSENSE_CLIENT=off 로 설정.
-  adsenseClient: resolveAdsenseClient(process.env.NEXT_PUBLIC_ADSENSE_CLIENT),
-  naverVerification: process.env.NEXT_PUBLIC_NAVER_SITE_VERIFICATION ?? "",
-  googleVerification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ?? "",
+  adsenseClient: resolveWithDefault(process.env.NEXT_PUBLIC_ADSENSE_CLIENT, ADSENSE_CLIENT_DEFAULT),
+  // 네이버 소유확인도 같은 방식. 다른 값으로 바꾸려면 NEXT_PUBLIC_NAVER_SITE_VERIFICATION, 끄려면 off.
+  naverVerification: resolveWithDefault(process.env.NEXT_PUBLIC_NAVER_SITE_VERIFICATION, NAVER_SITE_VERIFICATION_DEFAULT),
+  // 구글은 DNS TXT(도메인 속성) 방식으로 확인 중이라 메타태그 기본값 없음. URL 접두어 방식이면 이 변수에 content 값을 넣는다.
+  googleVerification: (process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ?? "").trim(),
   launchedYear: 2026,
 } as const;
 

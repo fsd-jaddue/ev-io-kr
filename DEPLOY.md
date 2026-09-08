@@ -61,8 +61,8 @@ GitHub 기본 브랜치와 Vercel Production Branch는 모두 **`main`** 이다.
 - [ ] `https://www.ev.io.kr` → `https://ev.io.kr` 리다이렉트
 - [ ] `https://ev.io.kr/sitemap.xml`, `/robots.txt` 응답
 - [ ] `/region/seoul` 표 하단 배지가 "누리집 수집" 인지 (스냅샷이면 파서 점검)
-- [ ] Google Search Console 등록 → 소유 확인(HTML 태그 방식이면 `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` 에 content 값) → sitemap 제출
-- [ ] 네이버 서치어드바이저 등록 → `NEXT_PUBLIC_NAVER_SITE_VERIFICATION`
+- [ ] Google Search Console 등록 → 소유 확인(도메인 속성: 가비아 DNS TXT `@` 에 `google-site-verification=…` 추가, 인증 후에도 삭제 금지. URL 접두어+HTML 태그 방식이면 `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` 에 content 값) → sitemap 제출
+- [ ] 네이버 서치어드바이저 등록 → HTML 태그 방식. 발급받은 content 값은 `lib/site.ts` 의 `NAVER_SITE_VERIFICATION_DEFAULT` 에 들어 있어 `main` 배포만 되면 모든 페이지 `<head>` 에 `<meta name="naver-site-verification">` 이 실린다. 배포 후 서치어드바이저에서 "소유확인" 클릭. (값을 바꾸려면 `NEXT_PUBLIC_NAVER_SITE_VERIFICATION`)
 
 ### 파서 점검 방법
 국내 PC에서 저장소를 클론한 뒤:
