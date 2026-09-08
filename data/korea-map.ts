@@ -16,6 +16,8 @@ export interface MapRegion {
   label: [number, number];
   /** 광역시 등 작은 면: 약칭만 표시 */
   small?: boolean;
+  /** 광역시가 얹혀 있는 도(선택 시 함께 떠오름). 경계에 걸친 세종·대전은 둘 다 */
+  parents?: string[];
 }
 
 export interface TileCell {
@@ -225,14 +227,14 @@ const PROVINCES: MapRegion[] = [
 ];
 
 const METRO: MapRegion[] = [
-  { slug: "seoul", d: blob(132, 110, 42, 24), label: [132, 110], small: true },
-  { slug: "incheon", d: blob(94, 115, 32, 24), label: [94, 115], small: true },
-  { slug: "sejong", d: blob(161, 195, 30, 24), label: [161, 195], small: true },
-  { slug: "daejeon", d: blob(171, 221, 34, 24), label: [171, 221], small: true },
-  { slug: "gwangju", d: blob(117, 323, 38, 22), label: [117, 323], small: true },
-  { slug: "daegu", d: blob(279, 262, 40, 26), label: [279, 262], small: true },
-  { slug: "ulsan", d: blob(340, 288, 40, 27), label: [340, 288], small: true },
-  { slug: "busan", d: blob(322, 319, 42, 26), label: [322, 319], small: true },
+  { slug: "seoul", d: blob(132, 110, 42, 24), label: [132, 110], small: true, parents: ["gyeonggi"] },
+  { slug: "incheon", d: blob(94, 115, 32, 24), label: [94, 115], small: true, parents: ["gyeonggi"] },
+  { slug: "sejong", d: blob(161, 195, 30, 24), label: [161, 195], small: true, parents: ["chungnam", "chungbuk"] },
+  { slug: "daejeon", d: blob(171, 221, 34, 24), label: [171, 221], small: true, parents: ["chungnam", "chungbuk"] },
+  { slug: "gwangju", d: blob(117, 323, 38, 22), label: [117, 323], small: true, parents: ["jeonnam"] },
+  { slug: "daegu", d: blob(279, 262, 40, 26), label: [279, 262], small: true, parents: ["gyeongbuk"] },
+  { slug: "ulsan", d: blob(340, 288, 40, 27), label: [340, 288], small: true, parents: ["gyeongnam"] },
+  { slug: "busan", d: blob(322, 319, 42, 26), label: [322, 319], small: true, parents: ["gyeongnam"] },
 ];
 
 export const KOREA_MAP = {
