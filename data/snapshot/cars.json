@@ -1,6 +1,919 @@
 {
-  "updatedAt": "",
-  "region": "",
+  "updatedAt": "2026-09-08",
+  "region": "서울특별시",
   "note": "scripts/fetch-snapshot.ts 가 ev.or.kr '지자체별 차종·모델 보조금'(서울) 그리드에서 승용 일반승용 모델별 국비를 수집해 채웁니다. rows 가 비어 있으면 data/cars.ts 의 수기값만 사용됩니다.",
-  "rows": []
+  "rows": [
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "BMW",
+      "model": "MINI Aceman E",
+      "national": 400,
+      "local": 120,
+      "conversionNational": 80
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "BMW",
+      "model": "MINI Aceman SE",
+      "national": 400,
+      "local": 120,
+      "conversionNational": 80
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "BMW",
+      "model": "MINI Cooper SE",
+      "national": 396,
+      "local": 118,
+      "conversionNational": 79
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "BMW",
+      "model": "MINI Countryman E",
+      "national": 217,
+      "local": 65,
+      "conversionNational": 43
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "BMW",
+      "model": "MINI Countryman SE ALL4",
+      "national": 203,
+      "local": 60,
+      "conversionNational": 41
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "BMW",
+      "model": "MINI JCW Aceman E",
+      "national": 197,
+      "local": 59,
+      "conversionNational": 39
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "BMW",
+      "model": "MINI JCW E",
+      "national": 191,
+      "local": 57,
+      "conversionNational": 38
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "BMW",
+      "model": "i4 M60 LCI (71HD)",
+      "national": 233,
+      "local": 69,
+      "conversionNational": 47
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "BMW",
+      "model": "i4 eDrive 40 LCI(21HD)",
+      "national": 244,
+      "local": 73,
+      "conversionNational": 49
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "BMW",
+      "model": "i4 eDrive 40 LCI(61HD)",
+      "national": 256,
+      "local": 76,
+      "conversionNational": 51
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "BMW",
+      "model": "i5 eDrive 40",
+      "national": 262,
+      "local": 78,
+      "conversionNational": 52
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "BMW",
+      "model": "iX1 eDrive20",
+      "national": 212,
+      "local": 63,
+      "conversionNational": 42
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "BMW",
+      "model": "iX1 eDrive20(11HM)",
+      "national": 235,
+      "local": 70,
+      "conversionNational": 47
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "BMW",
+      "model": "iX1 xDrive30",
+      "national": 192,
+      "local": 57,
+      "conversionNational": 38
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "BMW",
+      "model": "iX2 eDrive20",
+      "national": 214,
+      "local": 64,
+      "conversionNational": 43
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "BMW",
+      "model": "iX2 eDrive20(71GN)",
+      "national": 239,
+      "local": 71,
+      "conversionNational": 48
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "BMW",
+      "model": "iX3 50 xDrive",
+      "national": 275,
+      "local": 82,
+      "conversionNational": 55
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "EV3 GT",
+      "national": 248,
+      "local": 74,
+      "conversionNational": 50
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "EV3 롱레인지 2WD 17인치",
+      "national": 555,
+      "local": 166,
+      "conversionNational": 100
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "EV3 롱레인지 2WD 19인치",
+      "national": 555,
+      "local": 166,
+      "conversionNational": 100
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "EV3 롱레인지 4WD 19인치",
+      "national": 539,
+      "local": 161,
+      "conversionNational": 100
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "EV3 스탠다드 2WD",
+      "national": 469,
+      "local": 140,
+      "conversionNational": 94
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "EV4 GT",
+      "national": 255,
+      "local": 76,
+      "conversionNational": 51
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "EV4 롱레인지 2WD 17인치",
+      "national": 555,
+      "local": 166,
+      "conversionNational": 100
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "EV4 롱레인지 2WD 19인치",
+      "national": 555,
+      "local": 166,
+      "conversionNational": 100
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "EV4 롱레인지 4WD 19인치",
+      "national": 554,
+      "local": 166,
+      "conversionNational": 100
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "EV4 롱레인지 GTL 2WD 19인치",
+      "national": 555,
+      "local": 166,
+      "conversionNational": 100
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "EV4 스탠다드 2WD 17인치",
+      "national": 512,
+      "local": 153,
+      "conversionNational": 100
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "EV4 스탠다드 2WD 19인치",
+      "national": 481,
+      "local": 144,
+      "conversionNational": 96
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "EV5 GT",
+      "national": 232,
+      "local": 69,
+      "conversionNational": 46
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "EV5 롱레인지 2WD",
+      "national": 552,
+      "local": 165,
+      "conversionNational": 100
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "EV5 롱레인지 4WD 18인치",
+      "national": 499,
+      "local": 149,
+      "conversionNational": 100
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "EV5 롱레인지 4WD 19인치",
+      "national": 493,
+      "local": 147,
+      "conversionNational": 99
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "EV9 GT",
+      "national": 245,
+      "local": 73,
+      "conversionNational": 49
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "EV9 롱레인지 2WD 19인치",
+      "national": 270,
+      "local": 81,
+      "conversionNational": 54
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "EV9 롱레인지 2WD 20인치",
+      "national": 268,
+      "local": 80,
+      "conversionNational": 54
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "EV9 롱레인지 4WD 19인치",
+      "national": 254,
+      "local": 76,
+      "conversionNational": 51
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "EV9 롱레인지 4WD 21인치",
+      "national": 260,
+      "local": 78,
+      "conversionNational": 52
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "EV9 롱레인지 GTL 4WD 21인치",
+      "national": 252,
+      "local": 75,
+      "conversionNational": 50
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "EV9 스탠다드",
+      "national": 237,
+      "local": 71,
+      "conversionNational": 47
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "PV5 패신저 5인승 롱레인지",
+      "national": 458,
+      "local": 137,
+      "conversionNational": 92
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "Pv5 WAV(비용 미지원)",
+      "national": 648,
+      "local": 194,
+      "conversionNational": 100
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "Pv5 WAV(비용 지원)",
+      "national": 448,
+      "local": 134,
+      "conversionNational": 90
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "(단종) The all-new Kia Niro EV",
+      "national": 489,
+      "local": 146,
+      "conversionNational": 98
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "더뉴EV6 롱레인지 2WD 19인치",
+      "national": 570,
+      "local": 171,
+      "conversionNational": 100
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "더뉴EV6 롱레인지 2WD 20인치",
+      "national": 559,
+      "local": 167,
+      "conversionNational": 100
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "더뉴EV6 롱레인지 4WD 19인치",
+      "national": 561,
+      "local": 168,
+      "conversionNational": 100
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "더뉴EV6 롱레인지 4WD 20인치",
+      "national": 532,
+      "local": 159,
+      "conversionNational": 100
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "더뉴EV6 스탠다드",
+      "national": 501,
+      "local": 150,
+      "conversionNational": 100
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "메르세데스벤츠코리아",
+      "model": "EQA 250(Facelift)",
+      "national": 190,
+      "local": 57,
+      "conversionNational": 38
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "메르세데스벤츠코리아",
+      "model": "EQB 300 4MATIC(Facelift)",
+      "national": 154,
+      "local": 46,
+      "conversionNational": 31
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "메르세데스벤츠코리아",
+      "model": "EQB 300 4MATIC(Facelift)(CY25/2)",
+      "national": 162,
+      "local": 48,
+      "conversionNational": 32
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "볼보자동차코리아",
+      "model": "볼보 EX30 Single Motor ER",
+      "national": 247,
+      "local": 74,
+      "conversionNational": 49
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "볼보자동차코리아",
+      "model": "볼보 EX30CC Twin Motor Perf",
+      "national": 222,
+      "local": 66,
+      "conversionNational": 44
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "비와이디코리아",
+      "model": "(단종) BYD ATTO 3",
+      "national": 126,
+      "local": 37,
+      "conversionNational": 25
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "비와이디코리아",
+      "model": "(단종) BYD DOLPHIN",
+      "national": 109,
+      "local": 32,
+      "conversionNational": 22
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "비와이디코리아",
+      "model": "(단종) BYD DOLPHIN Active",
+      "national": 132,
+      "local": 39,
+      "conversionNational": 26
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "비와이디코리아",
+      "model": "(단종) BYD SEAL",
+      "national": 169,
+      "local": 50,
+      "conversionNational": 34
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "비와이디코리아",
+      "model": "(단종) BYD SEAL Dynamic AWD",
+      "national": 151,
+      "local": 45,
+      "conversionNational": 30
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "비와이디코리아",
+      "model": "(단종) BYD SEALION 7",
+      "national": 152,
+      "local": 45,
+      "conversionNational": 30
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "케이지모빌리티",
+      "model": "토레스 EVX 18인치",
+      "national": 354,
+      "local": 106,
+      "conversionNational": 71
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "케이지모빌리티",
+      "model": "토레스 EVX 18인치(2026)",
+      "national": 361,
+      "local": 108,
+      "conversionNational": 72
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "케이지모빌리티",
+      "model": "토레스 EVX 20인치",
+      "national": 344,
+      "local": 103,
+      "conversionNational": 69
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "케이지모빌리티",
+      "model": "토레스 EVX 20인치(2026)",
+      "national": 354,
+      "local": 106,
+      "conversionNational": 71
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "케이지모빌리티",
+      "model": "(단종) 토레스 EVX 2WD 18인치",
+      "national": 327,
+      "local": 98,
+      "conversionNational": 65
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "케이지모빌리티",
+      "model": "(단종) 토레스 EVX 2WD 20인치",
+      "national": 312,
+      "local": 93,
+      "conversionNational": 62
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "테슬라코리아",
+      "model": "Model 3 Performance",
+      "national": 200,
+      "local": 60,
+      "conversionNational": 40
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "테슬라코리아",
+      "model": "Model 3 Premium Long Range RWD",
+      "national": 420,
+      "local": 126,
+      "conversionNational": 84
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "테슬라코리아",
+      "model": "Model 3 Premium Long Range RWD(5999만원)",
+      "national": 210,
+      "local": 63,
+      "conversionNational": 42
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "테슬라코리아",
+      "model": "Model 3 RWD",
+      "national": 168,
+      "local": 50,
+      "conversionNational": 34
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "테슬라코리아",
+      "model": "Model 3 RWD(2025)",
+      "national": 168,
+      "local": 50,
+      "conversionNational": 34
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "테슬라코리아",
+      "model": "Model Y L AWD",
+      "national": 215,
+      "local": 64,
+      "conversionNational": 43
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "테슬라코리아",
+      "model": "Model Y Long Range(2025)",
+      "national": 210,
+      "local": 63,
+      "conversionNational": 42
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "테슬라코리아",
+      "model": "Model Y Premium Long Range",
+      "national": 210,
+      "local": 63,
+      "conversionNational": 42
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "테슬라코리아",
+      "model": "Model Y Premium RWD",
+      "national": 170,
+      "local": 51,
+      "conversionNational": 34
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "테슬라코리아",
+      "model": "Model Y RWD(2025)",
+      "national": 170,
+      "local": 51,
+      "conversionNational": 34
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "폭스바겐그룹코리아",
+      "model": "ID.4 Pro",
+      "national": 432,
+      "local": 129,
+      "conversionNational": 86
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "폭스바겐그룹코리아",
+      "model": "Q4 45 e-tron",
+      "national": 206,
+      "local": 61,
+      "conversionNational": 41
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "폭스바겐그룹코리아",
+      "model": "Q4 Sportback 45 e-tron",
+      "national": 206,
+      "local": 61,
+      "conversionNational": 41
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "폭스바겐그룹코리아",
+      "model": "(단종) Q6 e-tron performance",
+      "national": 220,
+      "local": 66,
+      "conversionNational": 44
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "폭스바겐그룹코리아",
+      "model": "iD.5 Pro",
+      "national": 473,
+      "local": 141,
+      "conversionNational": 95
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "폴스타오토모티브코리아",
+      "model": "Polestar 4 Coupe Dual Motor",
+      "national": 168,
+      "local": 50,
+      "conversionNational": 34
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "폴스타오토모티브코리아",
+      "model": "Polestar 4 Coupe Rear Motor",
+      "national": 181,
+      "local": 54,
+      "conversionNational": 36
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "현대자동차",
+      "model": "ELECTRIFIED G80",
+      "national": 270,
+      "local": 81,
+      "conversionNational": 54
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "현대자동차",
+      "model": "ELECTRIFIED GV70 AWD 19인치",
+      "national": 261,
+      "local": 78,
+      "conversionNational": 52
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "현대자동차",
+      "model": "ELECTRIFIED GV70 AWD 20인치",
+      "national": 245,
+      "local": 73,
+      "conversionNational": 49
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "현대자동차",
+      "model": "GV60 스탠다드 2WD 19인치",
+      "national": 285,
+      "local": 85,
+      "conversionNational": 57
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "현대자동차",
+      "model": "GV60 스탠다드 AWD 19인치",
+      "national": 272,
+      "local": 81,
+      "conversionNational": 54
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "현대자동차",
+      "model": "GV60 스탠다드 AWD 20인치",
+      "national": 261,
+      "local": 78,
+      "conversionNational": 52
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "현대자동차",
+      "model": "더 뉴 아이오닉5 2WD 롱레인지 19인치",
+      "national": 564,
+      "local": 169,
+      "conversionNational": 100
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "현대자동차",
+      "model": "더 뉴 아이오닉5 2WD 롱레인지 19인치 빌트인 캠 미적용",
+      "national": 567,
+      "local": 170,
+      "conversionNational": 100
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "현대자동차",
+      "model": "더 뉴 아이오닉5 2WD 롱레인지 20인치",
+      "national": 559,
+      "local": 167,
+      "conversionNational": 100
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "현대자동차",
+      "model": "더 뉴 아이오닉5 2WD 롱레인지 N라인 20인치",
+      "national": 541,
+      "local": 162,
+      "conversionNational": 100
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "현대자동차",
+      "model": "더 뉴 아이오닉5 2WD 스탠다드 19인치",
+      "national": 483,
+      "local": 144,
+      "conversionNational": 97
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "현대자동차",
+      "model": "더 뉴 아이오닉5 AWD 롱레인지 19인치",
+      "national": 558,
+      "local": 167,
+      "conversionNational": 100
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "현대자동차",
+      "model": "더 뉴 아이오닉5 AWD 롱레인지 20인치",
+      "national": 532,
+      "local": 159,
+      "conversionNational": 100
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "현대자동차",
+      "model": "더 뉴 아이오닉5 AWD 롱레인지 N라인 20인치",
+      "national": 510,
+      "local": 153,
+      "conversionNational": 100
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "현대자동차",
+      "model": "더 뉴 아이오닉6 2WD 롱레인지 18인치",
+      "national": 570,
+      "local": 171,
+      "conversionNational": 100
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "현대자동차",
+      "model": "더 뉴 아이오닉6 2WD 롱레인지 20인치",
+      "national": 570,
+      "local": 171,
+      "conversionNational": 100
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "현대자동차",
+      "model": "더 뉴 아이오닉6 2WD 롱레인지 N라인 20인치",
+      "national": 570,
+      "local": 171,
+      "conversionNational": 100
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "현대자동차",
+      "model": "더 뉴 아이오닉6 2WD 스탠다드 18인치",
+      "national": 560,
+      "local": 168,
+      "conversionNational": 100
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "현대자동차",
+      "model": "더 뉴 아이오닉6 AWD 롱레인지 18인치",
+      "national": 570,
+      "local": 171,
+      "conversionNational": 100
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "현대자동차",
+      "model": "더 뉴 아이오닉6 AWD 롱레인지 20인치",
+      "national": 553,
+      "local": 165,
+      "conversionNational": 100
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "현대자동차",
+      "model": "더 뉴 아이오닉6 AWD 롱레인지 N라인 20인치",
+      "national": 537,
+      "local": 161,
+      "conversionNational": 100
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "현대자동차",
+      "model": "스타리아 라운지 일렉트릭 7인승",
+      "national": 229,
+      "local": 68,
+      "conversionNational": 46
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "현대자동차",
+      "model": "스타리아 리무진 일렉트릭 6인승",
+      "national": 229,
+      "local": 68,
+      "conversionNational": 46
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "현대자동차",
+      "model": "아이오닉6 N",
+      "national": 250,
+      "local": 75,
+      "conversionNational": 50
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "현대자동차",
+      "model": "아이오닉9 성능형 AWD",
+      "national": 272,
+      "local": 81,
+      "conversionNational": 54
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "현대자동차",
+      "model": "아이오닉9 항속형 2WD",
+      "national": 274,
+      "local": 82,
+      "conversionNational": 55
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "현대자동차",
+      "model": "아이오닉9 항속형 AWD",
+      "national": 271,
+      "local": 81,
+      "conversionNational": 54
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "현대자동차",
+      "model": "코나 일렉트릭 2WD 롱레인지 17인치",
+      "national": 514,
+      "local": 154,
+      "conversionNational": 100
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "현대자동차",
+      "model": "코나 일렉트릭 2WD 롱레인지 17인치 빌트인 캠 미적용",
+      "national": 514,
+      "local": 154,
+      "conversionNational": 100
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "현대자동차",
+      "model": "코나 일렉트릭 2WD 롱레인지 19인치",
+      "national": 459,
+      "local": 137,
+      "conversionNational": 92
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "현대자동차",
+      "model": "코나 일렉트릭 2WD 스탠다드 17인치",
+      "national": 437,
+      "local": 131,
+      "conversionNational": 87
+    }
+  ]
 }
