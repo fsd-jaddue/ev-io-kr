@@ -14,7 +14,8 @@ import GuideCard from "@/components/GuideCard";
 import { IconCalc, IconGift, IconPercent } from "@/components/illustrations";
 
 export const metadata: Metadata = pageMetadata({
-  title: SITE.name,
+  // 홈은 사이트명 대신 검색어 형태(연도 + 띄어쓴 핵심어)를 앞세운다. 사이트명은 og:site_name·JSON-LD 로 전달
+  title: `2026 전기차 보조금 조회 | 지역·차종별 국비·지방비 현황`,
   description: SITE.description,
   path: "/",
 });

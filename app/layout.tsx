@@ -4,7 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import JsonLd from "@/components/JsonLd";
 import { SITE } from "@/lib/site";
-import { FEED_ALTERNATES, websiteJsonLd } from "@/lib/seo";
+import { FEED_ALTERNATES, organizationJsonLd, websiteJsonLd } from "@/lib/seo";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     images: [{ url: "/og.png", width: 1200, height: 630, alt: SITE.name }],
   },
   twitter: { card: "summary_large_image", images: ["/og.png"] },
-  robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 } },
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 } },
   verification: {
     google: SITE.googleVerification || undefined,
     // 네이버·Bing 은 Next 가 전용 키를 제공하지 않으므로 other 로 <meta name="…"> 출력
@@ -62,7 +62,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         )}
       </head>
       <body className="min-h-screen bg-white text-slate-800 antialiased">
-        <JsonLd data={websiteJsonLd()} />
+        <JsonLd data={[organizationJsonLd(), websiteJsonLd()]} />
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded focus:bg-white focus:px-3 focus:py-2"

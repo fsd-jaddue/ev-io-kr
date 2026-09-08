@@ -243,3 +243,36 @@ export function sigunguHref(slug: string, region: string): string | null {
 export function fmtNum(n: number | null | undefined): string {
   return n === null || n === undefined ? "-" : n.toLocaleString("ko-KR");
 }
+
+/**
+ * 시·군·구명으로 현황 행 찾기 — RemainTable 의 regionFilter 규칙과 같다(페이지 SSR 과 표가 같은 행을 보게).
+ * "수원시" → 접미사(시·군·구)를 뗀 "수원"이 지역명에 포함되는 행, sidoName 이 있으면 시·도 단일 공고 행(region === sidoName)도 포함.
+ */
+export function matchRemainRows(rows: RemainRow[], regionFilter: string, sidoName?: string): RemainRow[] {
+  const key = regionFilter.replace(/(시|군|구)$/, "");
+  return passengerRows(rows).filter((r) => r.region.includes(key) || (sidoName ? r.region === sidoName : false));
+}
+
+export interface RemainNoteParts {
+  /** 공고 종류 누적 (예: "본공고·추경1차·추경2차") */
+  rounds?: string;
+  /** 신청 상태 (예: "신청마감") */
+  status?: string;
+  /** 마감 시각 (예: "2026.08.18 12:28") */
+  deadline?: string;
+  /** 접수 기간 (마감 대신 있을 때) */
+  period?: string;
+}
+
+/** 현황 행의 note("본공고·추경1차 · 신청마감 · 마감 2026.08.18 12:28") 분해 */
+export function parseRemainNote(note?: string): RemainNoteParts {
+  const out: RemainNoteParts = {};
+  if (!note) return out;
+  for (const part of note.split(" · ").map((p) => p.trim()).filter(Boolean)) {
+    if (/^마감\s/.test(part)) out.deadline = part.replace(/^마감\s+/, "");
+    else if (/^접수\s/.test(part)) out.period = part.replace(/^접수\s+/, "");
+    else if (/마감|소진|접수중|신청가능/.test(part) && !/공고|추경/.test(part)) out.status = part;
+    else if (/공고|추경/.test(part)) out.rounds = part;
+  }
+  return out;
+}

@@ -62,6 +62,9 @@ GitHub 기본 브랜치와 Vercel Production Branch는 모두 **`main`** 이다.
 - [ ] `https://ev.io.kr/sitemap.xml`, `/robots.txt` 응답
 - [ ] `/region/seoul` 표 하단 배지가 "누리집 수집" 인지 (스냅샷이면 파서 점검)
 - [ ] Google Search Console 등록 → 소유 확인(도메인 속성: 가비아 DNS TXT `@` 에 `google-site-verification=…` 추가, 인증 후에도 삭제 금지. URL 접두어+HTML 태그 방식이면 `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` 에 content 값) → sitemap 제출
+- [ ] 다음(카카오) 검색등록: https://register.search.daum.net → 신규 등록 → 사이트 → URL·사이트명·소개·이메일 입력(태그 없음, 수동 심사 수일~2주). "블로그" 항목에 `https://ev.io.kr/feed.xml` 도 등록 가능
+- [ ] Bing 웹마스터: HTML Meta Tag 방식. 값은 `lib/site.ts` 의 `BING_SITE_VERIFICATION_DEFAULT` (2026-09-08 인증 완료). Sitemaps 에 `https://ev.io.kr/sitemap.xml` 제출
+- [ ] 네이버 서치어드바이저: 요청 → 사이트맵 제출(`/sitemap.xml`), RSS 제출(`/feed.xml`), 웹 페이지 수집(홈·시·도 17·가이드 16·차종·시·군·구 순, 일 50건), 검증 → 사이트 간단 체크·robots.txt 검증
 - [ ] 네이버 서치어드바이저 등록 → HTML 태그 방식. 발급받은 content 값은 `lib/site.ts` 의 `NAVER_SITE_VERIFICATION_DEFAULT` 에 들어 있어 `main` 배포만 되면 모든 페이지 `<head>` 에 `<meta name="naver-site-verification">` 이 실린다. 배포 후 서치어드바이저에서 "소유확인" 클릭. (값을 바꾸려면 `NEXT_PUBLIC_NAVER_SITE_VERIFICATION`)
 
 ### 파서 점검 방법

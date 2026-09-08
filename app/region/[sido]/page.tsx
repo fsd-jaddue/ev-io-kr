@@ -5,9 +5,14 @@ import Breadcrumb from "@/components/Breadcrumb";
 import LocalPriceTable from "@/components/LocalPriceTable";
 import RemainTable from "@/components/RemainTable";
 import AdSlot from "@/components/AdSlot";
-import { getLocalPriceData } from "@/lib/ev/getData";
+import FaqList from "@/components/FaqList";
+import JsonLd from "@/components/JsonLd";
+import { filterRemainBySido, formatFetchedAt, getLocalPriceData, getRemainSnapshot } from "@/lib/ev/getData";
 import { estimateTotal, won } from "@/lib/ev/summary";
-import { pageMetadata } from "@/lib/seo";
+import { sidoMaxRanking, sidoPriceStats } from "@/lib/ev/localPriceStats";
+import { summarizeRemainBySido, topSigungu } from "@/lib/ev/remainSummary";
+import { sidoFaq } from "@/lib/ev/regionCopy";
+import { faqJsonLd, pageMetadata, webPageJsonLd } from "@/lib/seo";
 import { SIDO_LIST, getSido } from "@/data/regions";
 import { SIDO_INTRO } from "@/data/sido-intro";
 import { CARS, NATIONAL_MAX, carName } from "@/data/cars";
@@ -22,7 +27,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ sido: string }> }): Promise<Metadata> {
   const { sido: slug } = await params;
   const sido = getSido(slug);
-  if (!sido) return {};
+  if (!sido) notFound();
   const local = await getLocalPriceData();
   const amounts = local.rows.filter((r) => r.sido === slug).map((r) => r.amount).filter((a): a is number => a !== null);
   const max = amounts.length ? Math.max(...amounts) : null;
@@ -49,22 +54,58 @@ export default async function SidoPage({ params }: { params: Promise<{ sido: str
   const intro = SIDO_INTRO[slug];
   const exampleCars = CARS.filter((c) => c.national !== null).slice(0, 5);
   const relatedGuides = GUIDES.filter((g) => g.category === "지역" || g.category === "신청").slice(0, 4);
+  // 접수·출고·잔여: 빌드 시 스냅샷을 HTML 에 싣고(검색엔진용), 브라우저에서 /api/remain 으로 갱신
+  const remain = filterRemainBySido(getRemainSnapshot(), slug);
+  const remainSummary = summarizeRemainBySido(remain.rows).find((s) => s.slug === slug) ?? null;
+  const stats = sidoPriceStats(local.rows, slug);
+  const faq = sidoFaq({
+    sido,
+    stats,
+    summary: remainSummary,
+    top: topSigungu(remain.rows, 3),
+    fetchedAt: remain.fetchedAt,
+    sidoRank: sidoMaxRanking(local.rows).find((s) => s.slug === slug),
+  });
+  const title = `${sido.name} 전기차 보조금 현황 2026`;
 
   return (
     <>
+      <JsonLd
+        data={[
+          webPageJsonLd({
+            name: title,
+            description: `${sido.name} 시·군·구별 승용 전기차 지방비, 국비 합산액, 접수·출고·잔여 현황과 신청 순서`,
+            path: `/region/${slug}`,
+            dateModified: remain.fetchedAt,
+          }),
+          ...(faq.length ? [faqJsonLd(faq)] : []),
+        ]}
+      />
       <Breadcrumb items={[{ name: "지역별 보조금", path: "/region" }, { name: sido.name, path: `/region/${slug}` }]} />
       <div className="flex items-start justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-black text-slate-900">{sido.name} 전기차 보조금 현황 2026</h1>
+          <h1 className="text-3xl font-black text-slate-900">{title}</h1>
           <p className="mt-3 max-w-3xl leading-7 text-slate-600">{intro?.summary}</p>
+          <p className="mt-2 text-xs text-slate-500">
+            데이터 기준: 지방비 {local.updatedAt} · 접수 현황 {formatFetchedAt(remain.fetchedAt)} · 출처 무공해차 통합누리집
+          </p>
         </div>
         <RegionArt className="hidden w-44 shrink-0 lg:block" />
       </div>
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-3">
-        <Card label="승용 지방비" value={max === null ? "공고 확인" : uniform ? won(max) : `${min}~${max}만원`} />
+      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <Card label="승용 지방비" value={max === null ? "공고 확인" : uniform ? won(max) : `${min}~${max}만원`} sub={uniform ? `${sido.name} 단일 공고` : `${stats.known}개 시·군·구 확인`} />
         <Card label="국비 최대" value={won(NATIONAL_MAX.large)} sub={`소형 ${NATIONAL_MAX.small}만원`} />
         <Card label="합산 최대" value={max === null ? "-" : won(max + NATIONAL_MAX.large)} sub="전환지원금 +100만원 별도" />
+        <Card
+          label={`${sido.short} 잔여 대수 (승용)`}
+          value={remainSummary && remainSummary.remaining !== null ? `${remainSummary.remaining.toLocaleString()}대` : "수집값 없음"}
+          sub={
+            remainSummary && remainSummary.rowCount > 0
+              ? `공고 ${remainSummary.announced?.toLocaleString() ?? "-"}대${remainSummary.single ? "" : ` · 소진 ${remainSummary.soldOutCount}곳`} · ${formatFetchedAt(remain.fetchedAt)} 기준`
+              : "누리집 수집값이 있을 때만 표시"
+          }
+        />
       </div>
 
       {intro?.points && (
@@ -89,7 +130,7 @@ export default async function SidoPage({ params }: { params: Promise<{ sido: str
 
       <AdSlot slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_REGION} />
 
-      <RemainTable sido={slug} title={`${sido.short} 접수·출고·잔여 현황`} />
+      <RemainTable sido={slug} initial={remain} title={`${sido.short} 접수·출고·잔여 현황`} />
 
       {max !== null && (
         <section className="mt-10">
@@ -156,6 +197,8 @@ export default async function SidoPage({ params }: { params: Promise<{ sido: str
           에서 확인할 수 있습니다.
         </p>
       </section>
+
+      <FaqList items={faq} title={`${sido.short} 전기차 보조금 자주 묻는 질문`} />
 
       <section className="mt-10">
         <h2 className="text-xl font-bold text-slate-900">함께 보면 좋은 가이드</h2>

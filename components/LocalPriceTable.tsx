@@ -4,7 +4,8 @@ import { NATIONAL_MAX } from "@/data/cars";
 import { sigunguPath } from "@/data/regions";
 import { won } from "@/lib/ev/summary";
 
-export default function LocalPriceTable({ sidoSlug, rows }: { sidoSlug: string; rows: LocalPriceRow[] }) {
+/** highlight: 강조할 시·군·구명 (비교표에서 현재 지역 표시) */
+export default function LocalPriceTable({ sidoSlug, rows, highlight }: { sidoSlug: string; rows: LocalPriceRow[]; highlight?: string }) {
   return (
     <div className="table-wrap">
       <table className="w-full text-sm">
@@ -19,7 +20,11 @@ export default function LocalPriceTable({ sidoSlug, rows }: { sidoSlug: string; 
         </thead>
         <tbody>
           {rows.map((r) => (
-            <tr key={r.sigungu} className="border-t border-slate-100 hover:bg-emerald-50/40">
+            <tr
+              key={r.sigungu}
+              className={`border-t border-slate-100 hover:bg-emerald-50/40 ${highlight === r.sigungu ? "bg-emerald-50 font-bold" : ""}`}
+              aria-current={highlight === r.sigungu ? "true" : undefined}
+            >
               <td className="px-3 py-2 font-medium">
                 <Link href={sigunguPath(sidoSlug, r.sigungu)} className="text-slate-900 hover:text-emerald-700 hover:underline">
                   {r.sigungu}
