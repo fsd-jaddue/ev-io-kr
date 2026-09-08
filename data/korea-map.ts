@@ -1,5 +1,5 @@
 /**
- * 홈 히어로용 간략화 대한민국 지도(데스크톱 SVG) · 모바일 타일 배치.
+ * 홈 히어로용 간략화 대한민국 지도(SVG, PC·모바일 공용).
  *
  * - 외부 지오데이터·라이브러리 없이 직접 잡은 좌표다. 행정경계 정밀도보다 "한눈에 어느 지역인지"를 우선한다.
  * - 구조: 경계 교차점(NODES) 사이의 경계선(ARCS, 중간점 포함)을 한 번만 정의하고, 시·도는 경계선 id 배열(뒤집기 가능)로 만든다.
@@ -18,12 +18,6 @@ export interface MapRegion {
   small?: boolean;
   /** 광역시가 얹혀 있는 도(선택 시 함께 떠오름). 경계에 걸친 세종·대전은 둘 다 */
   parents?: string[];
-}
-
-export interface TileCell {
-  slug: string;
-  row: number;
-  col: number;
 }
 
 type Pt = readonly [number, number];
@@ -104,50 +98,241 @@ interface Arc {
 
 const A = {
   // 휴전선
-  dmzGG: { from: "j1", to: "nw", via: [[139, 49], [120, 73], [96, 93]] },
-  dmzGW: { from: "ne", to: "j1", via: [[247, 31], [228, 40], [200, 44], [162, 43]] },
+  dmzGG: {
+    from: "j1",
+    to: "nw",
+    via: [
+      [139, 49],
+      [120, 73],
+      [96, 93],
+    ],
+  },
+  dmzGW: {
+    from: "ne",
+    to: "j1",
+    via: [
+      [247, 31],
+      [228, 40],
+      [200, 44],
+      [162, 43],
+    ],
+  },
   // 경기 서해안 (강화 → 인천 → 아산만)
-  coastGG: { from: "nw", to: "j12", via: [[73, 97], [86, 104], [96, 108], [98, 124], [110, 132], [104, 146], [112, 156]] },
+  coastGG: {
+    from: "nw",
+    to: "j12",
+    via: [
+      [73, 97],
+      [86, 104],
+      [96, 108],
+      [98, 124],
+      [110, 132],
+      [104, 146],
+      [112, 156],
+    ],
+  },
   // 경기·강원
-  bGG_GW: { from: "j1", to: "j2", via: [[167, 62], [186, 84], [190, 102], [204, 115], [209, 124]] },
+  bGG_GW: {
+    from: "j1",
+    to: "j2",
+    via: [
+      [167, 62],
+      [186, 84],
+      [190, 102],
+      [204, 115],
+      [209, 124],
+    ],
+  },
   // 강원 동해안
-  coastGW: { from: "ne", to: "j4", via: [[284, 53], [289, 62], [317, 88], [331, 115], [355, 124]] },
+  coastGW: {
+    from: "ne",
+    to: "j4",
+    via: [
+      [284, 53],
+      [289, 62],
+      [317, 88],
+      [331, 115],
+      [355, 124],
+    ],
+  },
   // 강원·충북 / 강원·경북
-  bGW_CB: { from: "j2", to: "j3", via: [[223, 146], [247, 146]] },
-  bGW_GB: { from: "j3", to: "j4", via: [[313, 154], [340, 150]] },
+  bGW_CB: {
+    from: "j2",
+    to: "j3",
+    via: [
+      [223, 146],
+      [247, 146],
+    ],
+  },
+  bGW_GB: {
+    from: "j3",
+    to: "j4",
+    via: [
+      [313, 154],
+      [340, 150],
+    ],
+  },
   // 경기 남쪽
-  bGG_CB: { from: "j2", to: "j10", via: [[200, 146], [181, 154]] },
-  bGG_CN: { from: "j10", to: "j12", via: [[148, 161], [129, 163]] },
+  bGG_CB: {
+    from: "j2",
+    to: "j10",
+    via: [
+      [200, 146],
+      [181, 154],
+    ],
+  },
+  bGG_CN: {
+    from: "j10",
+    to: "j12",
+    via: [
+      [148, 161],
+      [129, 163],
+    ],
+  },
   // 충북 서쪽(충남) / 동쪽(경북) / 남단
-  bCB_CN: { from: "j10", to: "j11", via: [[172, 172], [167, 190], [176, 207], [181, 220], [190, 238]] },
-  bCB_GB: { from: "j3", to: "j5", via: [[275, 168], [247, 181], [228, 203], [228, 229]] },
+  bCB_CN: {
+    from: "j10",
+    to: "j11",
+    via: [
+      [172, 172],
+      [167, 190],
+      [176, 207],
+      [181, 220],
+      [190, 238],
+    ],
+  },
+  bCB_GB: {
+    from: "j3",
+    to: "j5",
+    via: [
+      [275, 168],
+      [247, 181],
+      [228, 203],
+      [228, 229],
+    ],
+  },
   bCB_JB: { from: "j5", to: "j11", via: [[208, 250]] },
   // 충남 서해안 (아산만 → 태안 → 서천)
-  coastCN: { from: "j12", to: "j13", via: [[101, 161], [78, 157], [68, 168], [62, 188], [68, 207], [87, 216], [90, 230]] },
-  bCN_JB: { from: "j11", to: "j13", via: [[186, 249], [143, 242], [129, 242]] },
+  coastCN: {
+    from: "j12",
+    to: "j13",
+    via: [
+      [101, 161],
+      [78, 157],
+      [68, 168],
+      [62, 188],
+      [68, 207],
+      [87, 216],
+      [90, 230],
+    ],
+  },
+  bCN_JB: {
+    from: "j11",
+    to: "j13",
+    via: [
+      [186, 249],
+      [143, 242],
+      [129, 242],
+    ],
+  },
   // 전북·경북 (무주·김천) / 경북·경남
   bJB_GB: { from: "j5", to: "j7", via: [[220, 251]] },
-  bGB_GN: { from: "j7", to: "j6", via: [[228, 260], [247, 269], [266, 278], [294, 286], [341, 278]] },
+  bGB_GN: {
+    from: "j7",
+    to: "j6",
+    via: [
+      [228, 260],
+      [247, 269],
+      [266, 278],
+      [294, 286],
+      [341, 278],
+    ],
+  },
   // 경북 동해안 (울진 → 포항 → 감포)
-  coastGB: { from: "j4", to: "j6", via: [[364, 160], [360, 203], [360, 238], [376, 241], [369, 264]] },
+  coastGB: {
+    from: "j4",
+    to: "j6",
+    via: [
+      [364, 160],
+      [360, 203],
+      [360, 238],
+      [376, 241],
+      [369, 264],
+    ],
+  },
   // 전북·경남 / 전남·경남
-  bJB_GN: { from: "j7", to: "j8", via: [[200, 282], [195, 295]] },
-  bJN_GN: { from: "j8", to: "j9", via: [[200, 317], [207, 335]] },
+  bJB_GN: {
+    from: "j7",
+    to: "j8",
+    via: [
+      [200, 282],
+      [195, 295],
+    ],
+  },
+  bJN_GN: {
+    from: "j8",
+    to: "j9",
+    via: [
+      [200, 317],
+      [207, 335],
+    ],
+  },
   // 경남 남해안 (울산 → 부산 → 거제 → 통영 → 남해)
   coastGN: {
     from: "j6",
     to: "j9",
-    via: [[360, 291], [341, 308], [336, 322], [317, 330], [294, 326], [294, 344], [284, 357], [266, 352], [256, 339], [233, 344], [219, 359]],
+    via: [
+      [360, 291],
+      [341, 308],
+      [336, 322],
+      [317, 330],
+      [294, 326],
+      [294, 344],
+      [284, 357],
+      [266, 352],
+      [256, 339],
+      [233, 344],
+      [219, 359],
+    ],
   },
   // 전북·전남
-  bJB_JN: { from: "j8", to: "j14", via: [[167, 304], [143, 300], [125, 295]] },
+  bJB_JN: {
+    from: "j8",
+    to: "j14",
+    via: [
+      [167, 304],
+      [143, 300],
+      [125, 295],
+    ],
+  },
   // 전북 서해안
-  coastJB: { from: "j13", to: "j14", via: [[92, 249], [87, 278], [82, 291]] },
+  coastJB: {
+    from: "j13",
+    to: "j14",
+    via: [
+      [92, 249],
+      [87, 278],
+      [82, 291],
+    ],
+  },
   // 전남 서·남해안 (영광 → 목포 → 해남 → 고흥 → 여수 → 광양)
   coastJN: {
     from: "j14",
     to: "j9",
-    via: [[73, 308], [68, 326], [73, 352], [68, 370], [89, 396], [110, 383], [125, 388], [143, 379], [162, 388], [181, 352], [204, 370], [204, 346]],
+    via: [
+      [73, 308],
+      [68, 326],
+      [73, 352],
+      [68, 370],
+      [89, 396],
+      [110, 383],
+      [125, 388],
+      [143, 379],
+      [162, 388],
+      [181, 352],
+      [204, 370],
+      [204, 346],
+    ],
   },
 } as const satisfies Record<string, Arc>;
 
@@ -196,18 +381,56 @@ function blob(cx: number, cy: number, w: number, h: number): string {
 }
 
 const PROVINCES: MapRegion[] = [
-  { slug: "gyeonggi", d: ring(["dmzGG", "coastGG", "-bGG_CN", "-bGG_CB", "-bGG_GW"]), label: [181, 128] },
-  { slug: "gangwon", d: ring(["dmzGW", "bGG_GW", "bGW_CB", "bGW_GB", "-coastGW"]), label: [262, 92] },
-  { slug: "chungbuk", d: ring(["bGG_CB", "bCB_CN", "-bCB_JB", "-bCB_GB", "-bGW_CB"]), label: [212, 184] },
-  { slug: "chungnam", d: ring(["bGG_CN", "coastCN", "-bCN_JB", "-bCB_CN"]), label: [104, 206] },
-  { slug: "jeonbuk", d: ring(["bCN_JB", "coastJB", "-bJB_JN", "-bJB_GN", "-bJB_GB", "bCB_JB"]), label: [146, 274] },
+  {
+    slug: "gyeonggi",
+    d: ring(["dmzGG", "coastGG", "-bGG_CN", "-bGG_CB", "-bGG_GW"]),
+    label: [181, 128],
+  },
+  {
+    slug: "gangwon",
+    d: ring(["dmzGW", "bGG_GW", "bGW_CB", "bGW_GB", "-coastGW"]),
+    label: [262, 92],
+  },
+  {
+    slug: "chungbuk",
+    d: ring(["bGG_CB", "bCB_CN", "-bCB_JB", "-bCB_GB", "-bGW_CB"]),
+    label: [212, 184],
+  },
+  {
+    slug: "chungnam",
+    d: ring(["bGG_CN", "coastCN", "-bCN_JB", "-bCB_CN"]),
+    label: [104, 206],
+  },
+  {
+    slug: "jeonbuk",
+    d: ring(["bCN_JB", "coastJB", "-bJB_JN", "-bJB_GN", "-bJB_GB", "bCB_JB"]),
+    label: [146, 274],
+  },
   {
     slug: "jeonnam",
     d:
       ring(["bJB_JN", "coastJN", "-bJN_GN"]) +
       // 진도·완도 (장식)
-      bezierClosed([[60, 382], [72, 378], [78, 386], [70, 394], [58, 390]], 0.9) +
-      bezierClosed([[104, 402], [118, 400], [122, 407], [110, 411], [100, 408]], 0.9),
+      bezierClosed(
+        [
+          [60, 382],
+          [72, 378],
+          [78, 386],
+          [70, 394],
+          [58, 390],
+        ],
+        0.9,
+      ) +
+      bezierClosed(
+        [
+          [104, 402],
+          [118, 400],
+          [122, 407],
+          [110, 411],
+          [100, 408],
+        ],
+        0.9,
+      ),
     label: [140, 356],
   },
   {
@@ -215,26 +438,100 @@ const PROVINCES: MapRegion[] = [
     d:
       ring(["bGW_GB", "coastGB", "-bGB_GN", "-bJB_GB", "-bCB_GB"]) +
       // 울릉도
-      bezierClosed([[384, 148], [392, 147], [396, 152], [392, 158], [384, 158], [381, 152]], 0.9),
+      bezierClosed(
+        [
+          [384, 148],
+          [392, 147],
+          [396, 152],
+          [392, 158],
+          [384, 158],
+          [381, 152],
+        ],
+        0.9,
+      ),
     label: [312, 212],
   },
-  { slug: "gyeongnam", d: ring(["bGB_GN", "coastGN", "-bJN_GN", "-bJB_GN"]), label: [262, 318] },
+  {
+    slug: "gyeongnam",
+    d: ring(["bGB_GN", "coastGN", "-bJN_GN", "-bJB_GN"]),
+    label: [262, 318],
+  },
   {
     slug: "jeju",
-    d: bezierClosed([[62, 432], [80, 418], [110, 414], [132, 424], [136, 438], [118, 452], [88, 454], [66, 446]], 0.9),
+    d: bezierClosed(
+      [
+        [62, 432],
+        [80, 418],
+        [110, 414],
+        [132, 424],
+        [136, 438],
+        [118, 452],
+        [88, 454],
+        [66, 446],
+      ],
+      0.9,
+    ),
     label: [99, 437],
   },
 ];
 
 const METRO: MapRegion[] = [
-  { slug: "seoul", d: blob(132, 110, 42, 24), label: [132, 110], small: true, parents: ["gyeonggi"] },
-  { slug: "incheon", d: blob(94, 115, 32, 24), label: [94, 115], small: true, parents: ["gyeonggi"] },
-  { slug: "sejong", d: blob(161, 195, 30, 24), label: [161, 195], small: true, parents: ["chungnam", "chungbuk"] },
-  { slug: "daejeon", d: blob(171, 221, 34, 24), label: [171, 221], small: true, parents: ["chungnam", "chungbuk"] },
-  { slug: "gwangju", d: blob(117, 323, 38, 22), label: [117, 323], small: true, parents: ["jeonnam"] },
-  { slug: "daegu", d: blob(279, 262, 40, 26), label: [279, 262], small: true, parents: ["gyeongbuk"] },
-  { slug: "ulsan", d: blob(340, 288, 40, 27), label: [340, 288], small: true, parents: ["gyeongnam"] },
-  { slug: "busan", d: blob(322, 319, 42, 26), label: [322, 319], small: true, parents: ["gyeongnam"] },
+  {
+    slug: "seoul",
+    d: blob(132, 110, 42, 24),
+    label: [132, 110],
+    small: true,
+    parents: ["gyeonggi"],
+  },
+  {
+    slug: "incheon",
+    d: blob(94, 115, 32, 24),
+    label: [94, 115],
+    small: true,
+    parents: ["gyeonggi"],
+  },
+  {
+    slug: "sejong",
+    d: blob(161, 195, 30, 24),
+    label: [161, 195],
+    small: true,
+    parents: ["chungnam", "chungbuk"],
+  },
+  {
+    slug: "daejeon",
+    d: blob(171, 221, 34, 24),
+    label: [171, 221],
+    small: true,
+    parents: ["chungnam", "chungbuk"],
+  },
+  {
+    slug: "gwangju",
+    d: blob(117, 323, 38, 22),
+    label: [117, 323],
+    small: true,
+    parents: ["jeonnam"],
+  },
+  {
+    slug: "daegu",
+    d: blob(279, 262, 40, 26),
+    label: [279, 262],
+    small: true,
+    parents: ["gyeongbuk"],
+  },
+  {
+    slug: "ulsan",
+    d: blob(340, 288, 40, 27),
+    label: [340, 288],
+    small: true,
+    parents: ["gyeongnam"],
+  },
+  {
+    slug: "busan",
+    d: blob(322, 319, 42, 26),
+    label: [322, 319],
+    small: true,
+    parents: ["gyeongnam"],
+  },
 ];
 
 export const KOREA_MAP = {
@@ -245,29 +542,4 @@ export const KOREA_MAP = {
   regions: [...PROVINCES, ...METRO] as MapRegion[],
   /** 제주 인셋 안내 상자 */
   jejuInset: { x: 48, y: 406, width: 104, height: 56 },
-} as const;
-
-/** 모바일 타일 카토그램(4열 × 5행). 대략의 지리 관계만 맞춘다. */
-export const TILE_LAYOUT = {
-  cols: 4,
-  rows: 5,
-  cells: [
-    { slug: "incheon", row: 1, col: 1 },
-    { slug: "seoul", row: 1, col: 2 },
-    { slug: "gyeonggi", row: 1, col: 3 },
-    { slug: "gangwon", row: 1, col: 4 },
-    { slug: "chungnam", row: 2, col: 1 },
-    { slug: "sejong", row: 2, col: 2 },
-    { slug: "chungbuk", row: 2, col: 3 },
-    { slug: "gyeongbuk", row: 2, col: 4 },
-    { slug: "jeonbuk", row: 3, col: 1 },
-    { slug: "daejeon", row: 3, col: 2 },
-    { slug: "daegu", row: 3, col: 3 },
-    { slug: "ulsan", row: 3, col: 4 },
-    { slug: "gwangju", row: 4, col: 1 },
-    { slug: "jeonnam", row: 4, col: 2 },
-    { slug: "gyeongnam", row: 4, col: 3 },
-    { slug: "busan", row: 4, col: 4 },
-    { slug: "jeju", row: 5, col: 1 },
-  ] as TileCell[],
 } as const;

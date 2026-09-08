@@ -18,6 +18,8 @@ interface Props {
   summary: SidoRemainSummary[];
   selected: string | null;
   onSelect: (slug: string | null) => void;
+  /** 모바일 팝업의 "시·군·구별 보기" — 아래 패널로 스크롤 */
+  onDrillDown?: () => void;
   className?: string;
 }
 
@@ -25,8 +27,6 @@ const TIP_W = 220;
 const TIP_H = 84;
 /** 면 두께 (viewBox 단위) */
 const DEPTH = 7;
-/** 선택 시 떠오르는 높이 */
-const LIFT = 6;
 /**
  * 바닥에 놓인 보드 느낌을 내는 세로 압축 비율. CSS 3D(rotateX)는 SVG 전체를 비트맵으로 굽어 글자가 흐려지므로
  * SVG 내부 2D 변형만 쓰고, 라벨은 변형 그룹 밖에서 좌표만 매핑해 선명하게 유지한다.
@@ -55,6 +55,7 @@ export default function KoreaMap({
   summary,
   selected,
   onSelect,
+  onDrillDown,
   className = "",
 }: Props) {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
@@ -124,10 +125,11 @@ export default function KoreaMap({
     const meta = LEVEL_META[s?.level ?? "unknown"];
     const [x, rawY] = r.label;
     const y = mapY(rawY);
+    const k = key ?? r.slug;
     if (r.small) {
       return (
         <text
-          key={key ?? r.slug}
+          key={k}
           x={x}
           y={y + 4.5}
           textAnchor="middle"
@@ -146,28 +148,52 @@ export default function KoreaMap({
           ? "소진"
           : fmtNum(s.remaining);
     return (
-      <text
-        key={key ?? r.slug}
-        x={x}
-        y={y - 1}
-        textAnchor="middle"
-        fontSize={13}
-        fontWeight={700}
-        fill={meta.labelFill}
-      >
-        {s?.short}
-        <tspan x={x} dy={13} fontSize={11} fontWeight={600}>
-          {n}
-        </tspan>
-      </text>
+      <g key={k}>
+        {/* 모바일: 약칭만 (대수는 탭 팝업에서) */}
+        <text
+          className="md:hidden"
+          x={x}
+          y={y + 4.5}
+          textAnchor="middle"
+          fontSize={13}
+          fontWeight={700}
+          fill={meta.labelFill}
+        >
+          {s?.short}
+        </text>
+        {/* 데스크톱: 약칭 + 잔여 대수 */}
+        <text
+          className="hidden md:block"
+          x={x}
+          y={y - 1}
+          textAnchor="middle"
+          fontSize={13}
+          fontWeight={700}
+          fill={meta.labelFill}
+        >
+          {s?.short}
+          <tspan x={x} dy={13} fontSize={11} fontWeight={600}>
+            {n}
+          </tspan>
+        </text>
+      </g>
     );
   };
+
+  const selectedSummary = selected ? bySlug.get(selected) : undefined;
+  const selectedMeta = selectedSummary
+    ? LEVEL_META[selectedSummary.level]
+    : undefined;
+  const selectedSoldOut =
+    !!selectedSummary &&
+    selectedSummary.remaining !== null &&
+    selectedSummary.remaining <= 0;
 
   return (
     <div ref={wrapRef} className={`relative ${className}`}>
       <svg
         viewBox={KOREA_MAP.viewBox}
-        className="mx-auto h-[340px] w-auto max-w-full lg:h-[420px]"
+        className="mx-auto h-auto w-full max-w-[380px] md:h-[340px] md:w-auto md:max-w-full lg:h-[420px]"
         role="group"
         aria-label="시·도별 전기차 보조금 잔여 현황 지도"
         onPointerMove={onMove}
@@ -375,6 +401,82 @@ export default function KoreaMap({
           )}
         </g>
       </svg>
+
+      {selectedSummary && selectedMeta && (
+        <div
+          role="dialog"
+          aria-label={`${selectedSummary.name} 잔여 현황`}
+          className="absolute inset-x-1 bottom-1 z-10 rounded-xl bg-white/95 p-3 text-slate-900 shadow-xl ring-1 ring-black/5 backdrop-blur animate-fade-up motion-reduce:animate-none md:hidden"
+        >
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <p className="flex flex-wrap items-center gap-1.5 font-bold">
+                {selectedSummary.name}
+                <span
+                  className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${selectedMeta.badge}`}
+                >
+                  {selectedMeta.label}
+                  {selectedSummary.ratio !== null &&
+                    ` · 잔여율 ${Math.round(selectedSummary.ratio * 100)}%`}
+                </span>
+              </p>
+              <p className="mt-0.5 whitespace-nowrap text-[11px] tabular-nums text-slate-500">
+                공고 {fmtNum(selectedSummary.announced)} · 접수{" "}
+                {fmtNum(selectedSummary.applied)} · 출고{" "}
+                {fmtNum(selectedSummary.released)}
+              </p>
+            </div>
+            <button
+              type="button"
+              aria-label="닫기"
+              onClick={() => onSelect(null)}
+              className="-mr-1 -mt-1 shrink-0 rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            >
+              <svg
+                viewBox="0 0 20 20"
+                className="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                aria-hidden="true"
+              >
+                <path d="M5 5l10 10M15 5L5 15" />
+              </svg>
+            </button>
+          </div>
+          <div className="mt-2 flex items-end justify-between gap-2">
+            <div className="min-w-0 tabular-nums">
+              <p className="leading-none">
+                <span className={`text-2xl font-black ${selectedMeta.text}`}>
+                  {selectedSoldOut ? "소진" : fmtNum(selectedSummary.remaining)}
+                </span>
+                {!selectedSoldOut && selectedSummary.remaining !== null && (
+                  <span className="whitespace-nowrap text-xs text-slate-500">
+                    {" "}
+                    대 잔여
+                  </span>
+                )}
+              </p>
+              {selectedSummary.rowCount > 1 && (
+                <p className="mt-1 text-xs text-slate-500">
+                  소진 {selectedSummary.soldOutCount}/{selectedSummary.rowCount}{" "}
+                  지역
+                </p>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={onDrillDown}
+              className="shrink-0 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700"
+            >
+              {selectedSummary.rowCount > 1
+                ? "시·군·구별 보기 ↓"
+                : "상세 보기 ↓"}
+            </button>
+          </div>
+        </div>
+      )}
 
       {tip && tipRegion && (
         <div
