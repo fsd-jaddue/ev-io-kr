@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { SITE } from "./site";
 
+/** 가이드 RSS. Next 메타데이터 병합에서 alternates 는 세그먼트 단위로 통째 교체되므로 pageMetadata 와 루트 레이아웃 양쪽에 넣는다 */
+export const FEED_ALTERNATES = {
+  "application/rss+xml": [{ url: `${SITE.url}/feed.xml`, title: `${SITE.name} 가이드 RSS` }],
+};
+
 interface PageMeta {
   title: string;
   description: string;
@@ -20,7 +25,7 @@ export function pageMetadata(m: PageMeta): Metadata {
     title: { absolute: fullTitle },
     description: m.description,
     keywords: m.keywords,
-    alternates: { canonical: url },
+    alternates: { canonical: url, types: FEED_ALTERNATES },
     robots: m.noindex ? { index: false, follow: false } : undefined,
     openGraph: {
       title: fullTitle,
