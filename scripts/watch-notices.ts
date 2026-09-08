@@ -29,12 +29,16 @@ interface Source {
   follow?: RegExp;
 }
 const SOURCES: Source[] = [
-  { id: "me-press", name: "환경부 보도·설명자료", url: "https://www.me.go.kr/home/web/board/list.do?menuId=10525&boardMasterId=1" },
-  { id: "ev-notice", name: "무공해차 통합누리집 공지사항", url: "https://ev.or.kr/nportal/main.do", follow: /공지사항|공지/ },
+  // 환경부는 2025년 기후에너지환경부(mcee.go.kr)로 개편돼 옛 me.go.kr 주소는 404. 메인에서 보도자료 메뉴를 찾아 들어간다
+  { id: "me-press", name: "기후에너지환경부 보도·설명자료", url: "https://mcee.go.kr/", follow: /보도자료|보도·설명|보도\/설명|보도 자료/ },
+  // 2026-09 확인된 공지사항 목록 주소 (메인의 "공지사항" 링크가 여기로 온다)
+  { id: "ev-notice", name: "무공해차 통합누리집 공지사항", url: "https://ev.or.kr/nportal/partcptn/initNoticeAction.do", follow: /공지사항/ },
 ];
 /** 보조금 정책과 관련 있는 글만 */
 const STRONG = /(보조금|지침|무공해차|전기차|전기승용)/;
 const WEAK = /(개편|개정|확정|공고|지원|예산|지급|업무처리|시행)/;
+/** 게시글 링크처럼 보이는 주소만 (메뉴·안내 페이지 제외). 예: board/generalView.do?ARTC_ID=…, board/read.do?…, nttId=… */
+const ARTICLE_HREF = /(view|read|detail|artc_id|nttid|boardid|bbsid|articleno|seq=|idx=|\/board\/|\/news\/|\/press)/i;
 
 export interface NoticeItem {
   source: string;
@@ -56,6 +60,7 @@ export function extractCandidates(html: string, baseUrl: string): { title: strin
     const title = $(a).text().replace(/\s+/g, " ").trim();
     const raw = $(a).attr("href") ?? "";
     if (title.length < 6 || !raw || /^(javascript:|#|mailto:)/i.test(raw)) return;
+    if (!ARTICLE_HREF.test(raw)) return;
     if (!STRONG.test(title) || !(WEAK.test(title) || /보조금/.test(title))) return;
     let href: string;
     try {
@@ -103,7 +108,9 @@ async function loadHtml(browser: Browser, src: Source): Promise<{ html: string; 
       );
       return a ? a.href : null;
     }, src.follow.source);
-    if (target) {
+    if (target && target.split("#")[0] === page.url().split("#")[0]) {
+      log(`${src.id}: already on ${target}`);
+    } else if (target) {
       log(`${src.id}: follow → ${target}`);
       await page.goto(target, { waitUntil: "domcontentloaded", timeout: 45_000 }).catch(() => {});
       await page.waitForTimeout(2500);
