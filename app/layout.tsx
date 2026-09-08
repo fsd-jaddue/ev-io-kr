@@ -4,7 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import JsonLd from "@/components/JsonLd";
 import { SITE } from "@/lib/site";
-import { websiteJsonLd } from "@/lib/seo";
+import { FEED_ALTERNATES, websiteJsonLd } from "@/lib/seo";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
@@ -19,6 +19,7 @@ export const metadata: Metadata = {
   creator: SITE.operator,
   publisher: SITE.operator,
   formatDetection: { email: false, address: false, telephone: false },
+  alternates: { types: FEED_ALTERNATES },
   openGraph: {
     type: "website",
     locale: "ko_KR",

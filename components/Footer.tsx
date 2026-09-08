@@ -21,6 +21,11 @@ export default function Footer() {
                   </Link>
                 </li>
               ))}
+              <li>
+                <a href="/feed.xml" className="hover:text-emerald-700 hover:underline">
+                  가이드 RSS
+                </a>
+              </li>
             </ul>
           </div>
           <div>
