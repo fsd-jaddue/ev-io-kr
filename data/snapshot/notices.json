@@ -1,4 +1,71 @@
 {
-  "checkedAt": "",
-  "items": []
+  "checkedAt": "2026-09-08T06:43:25.594Z",
+  "items": [
+    {
+      "source": "ev-notice",
+      "title": "무공해차 통합누리집 개편으로 인한 서비스 일시중단 안내",
+      "href": "https://ev.or.kr/nportal/board/generalView.do?ARTC_ID=25189&boardType=notice&curPage=1&searchValue=",
+      "firstSeen": "2026-09-08T06:43:25.594Z"
+    },
+    {
+      "source": "ev-notice",
+      "title": "2026년 지역별 무공해차 전환 브랜드 사업 공모 공고(3차)",
+      "href": "https://ev.or.kr/nportal/board/generalView.do?ARTC_ID=25387&boardType=notice&curPage=1&searchValue=",
+      "firstSeen": "2026-09-08T06:43:25.594Z"
+    },
+    {
+      "source": "ev-notice",
+      "title": "보조금 도우미",
+      "href": "https://ev.or.kr/nportal/ai/chat/initAiHelpdeskAction.do?chatType=subsidy",
+      "firstSeen": "2026-09-08T06:43:25.594Z"
+    },
+    {
+      "source": "ev-notice",
+      "title": "지자체문의처 및 보조금지급여부 확인",
+      "href": "https://ev.or.kr/nportal/buySupprt/initPsLocalInquiriesAction.do",
+      "firstSeen": "2026-09-08T06:43:25.594Z"
+    },
+    {
+      "source": "ev-notice",
+      "title": "보조금 환수금 안내·계산기",
+      "href": "https://ev.or.kr/nportal/buySupprt/initPenaltyCalcAction.do",
+      "firstSeen": "2026-09-08T06:43:25.594Z"
+    },
+    {
+      "source": "ev-notice",
+      "title": "보조금 안내·계산기",
+      "href": "https://ev.or.kr/nportal/buySupprt/initSubsiCalcAction.do",
+      "firstSeen": "2026-09-08T06:43:25.594Z"
+    },
+    {
+      "source": "ev-notice",
+      "title": "보조금 지급대상 차종",
+      "href": "https://ev.or.kr/nportal/buySupprt/initSubsidyTargetVehicleAction.do",
+      "firstSeen": "2026-09-08T06:43:25.594Z"
+    },
+    {
+      "source": "ev-notice",
+      "title": "지자체별 차종·모델 보조금",
+      "href": "https://ev.or.kr/nportal/buySupprt/initPsLocalCarPirceAction.do",
+      "firstSeen": "2026-09-08T06:43:25.594Z"
+    },
+    {
+      "source": "ev-notice",
+      "title": "지자체별 보조금 현황",
+      "href": "https://ev.or.kr/nportal/buySupprt/initSubsidyPaymentCheckAction.do",
+      "firstSeen": "2026-09-08T06:43:25.594Z"
+    },
+    {
+      "source": "ev-notice",
+      "title": "보조금 지원 대상 및 신청절차",
+      "href": "https://ev.or.kr/nportal/buySupprt/initSubsiGuideAction.do",
+      "firstSeen": "2026-09-08T06:43:25.594Z"
+    },
+    {
+      "source": "ev-notice",
+      "title": "무공해차 구매보조금안내",
+      "href": "https://ev.or.kr/nportal/buySupprt/initSubsiGuideAction.do",
+      "firstSeen": "2026-09-08T06:43:25.594Z"
+    }
+  ]
 }
