@@ -267,7 +267,7 @@ const FIGURES = {
     items: [
       { label: "현대 아이오닉 6 롱레인지", value: 570 },
       { label: "기아 EV6 롱레인지", value: 570 },
-      { label: "현대 아이오닉 5 롱레인지", value: 567 },
+      { label: "현대 아이오닉 5 롱레인지", value: 564 },
       { label: "기아 EV3 롱레인지", value: 555 },
       { label: "현대 코나 일렉트릭 롱레인지", value: 514 },
       { label: "테슬라 모델 3 프리미엄 LR", value: 420, color: C.sky },
@@ -486,7 +486,7 @@ const FIGURES = {
     items: [
       { label: "현대 아이오닉 6 롱레인지", value: 570 },
       { label: "기아 EV6 롱레인지 2WD", value: 570 },
-      { label: "현대 아이오닉 5 롱레인지", value: 567 },
+      { label: "현대 아이오닉 5 롱레인지", value: 564 },
       { label: "기아 EV3 롱레인지", value: 555 },
       { label: "현대 코나 일렉트릭 LR", value: 514 },
       { label: "테슬라 모델 3 프리미엄 LR", value: 420, color: C.sky },
