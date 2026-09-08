@@ -51,6 +51,7 @@ scripts/gen-guide-figures.mjs    가이드 인포그래픽 SVG 생성기
 - **홈 히어로 = 잔여 현황 지도 보드**(2026-09-07). 배너 일러스트를 지도로 대체: PC는 `data/korea-map.ts`의 간략화 윤곽 지도(SVG; 두께 레이어+그림자+광택+rotateX 기울기로 입체감, 선택 시 블록이 떠오름), 모바일은 4열 타일 카토그램. 둘 다 렌더하고 CSS(`hidden md:block` / `md:hidden`)로 토글해 hydration 불일치를 피한다. 첫 페인트·SEO는 빌드 시 `getRemainSnapshot()`(동기 스냅샷, 라이브 시도 없음)으로 채우고, 마운트 후 `/api/remain`을 한 번 호출해 더 새로우면 교체한다. 지역 선택 → 아래 도킹 `RegionPanel`에서 시·군·구 타일(도) / 단일 공고 카드(특별·광역시·세종·제주) / `RemainTable embedded` 표로 드릴다운. 잔여 수준은 잔여/공고 기준 소진(≤0)·적음(<5%)·보통(5~15%)·여유(≥15%)·미수집 5단계이며 색은 마스크 재고 지도 관례(초록·노랑·주황·빨강). `RemainTable`은 `data`(재요청 생략)·`embedded`(표만) prop을 받는다.
 - 시·군·구 페이지 slug는 **한글 원문**(`sigunguSlug`, 공백만 제거)을 `generateStaticParams`에 넘긴다. 미리 퍼센트 인코딩하면 Next/Vercel이 한 번 더 인코딩해 프리렌더 경로가 이중 인코딩되고 실제 요청(/region/busan/중구)이 404가 난다(2026-09-07 수정). 링크·canonical·sitemap은 `sigunguPath()`로만 만든다.
 - 애드센스 게시자 ID `ca-pub-9408914409364609`는 `lib/site.ts`의 `ADSENSE_CLIENT_DEFAULT`에 박혀 있어 스크립트(`<head>` 직접 삽입)·메타태그·ads.txt가 항상 켜진다. `NEXT_PUBLIC_ADSENSE_CLIENT`로 덮어쓰거나 `off`로 끌 수 있음. 광고 자리(AdSlot)는 슬롯 ID 환경변수가 있을 때만 렌더링.
+- 네이버 서치어드바이저 소유확인 값(2026-09-08 발급)도 같은 방식으로 `lib/site.ts`의 `NAVER_SITE_VERIFICATION_DEFAULT`에 있어 `<meta name="naver-site-verification">`이 항상 나간다(`NEXT_PUBLIC_NAVER_SITE_VERIFICATION`으로 덮어쓰기/`off`). 구글 서치콘솔은 도메인 속성(가비아 DNS TXT) 방식으로 진행 중이라 메타태그 기본값이 없다.
 - 이미지는 전부 직접 그린 SVG(저작권 이슈 없음). 외부 스톡 이미지 사용 안 함. 사용자가 Pixabay 사진을 `public/images/photos/`에 넣어주면 배치할 수 있음.
 
 ## 데이터 수집 구조 (2026-09-03 완성)
