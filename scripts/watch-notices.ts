@@ -51,29 +51,51 @@ interface State {
   items: NoticeItem[];
 }
 
-/** 목록 HTML 에서 후보 링크 추출 (제목 6자 이상, 키워드 포함) */
-export function extractCandidates(html: string, baseUrl: string): { title: string; href: string }[] {
+/** 메뉴·머리글·바닥글 안의 링크는 게시글이 아니다 */
+const CHROME_SELECTOR = "nav, header, footer, .gnb, .lnb, .snb, .quick, #header, #footer, #gnb, #lnb, .header, .footer, .menu, .navi";
+
+export interface ExtractResult {
+  items: { title: string; href: string }[];
+  /** 진단용: 전체 링크 수, 키워드 제목 링크 수(필터 전), 샘플 */
+  anchors: number;
+  keywordHits: number;
+  samples: string[];
+}
+
+/**
+ * 목록 HTML 에서 후보 링크 추출 (제목 6자 이상, 키워드 포함).
+ * - 실제 주소면 게시글형(ARTICLE_HREF)만, javascript:/# 로 여는 게시판(공공기관에 흔함)이면 목록 페이지 주소 + #제목 으로 기록한다.
+ * - 메뉴·머리글·바닥글 안의 링크는 제외한다.
+ */
+export function extractCandidates(html: string, baseUrl: string): ExtractResult {
   const $ = cheerio.load(html);
-  const out: { title: string; href: string }[] = [];
+  const items: { title: string; href: string }[] = [];
   const seen = new Set<string>();
+  const samples: string[] = [];
+  let keywordHits = 0;
+  const anchors = $("a[href]").length;
   $("a[href]").each((_, a) => {
     const title = $(a).text().replace(/\s+/g, " ").trim();
-    const raw = $(a).attr("href") ?? "";
-    if (title.length < 6 || !raw || /^(javascript:|#|mailto:)/i.test(raw)) return;
-    if (!ARTICLE_HREF.test(raw)) return;
+    const raw = ($(a).attr("href") ?? "").trim();
+    if (title.length < 6 || !raw || /^mailto:/i.test(raw)) return;
     if (!STRONG.test(title) || !(WEAK.test(title) || /보조금/.test(title))) return;
+    keywordHits++;
+    if (samples.length < 6) samples.push(`${title.slice(0, 40)} | ${raw.slice(0, 80)}`);
+    if ($(a).closest(CHROME_SELECTOR).length > 0) return;
+    const isScript = /^(javascript:|#)/i.test(raw);
+    if (!isScript && !ARTICLE_HREF.test(raw)) return;
     let href: string;
     try {
-      href = new URL(raw, baseUrl).toString();
+      href = isScript ? `${baseUrl.split("#")[0]}#${encodeURIComponent(title.slice(0, 60))}` : new URL(raw, baseUrl).toString();
     } catch {
       return;
     }
     const key = `${title}|${href}`;
     if (seen.has(key)) return;
     seen.add(key);
-    out.push({ title, href });
+    items.push({ title, href });
   });
-  return out;
+  return { items, anchors, keywordHits, samples };
 }
 
 function readState(): State {
@@ -118,6 +140,9 @@ async function loadHtml(browser: Browser, src: Source): Promise<{ html: string; 
       log(`${src.id}: no link matching ${src.follow} on ${src.url}; scanning main page instead`);
     }
   }
+  // 목록이 AJAX 로 늦게 그려지는 게시판이 많으므로 네트워크가 잠잠해질 때까지 + 여유 대기
+  await page.waitForLoadState("networkidle", { timeout: 15_000 }).catch(() => {});
+  await page.waitForTimeout(2500);
   const html = await page.content();
   const url = page.url();
   await ctx.close();
@@ -134,9 +159,10 @@ async function main() {
     for (const src of SOURCES) {
       try {
         const { html, url } = await loadHtml(browser, src);
-        const cands = extractCandidates(html, url);
+        const { items: cands, anchors, keywordHits, samples } = extractCandidates(html, url);
         const seeded = state.items.some((it) => it.source === src.id);
-        log(`${src.id}: ${cands.length} candidate links at ${url}${seeded ? "" : " (first run — seeding only)"}`);
+        log(`${src.id}: ${cands.length} candidate links at ${url} (anchors ${anchors}, keyword titles ${keywordHits})${seeded ? "" : " (first run — seeding only)"}`);
+        for (const smp of samples) log(`  sample: ${smp}`);
         for (const c of cands.slice(0, 40)) {
           const key = `${src.id}|${c.title}|${c.href}`;
           if (known.has(key)) continue;
