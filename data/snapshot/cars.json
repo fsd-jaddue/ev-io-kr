@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-08",
+  "updatedAt": "2026-09-09",
   "region": "서울특별시",
   "note": "scripts/fetch-snapshot.ts 가 ev.or.kr '지자체별 차종·모델 보조금'(서울) 그리드에서 승용 일반승용 모델별 국비를 수집해 채웁니다. rows 가 비어 있으면 data/cars.ts 의 수기값만 사용됩니다.",
   "rows": [
