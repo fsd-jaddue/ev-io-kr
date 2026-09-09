@@ -62,6 +62,22 @@
     {
       "carClass": "전기승용 일반승용",
       "maker": "BMW",
+      "model": "New MINI Countryman E",
+      "national": 238,
+      "local": 71,
+      "conversionNational": 48
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "BMW",
+      "model": "New MINI Countryman SE ALL4",
+      "national": 225,
+      "local": 67,
+      "conversionNational": 45
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "BMW",
       "model": "i4 M60 LCI (71HD)",
       "national": 233,
       "local": 69,
@@ -270,6 +286,14 @@
     {
       "carClass": "전기승용 일반승용",
       "maker": "기아",
+      "model": "EV5 스탠다드 2WD 19인치",
+      "national": 453,
+      "local": 135,
+      "conversionNational": 91
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
       "model": "EV9 GT",
       "national": 245,
       "local": 73,
@@ -326,10 +350,42 @@
     {
       "carClass": "전기승용 일반승용",
       "maker": "기아",
+      "model": "PV5 패신저 5인승 (1-2-2 택시) 롱레인지",
+      "national": 458,
+      "local": 137,
+      "conversionNational": 92
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
       "model": "PV5 패신저 5인승 롱레인지",
       "national": 458,
       "local": 137,
       "conversionNational": 92
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "PV5 패신저 5인승(1-2-2) 롱레인지",
+      "national": 458,
+      "local": 137,
+      "conversionNational": 92
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "PV5 패신저 7인승(2-2-3) 롱레인지",
+      "national": 455,
+      "local": 136,
+      "conversionNational": 91
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "기아",
+      "model": "PV5 프라임 롱레인지",
+      "national": 439,
+      "local": 131,
+      "conversionNational": 88
     },
     {
       "carClass": "전기승용 일반승용",
