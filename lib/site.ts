@@ -27,6 +27,9 @@ export const SITE = {
   bingVerification: resolveWithDefault(process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION, BING_SITE_VERIFICATION_DEFAULT),
   // 구글은 DNS TXT(도메인 속성) 방식으로 확인 중이라 메타태그 기본값 없음. URL 접두어 방식이면 이 변수에 content 값을 넣는다.
   googleVerification: (process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ?? "").trim(),
+  // 구글 애널리틱스 4 측정 ID(G-XXXXXXXXXX). 비어 있으면 GA 스크립트를 넣지 않는다.
+  // 애드센스 승인 뒤 Vercel 환경변수에 값을 넣고 Redeploy 하면 코드 수정 없이 켜진다.
+  gaMeasurementId: (process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "").trim(),
   launchedYear: 2026,
 } as const;
 

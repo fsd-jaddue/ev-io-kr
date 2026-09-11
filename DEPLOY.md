@@ -83,10 +83,17 @@ npm run fetch:snapshot
    - 모든 페이지 `<head>` 에 `adsbygoogle.js?client=ca-pub-…` 스크립트와 `<meta name="google-adsense-account">` 태그가 들어갑니다.
    - `https://ev.io.kr/ads.txt` 가 `google.com, pub-9408914409364609, DIRECT, f08c47fec0942fa0` 을 반환합니다.
    - 배포 후 애드센스 화면 **사이트 → ev.io.kr → 코드 확인/ads.txt 확인** 을 눌러 "사이트 연결됨" 이 뜨면 심사 요청.
+   - 애드센스 "사이트" 목록의 **Ads.txt 상태가 "찾을 수 없음"** 으로 남아 있어도 당황하지 말 것. 구글은 ads.txt 를 며칠~몇 주 간격으로만 다시 읽고, 목록의 "최종 업데이트" 시각이 파일을 올린 시점보다 앞서 있으면 아직 다시 읽지 않은 것이다. 확인 순서: ① 브라우저에서 `https://ev.io.kr/ads.txt` 를 열어 위 한 줄이 보이는지 ② 시크릿 창에서도 같은지 ③ 그래도 상태가 안 바뀌면 사이트 상세 화면의 ads.txt 항목에 "확인/업데이트 확인" 버튼이 있을 때 눌러 재확인 요청. 심사 자체에는 ads.txt 상태가 필수 조건이 아니다.
 4. 승인 후 광고 단위를 만들고 슬롯 ID를 `NEXT_PUBLIC_ADSENSE_SLOT_HOME` 등에 넣어 Redeploy 하면 각 페이지의 광고 자리가 활성화됩니다.
 5. 심사 기간(보통 2주~1개월) 동안은 콘텐츠를 계속 추가하고, 지역 페이지의 "공고 확인" 값을 실제 공고 금액으로 채워 두는 것이 유리합니다.
 
-## 7. 자료 갱신 루틴
+## 7. 방문 통계
+
+- **Vercel Web Analytics**(코드 내장, 쿠키 없음): Vercel 대시보드 → 프로젝트 `ev-io-kr` → **Analytics** 탭 → **Enable**. 켠 뒤 배포된 사이트를 한 번 열면 몇 분 안에 페이지별 방문·유입 경로·국가·기기가 보인다. 무료(Hobby) 플랜은 월 2,500 이벤트까지 집계된다.
+- **Google Analytics 4**(선택, 애드센스 승인 뒤): https://analytics.google.com 에서 속성 생성 → 웹 스트림 `ev.io.kr` → 측정 ID(`G-…`) 복사 → Vercel 프로젝트 Settings → Environment Variables 에 `NEXT_PUBLIC_GA_MEASUREMENT_ID` 로 저장(Production) → Redeploy. 값이 없으면 GA 스크립트는 페이지에 들어가지 않는다. 애드센스 콘솔에서 GA 계정을 연결하면 광고 수익과 방문 데이터를 함께 볼 수 있다.
+- 검색어별 유입은 구글 서치콘솔·네이버 서치어드바이저 "검색 성과/유입 검색어" 보고서에서 별도 설정 없이 확인.
+
+## 8. 자료 갱신 루틴
 
 - **자동**: 매시간 수집 워크플로가 접수·출고·잔여, 시·군·구 지방비, 누리집 모델별 국비(`cars.json`)를 갱신·배포한다. 지방비 금액, 공고 물량·종류, 소진/재개, 국비가 바뀌면 GitHub Issue(`data-change`)가 열린다. 매일 09:30 정책 공지 감시가 환경부 보도자료·누리집 공지의 보조금 관련 새 글을 Issue(`policy-notice`)로 올린다. Issue 알림은 GitHub 계정 이메일로 온다(Settings → Notifications 에서 확인).
 - **사람이 하는 일**: Issue 를 보고 가이드 본문·시·도 소개문·차종 설명이 새 수치와 어긋나면 세션에서 갱신. `data-change` Issue 에 ⚠️/❌ 매칭 항목이 있으면 `data/cars.ts` 의 `evMatch` 를 보정.
