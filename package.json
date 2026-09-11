@@ -13,6 +13,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@next/third-parties": "^15.5.25",
+    "@vercel/analytics": "^2.0.1",
     "cheerio": "^1.2.0",
     "iconv-lite": "^0.7.3",
     "next": "15.5.25",

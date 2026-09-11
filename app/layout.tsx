@@ -5,6 +5,8 @@ import Footer from "@/components/Footer";
 import JsonLd from "@/components/JsonLd";
 import { SITE } from "@/lib/site";
 import { FEED_ALTERNATES, organizationJsonLd, websiteJsonLd } from "@/lib/seo";
+import { Analytics } from "@vercel/analytics/next";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
@@ -74,6 +76,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           {children}
         </main>
         <Footer />
+        {/* 방문 통계. Vercel Web Analytics 는 쿠키를 쓰지 않으며 Vercel 대시보드 → Analytics 탭에서 Enable 해야 집계된다.
+            GA4 는 NEXT_PUBLIC_GA_MEASUREMENT_ID 가 있을 때만 스크립트를 넣는다(애드센스 승인 뒤 연결 예정). */}
+        <Analytics />
+        {SITE.gaMeasurementId && <GoogleAnalytics gaId={SITE.gaMeasurementId} />}
       </body>
     </html>
   );
