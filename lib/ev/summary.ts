@@ -10,7 +10,10 @@ export interface SidoSummary {
   max: number | null;
   count: number; // 시·군·구 수
   known: number; // 금액 확인된 시·군·구 수
-  uniform: boolean; // 단일 공고 여부
+  /** 시·도 전역 단일 공고(특별·광역시·세종·제주). 금액만 같은 시·군별 공고는 equal */
+  uniform: boolean;
+  /** 확인된 시·군·구가 2곳 이상이고 금액이 모두 같음(단일 공고 포함) */
+  equal: boolean;
 }
 
 export function summarizeBySido(rows: LocalPriceRow[]): SidoSummary[] {
@@ -27,7 +30,8 @@ export function summarizeBySido(rows: LocalPriceRow[]): SidoSummary[] {
       max,
       count: s.sigungu.length,
       known: amounts.length,
-      uniform: amounts.length > 0 && min === max && s.sigungu.length > 1,
+      uniform: amounts.length > 0 && mine.every((r) => r.amount === null || r.single),
+      equal: amounts.length > 1 && min === max,
     };
   });
 }

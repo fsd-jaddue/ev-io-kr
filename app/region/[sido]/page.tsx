@@ -50,7 +50,6 @@ export default async function SidoPage({ params }: { params: Promise<{ sido: str
   const amounts = rows.map((r) => r.amount).filter((a): a is number => a !== null);
   const max = amounts.length ? Math.max(...amounts) : null;
   const min = amounts.length ? Math.min(...amounts) : null;
-  const uniform = amounts.length > 0 && min === max;
   const intro = SIDO_INTRO[slug];
   const exampleCars = CARS.filter((c) => c.national !== null).slice(0, 5);
   const relatedGuides = GUIDES.filter((g) => g.category === "지역" || g.category === "신청").slice(0, 4);
@@ -58,6 +57,7 @@ export default async function SidoPage({ params }: { params: Promise<{ sido: str
   const remain = filterRemainBySido(getRemainSnapshot(), slug);
   const remainSummary = summarizeRemainBySido(remain.rows).find((s) => s.slug === slug) ?? null;
   const stats = sidoPriceStats(local.rows, slug);
+  const uniform = stats.uniform;
   const faq = sidoFaq({
     sido,
     stats,
@@ -94,7 +94,7 @@ export default async function SidoPage({ params }: { params: Promise<{ sido: str
       </div>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Card label="승용 지방비" value={max === null ? "공고 확인" : uniform ? won(max) : `${min}~${max}만원`} sub={uniform ? `${sido.name} 단일 공고` : `${stats.known}개 시·군·구 확인`} />
+        <Card label="승용 지방비" value={max === null ? "공고 확인" : uniform ? won(max) : `${min}~${max}만원`} sub={uniform ? `${sido.name} 단일 공고` : stats.equal ? `${stats.count}개 시·군 동일 금액 (공고는 시·군별)` : `${stats.known}개 시·군·구 확인`} />
         <Card label="국비 최대" value={won(NATIONAL_MAX.large)} sub={`소형 ${NATIONAL_MAX.small}만원`} />
         <Card label="합산 최대" value={max === null ? "-" : won(max + NATIONAL_MAX.large)} sub="전환지원금 +100만원 별도" />
         <Card

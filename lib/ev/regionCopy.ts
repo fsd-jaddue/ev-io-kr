@@ -58,6 +58,14 @@ export function sigunguComparison(f: SigunguFacts): string {
     const rank = f.sidoRank?.rank ? ` 17개 시·도 최대 지방비 기준으로는 ${f.sidoRank.rank}위입니다.` : "";
     return `${eunNeun(sido.name)} ${stats.count}개 시·군·구 구분 없이 단일 공고로 운영되어 ${name}도 다른 지역과 같은 ${n(amount)}만원을 받습니다.${rank} ${sums}`;
   }
+  if (stats.equal) {
+    const rank = f.sidoRank?.rank ? ` 17개 시·도 최대 지방비 기준으로 ${sido.short}는 ${f.sidoRank.rank}위입니다.` : "";
+    const remain =
+      f.remainRow && f.remainRow.region !== sido.name
+        ? ` 다만 공고는 ${name}이 따로 내므로 물량과 잔여 대수는 ${sido.short} 다른 시·군과 다릅니다.`
+        : ` 다만 공고와 물량은 시·군별로 따로 운영되므로 잔여 대수는 지역마다 다릅니다.`;
+    return `${sido.short} ${stats.count}개 시·군은 2026년 승용 지방비를 모두 ${n(amount)}만원으로 공고해 ${name}도 같은 금액입니다.${rank}${remain} ${sums}`;
+  }
   const parts: string[] = [];
   if (f.rankSido) parts.push(`${name} 승용 지방비 ${n(amount)}만원은 ${sido.short} ${f.rankSido.total}개 시·군·구 중 ${rankText(f.rankSido)}입니다.`);
   if (stats.max !== null && stats.min !== null && stats.avg !== null) {
@@ -128,6 +136,11 @@ export function sigunguFaq(f: SigunguFacts): Faq[] {
         q: `${name} 지방비는 ${sido.short} 다른 지역과 다른가요?`,
         a: `아닙니다. ${eunNeun(sido.name)} ${stats.count}개 시·군·구 구분 없이 단일 공고로 운영해 어디에 살든 같은 ${n(amount)}만원입니다.${f.sidoRank?.rank ? ` 17개 시·도의 최대 지방비를 비교하면 ${f.sidoRank.rank}위입니다.` : ""}`,
       });
+    } else if (stats.equal) {
+      out.push({
+        q: `${name} 지방비는 ${sido.short} 다른 시·군과 다른가요?`,
+        a: `금액은 같습니다. ${sido.short} ${stats.count}개 시·군이 2026년 승용 지방비를 모두 ${n(amount)}만원으로 공고했습니다. 다만 공고 주체·물량·접수 기간은 시·군별로 달라서 ${name}의 잔여 대수와 마감 시점은 다른 시·군과 다를 수 있습니다.`,
+      });
     } else if (f.rankSido && stats.max !== null && stats.min !== null) {
       out.push({
         q: `${name} 지방비는 ${sido.short} 다른 시·군·구와 비교하면 어떤가요?`,
@@ -173,7 +186,9 @@ export function sidoFaq(f: SidoFacts): Faq[] {
       q: `${eunNeun(sido.short)} 시·군·구마다 보조금이 다른가요?`,
       a: stats.uniform
         ? `아닙니다. ${sido.name}가 ${stats.count}개 시·군·구 구분 없이 하나의 공고로 운영하므로 거주 구·군과 관계없이 같은 금액과 같은 잔여 물량이 적용됩니다.${f.sidoRank?.rank ? ` 17개 시·도 최대 지방비 순위는 ${f.sidoRank.rank}위입니다.` : ""}`
-        : `네. ${eunNeun(sido.short)} ${stats.count}개 시·군·구가 각자 공고를 내며 확인된 ${stats.known}곳의 지방비는 ${n(stats.min)}~${n(stats.max)}만원으로 최대 ${n(stats.max - stats.min)}만원 차이가 납니다. 최저는 ${stats.minNames.slice(0, 3).join("·")}(${n(stats.min)}만원), 평균은 ${stats.avg !== null ? `${n(stats.avg)}만원` : "-"}입니다. 지방비는 차량 등록 주소지 시·군·구 기준입니다.`,
+        : stats.equal
+          ? `금액은 같고 물량은 다릅니다. ${sido.short} ${stats.count}개 시·군이 모두 승용 지방비 ${n(stats.max)}만원을 공고했지만, 공고는 시·군별로 따로 내기 때문에 공고 대수·접수 기간·잔여 대수는 지역마다 다릅니다. 지방비는 차량 등록 주소지 시·군 기준입니다.`
+          : `네. ${eunNeun(sido.short)} ${stats.count}개 시·군·구가 각자 공고를 내며 확인된 ${stats.known}곳의 지방비는 ${n(stats.min)}~${n(stats.max)}만원으로 최대 ${n(stats.max - stats.min)}만원 차이가 납니다. 최저는 ${stats.minNames.slice(0, 3).join("·")}(${n(stats.min)}만원), 평균은 ${stats.avg !== null ? `${n(stats.avg)}만원` : "-"}입니다. 지방비는 차량 등록 주소지 시·군·구 기준입니다.`,
     });
   }
   if (summary && summary.rowCount > 0) {

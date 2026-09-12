@@ -3,7 +3,7 @@
 이 파일은 새 작업 세션이 프로젝트 맥락을 바로 이어받기 위한 안내서다. 작업 전 반드시 읽고, 큰 결정이 바뀌면 이 파일도 갱신한다.
 
 ## 프로젝트 한 줄 요약
-구글 애드센스 승인을 목표로 만든 정보 사이트. 전국 17개 시·도 / 229개 시·군·구별 전기차 구매 보조금(국비·지방비), 차종별 국비, 보조금 계산기, 가이드 16편, 정책 페이지를 제공한다. 사이트명은 **"전기차보조금 조회"** ('실시간'이라는 표현은 쓰지 않기로 결정). 운영자 표기도 사이트명, 문의 이메일 `eviokr@icloud.com`.
+구글 애드센스 승인을 목표로 만든 정보 사이트. 전국 17개 시·도 / 229개 시·군·구별 전기차 구매 보조금(국비·지방비), 차종별 국비(20종, 각 수기 해설), 보조금 계산기, 가이드 27편, 정책 페이지를 제공한다. 사이트명은 **"전기차보조금 조회"** ('실시간'이라는 표현은 쓰지 않기로 결정). 운영자 표기도 사이트명, 문의 이메일 `eviokr@icloud.com`.
 
 ## 기술 스택 / 실행
 - Next.js 15 App Router + TypeScript + Tailwind v4, Node 22. DB 없음.
@@ -33,7 +33,9 @@ data/korea-map.ts    직접 잡은 좌표의 한국 지도: 교차점(NODES)+경
 lib/ev/remainSummary.ts  접수·출고·잔여 시·도 합계·잔여 수준(레벨)·TOP N·matchRemainRows·parseRemainNote 등 순수 함수 + 레벨별 색/클래스(LEVEL_META)
 lib/ev/localPriceStats.ts 시·도 내 지방비 통계·순위(1224식)·인근 비교 행·17개 시·도 최대액 순위 (순수)
 lib/ev/regionCopy.ts     지역 페이지의 데이터 기반 비교 문단·체크리스트·FAQ 생성기 (순수, 수치는 데이터에서만, eunNeun 조사 헬퍼)
-content/guides/      가이드 16편 (basic/apply/benefit/region-car .ts, HTML 본문 + faq). index.ts 가 합침
+content/guides/      가이드 27편 (basic/apply/benefit/region-car/practical .ts 수기, region-deep.ts 는 도 8곳 시·군 비교 — 수치는 스냅샷에서 계산·해설은 수기). index.ts 가 합침
+content/cars/        차종 20종의 수기 해설(소개·국비 산정 배경·확인할 점·비교 차종·FAQ). family 정규식으로 누리집 동일 계열 트림 표를 그림
+lib/ev/localPrice.ts 지방비 스냅샷 정규화(순수, server-only 아님). 가이드 본문처럼 빌드 시 데이터가 필요한 곳은 getLocalPriceSnapshot() 사용
 data/regions.ts      17개 시·도 + 시·군·구 목록, slug 헬퍼
 data/cars.ts         차종별 2026 국비 (null = 확정치 미확인)
 data/sido-intro.ts   시·도 소개 문단
@@ -51,6 +53,12 @@ scripts/gen-guide-figures.mjs    가이드 인포그래픽 SVG 생성기
 .github/workflows/snapshot.yml   매시간(KST 06~23시) 수집 → 변경 감지 → JSON 커밋 → Vercel 자동 재배포 → 변경 시 Issue
 .github/workflows/notices.yml    매일 KST 09:30 정책 공지 감시 → 새 글 있으면 Issue
 ```
+
+## 애드센스 1차 심사 "가치가 별로 없는 콘텐츠" 대응 (2026-09-12)
+- 진단: 차종 페이지 20개가 600~1,200자 얇은 페이지, 시·도 단일 공고 지역(서울·부산·대구·인천·광주·대전·울산·세종·제주)의 구·군 페이지 78개가 시·도 페이지와 완전 중복, 편집 글 16편뿐(자동 생성 페이지 95%).
+- 조치: ① `content/cars/`로 차종 페이지에 수기 해설·트림별 국비 표·비교표·FAQ ② 단일 공고 시·도의 구·군 페이지는 `noindex,follow`(`pageMetadata({noindex})`, follow 유지) + 사이트맵 제외(`app/sitemap.ts`) — 페이지는 그대로 열리고 시·도 페이지로 안내 ③ 가이드 11편 추가 ④ 소개 페이지에 편집 원칙. 재심사 절차는 `DEPLOY.md` 6-1.
+- **"단일 공고"(uniform)와 "동일 금액"(equal)을 구분한다.** `LocalPriceRow.single`은 수집 JSON의 "전체" 행에서 복제된 행에만 붙고, `sidoPriceStats().uniform`/`summarizeBySido().uniform`은 이 플래그 기준이다. 강원·충북·충남·전북처럼 시·군별 공고인데 금액만 같은 곳은 `equal`만 true 이며 잔여 물량이 시·군마다 다르므로 색인 유지·"단일 공고" 문구 금지(예전엔 이곳도 단일 공고로 잘못 표시했음).
+- 승인 뒤에도 noindex 는 유지하는 편이 낫다(구글이 중복으로 보는 페이지). 되돌리려면 시·군·구 페이지 `generateMetadata`의 `noindex` 와 sitemap 필터만 지우면 된다.
 
 ## 데이터 흐름과 핵심 결정
 - 지방비(시·군·구별 승용 최대액)는 `data/snapshot/local-price.ts`의 취합값이 기본이고, 수집 JSON에 행이 있으면 그것이 우선. 확인 안 된 곳은 `null` → 화면에 "공고 확인".
@@ -74,7 +82,7 @@ scripts/gen-guide-figures.mjs    가이드 인포그래픽 SVG 생성기
 
 ## 다음 할 일 (우선순위 순)
 1. 검색엔진 등록은 2026-09-08 완료(구글 DNS TXT, 네이버·Bing 메타태그, 다음 검색등록). 남은 일: GSC·서치어드바이저 색인 보고서 확인, `/feed.xml` RSS 제출 확인. 첫 `cars.json` 수집 뒤 Issue의 매칭 표를 보고 `data/cars.ts` `evMatch` 정규식 보정.
-2. 애드센스 사이트 연결 완료(2026-09-03, 게시자 ID 코드 내장). 애드센스 콘솔에서 "코드 확인" → 심사 요청 → 승인 후 광고 단위 슬롯 ID를 `NEXT_PUBLIC_ADSENSE_SLOT_*` 환경변수에 입력.
+2. 애드센스 1차 심사는 2026-09-12 "가치가 별로 없는 콘텐츠"로 거절 → 같은 날 위 대응을 배포. 사용자가 애드센스 콘솔에서 "문제를 수정했음" 체크 후 검토 요청해야 한다(배포 후 하루쯤 뒤 권장). 승인 후 광고 단위 슬롯 ID를 `NEXT_PUBLIC_ADSENSE_SLOT_*` 환경변수에 입력. 재거절 시 후보 조치는 `DEPLOY.md` 6-1.
 3. 수집 워크플로가 계속 성공하는지 주기적으로 확인(Actions 탭). ev.or.kr 화면 구조가 바뀌면 로그의 `grid headers`를 보고 `lib/ev/aggrid.ts`의 열 정규식을 맞춘다.
 4. 가이드·지역 콘텐츠 보강, 2027년 지침 확정 시 수치 갱신(`data/cars.ts`, 가이드 본문, `scripts/gen-guide-figures.mjs` 후 재생성).
 

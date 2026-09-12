@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { LEGAL_UPDATED_AT, SITE } from "@/lib/site";
-import { getSnapshotDates } from "@/lib/ev/getData";
+import { getLocalPriceData, getSnapshotDates } from "@/lib/ev/getData";
+import { summarizeBySido } from "@/lib/ev/summary";
 import { SIDO_LIST, sigunguPath } from "@/data/regions";
 import { CARS } from "@/data/cars";
 import { GUIDES } from "@/content/guides";
@@ -9,8 +10,10 @@ import { GUIDES } from "@/content/guides";
  * lastModified 는 실제 자료 기준 시각을 쓴다(빌드 시각 아님). 잔여 현황을 서버 렌더링하는 홈·지역 페이지는
  * 스냅샷 최신 시각, 차종 페이지는 지방비 수집일, 가이드는 updated, 정책 페이지는 LEGAL_UPDATED_AT.
  */
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = SITE.url;
+  // 시·도 단일 공고 지역의 구·군 페이지는 noindex 이므로 사이트맵에서도 뺀다 (app/region/[sido]/[sigungu]/page.tsx 참고)
+  const singleNotice = new Set(summarizeBySido((await getLocalPriceData()).rows).filter((s) => s.uniform).map((s) => s.slug));
   const { latest, localPriceUpdatedAt } = getSnapshotDates();
   const legal = new Date(`${LEGAL_UPDATED_AT}T00:00:00+09:00`);
   const guideLatest = GUIDES.reduce((m, g) => (g.updated > m ? g.updated : m), GUIDES[0]?.updated ?? LEGAL_UPDATED_AT);
@@ -32,7 +35,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: "daily",
     priority: 0.8,
   }));
-  const sigungus: MetadataRoute.Sitemap = SIDO_LIST.flatMap((s) =>
+  const sigungus: MetadataRoute.Sitemap = SIDO_LIST.filter((s) => !singleNotice.has(s.slug)).flatMap((s) =>
     s.sigungu.map((g) => ({
       url: `${base}${sigunguPath(s.slug, g)}`,
       lastModified: latest,

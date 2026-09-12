@@ -26,7 +26,8 @@ export function pageMetadata(m: PageMeta): Metadata {
     description: m.description,
     keywords: m.keywords,
     alternates: { canonical: url, types: FEED_ALTERNATES },
-    robots: m.noindex ? { index: false, follow: false } : undefined,
+    // noindex 여도 follow 는 유지: 링크 신호는 전달하고 색인만 막는다(중복 시·군·구 페이지용)
+    robots: m.noindex ? { index: false, follow: true } : undefined,
     openGraph: {
       title: fullTitle,
       description: m.description,

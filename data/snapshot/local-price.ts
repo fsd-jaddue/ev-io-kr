@@ -202,6 +202,7 @@ export const LOCAL_PRICE_ROWS: LocalPriceRow[] = SIDO_LIST.flatMap((sido) => {
       sigungu: name,
       amount: uniform.amount,
       note: uniform.note,
+      single: true,
     }));
   }
   const table = BY_SIGUNGU[sido.slug] ?? {};

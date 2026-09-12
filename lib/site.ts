@@ -34,7 +34,7 @@ export const SITE = {
 } as const;
 
 /** 정책·소개 페이지의 마지막 내용 수정일 (sitemap lastmod). 문구를 고치면 갱신한다 */
-export const LEGAL_UPDATED_AT = "2026-09-01";
+export const LEGAL_UPDATED_AT = "2026-09-12";
 
 export const NAV = [
   { href: "/", label: "홈" },
