@@ -142,11 +142,11 @@ export default async function CarPage({ params }: { params: Promise<{ slug: stri
                   return (
                     <tr key={`${r.maker}|${r.model}`} className={`border-t border-slate-100 ${mine ? "bg-emerald-50 font-bold" : ""}`}>
                       <td className="px-3 py-2">{r.model}</td>
-                      <td className="px-3 py-2 text-right tabular-nums text-emerald-700">{won(r.national)}</td>
-                      <td className="px-3 py-2 text-right tabular-nums text-slate-500">
+                      <td className="whitespace-nowrap px-3 py-2 text-right tabular-nums text-emerald-700">{won(r.national)}</td>
+                      <td className="whitespace-nowrap px-3 py-2 text-right tabular-nums text-slate-500">
                         {diff === null ? "-" : diff === 0 ? "같음" : `${diff > 0 ? "+" : "−"}${Math.abs(diff)}만원`}
                       </td>
-                      <td className="px-3 py-2 text-right tabular-nums text-slate-600">{won(r.conversionNational)}</td>
+                      <td className="whitespace-nowrap px-3 py-2 text-right tabular-nums text-slate-600">{won(r.conversionNational)}</td>
                     </tr>
                   );
                 })}
@@ -249,8 +249,8 @@ export default async function CarPage({ params }: { params: Promise<{ slug: stri
                         {carName(r.car!)}
                       </Link>
                     </td>
-                    <td className="px-3 py-2 text-right tabular-nums text-emerald-700">{won(r.car!.national)}</td>
-                    <td className="px-3 py-2 text-right tabular-nums">{r.car!.range ? `${r.car!.range}km` : "-"}</td>
+                    <td className="whitespace-nowrap px-3 py-2 text-right tabular-nums text-emerald-700">{won(r.car!.national)}</td>
+                    <td className="whitespace-nowrap px-3 py-2 text-right tabular-nums">{r.car!.range ? `${r.car!.range}km` : "-"}</td>
                     <td className="px-3 py-2 text-slate-600">{r.why}</td>
                   </tr>
                 ))}
