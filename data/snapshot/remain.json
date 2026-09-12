@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-11T23:20:23.425Z",
+  "fetchedAt": "2026-09-12T01:16:14.227Z",
   "note": "무공해차 통합누리집 '지자체별 보조금 현황' 수집 결과. scripts/fetch-snapshot.ts 실행으로 갱신됩니다. rows가 비어 있으면 화면에는 누리집 링크만 표시됩니다.",
   "rows": [
     {
@@ -1437,9 +1437,9 @@
       "region": "통영시",
       "vehicleType": "승용",
       "announced": 260,
-      "applied": 254,
-      "released": 253,
-      "remaining": 7,
+      "applied": 251,
+      "released": 250,
+      "remaining": 10,
       "note": "본공고·추경1차 · 신청마감 · 마감 2026.05.13 18:00"
     },
     {
