@@ -60,6 +60,8 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
     title: `${d.sido.short} ${d.name} 전기차 보조금 2026`,
     description: `2026년 ${d.sido.name} ${d.name} 승용 전기차 보조금: 지방비 ${won(d.row.amount)}${total ? `, 국비 ${NATIONAL_MAX.large}만원 합산 최대 ${total.toLocaleString()}만원` : ""}.${remainText} 차종별 예상 지원액, ${d.sido.short} 시·군·구 비교, 신청 방법 정리.`,
     path: sigunguPath(d.sido.slug, d.name),
+    // 시·도 단일 공고 지역의 구·군 페이지는 시·도 페이지와 내용이 같으므로 색인에서 뺀다(중복·얇은 페이지 방지, 2026-09-12)
+    noindex: d.stats.uniform,
     keywords: [`${d.name} 전기차 보조금`, `${d.sido.short} ${d.name} 전기차 보조금`, `${d.name} 전기차 지방비`, `2026 ${d.name} 전기차 보조금`],
   });
 }
@@ -104,12 +106,21 @@ export default async function SigunguPage({ params }: { params: Params }) {
         {row.note ? ` ${row.note}.` : ""} 실제 지급액은 차종별 국비 산정액에 비례하며, 공고 물량이 소진되면 지급되지 않습니다.
       </p>
       <p className="mt-3 max-w-3xl leading-7 text-slate-700">{sigunguComparison(facts)}</p>
+      {stats.uniform && (
+        <p className="mt-3 max-w-3xl rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">
+          {sido.name}는 {stats.count}개 구·군 구분 없이 하나의 공고로 운영하므로 이 페이지의 금액·접수 현황은{" "}
+          <Link href={`/region/${sido.slug}`} className="text-emerald-700 underline">
+            {sido.name} 페이지
+          </Link>
+          와 같습니다. 구·군별 추가 인센티브가 있는지는 {name} 홈페이지 고시·공고에서 확인하세요.
+        </p>
+      )}
       <p className="mt-2 text-xs text-slate-500">
         데이터 기준: 지방비 {local.updatedAt} · 접수 현황 {formatFetchedAt(remain.fetchedAt)} · 출처 무공해차 통합누리집
       </p>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Card label={`${name} 지방비 최대`} value={won(row.amount)} sub={facts.rankSido && !stats.uniform ? `${sido.short} ${facts.rankSido.total}곳 중 ${facts.rankSido.rank}위` : stats.uniform ? `${sido.name} 단일 공고` : undefined} />
+        <Card label={`${name} 지방비 최대`} value={won(row.amount)} sub={stats.uniform ? `${sido.name} 단일 공고` : stats.equal ? `${sido.short} ${stats.count}개 시·군 동일 금액` : facts.rankSido ? `${sido.short} ${facts.rankSido.total}곳 중 ${facts.rankSido.rank}위` : undefined} />
         <Card label="국비 최대" value={won(NATIONAL_MAX.large)} sub={`소형 ${NATIONAL_MAX.small}만원`} />
         <Card
           label="합산 최대"

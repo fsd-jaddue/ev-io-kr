@@ -74,7 +74,7 @@ export default async function RegionIndexPage() {
                   <td className="px-3 py-2 text-right font-semibold tabular-nums">
                     {s.max === null ? "-" : `${(s.max + NATIONAL_MAX.large).toLocaleString()}만원`}
                   </td>
-                  <td className="px-3 py-2 text-right text-slate-500">{s.uniform ? "시·도 단일" : `${s.count}개 시·군·구`}</td>
+                  <td className="px-3 py-2 text-right text-slate-500">{s.uniform ? "시·도 단일" : s.equal ? `${s.count}개 시·군 동일 금액` : `${s.count}개 시·군·구`}</td>
                 </tr>
               ))}
             </tbody>

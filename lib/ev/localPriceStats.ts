@@ -19,8 +19,10 @@ export interface SidoPriceStats {
   /** 최고액 시·군·구(동률 전부) */
   maxNames: string[];
   minNames: string[];
-  /** 확인된 곳이 2곳 이상이고 모두 같은 금액 (시·도 단일 공고) */
+  /** 시·도 전역 단일 공고(행이 "전체" 1건에서 복제됨). 시·군별 공고인데 금액만 같은 경우는 equal 만 true */
   uniform: boolean;
+  /** 확인된 곳이 2곳 이상이고 금액이 모두 같음 (단일 공고 포함) */
+  equal: boolean;
   /** 금액 내림차순, null 은 뒤로, 동률은 이름순 */
   sorted: LocalPriceRow[];
 }
@@ -53,7 +55,8 @@ export function sidoPriceStats(rows: LocalPriceRow[], sidoSlug: string): SidoPri
     avg,
     maxNames: known.filter((r) => r.amount === max).map((r) => r.sigungu),
     minNames: known.filter((r) => r.amount === min).map((r) => r.sigungu),
-    uniform: known.length > 1 && min === max,
+    uniform: known.length > 0 && known.every((r) => r.single),
+    equal: known.length > 1 && min === max,
     sorted: [...mine].sort(byAmountDesc),
   };
 }
@@ -87,7 +90,7 @@ export function rankNational(rows: LocalPriceRow[], sidoSlug: string, sigungu: s
  */
 export function neighborRows(rows: LocalPriceRow[], sidoSlug: string, sigungu: string, n = 5): LocalPriceRow[] {
   const stats = sidoPriceStats(rows, sidoSlug);
-  if (stats.uniform || stats.known === 0) return [];
+  if (stats.uniform || stats.equal || stats.known === 0) return [];
   const known = stats.sorted.filter((r) => r.amount !== null);
   const picked = new Map<string, LocalPriceRow>();
   for (const r of known.slice(0, n)) picked.set(r.sigungu, r);

@@ -15,8 +15,10 @@ import { GUIDES_BASIC } from "./basic";
 import { GUIDES_APPLY } from "./apply";
 import { GUIDES_BENEFIT } from "./benefit";
 import { GUIDES_REGION_CAR } from "./region-car";
+import { GUIDES_REGION_DEEP } from "./region-deep";
+import { GUIDES_PRACTICAL } from "./practical";
 
-export const GUIDES: Guide[] = [...GUIDES_BASIC, ...GUIDES_APPLY, ...GUIDES_BENEFIT, ...GUIDES_REGION_CAR].sort(
+export const GUIDES: Guide[] = [...GUIDES_BASIC, ...GUIDES_APPLY, ...GUIDES_BENEFIT, ...GUIDES_REGION_CAR, ...GUIDES_REGION_DEEP, ...GUIDES_PRACTICAL].sort(
   (a, b) => (a.published < b.published ? 1 : -1),
 );
 

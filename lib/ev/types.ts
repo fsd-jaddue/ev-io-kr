@@ -16,6 +16,8 @@ export interface LocalPriceRow {
   amount: number | null;
   /** 추가 인센티브·특이사항 */
   note?: string;
+  /** 시·도 전역 단일 공고("전체" 1건)에서 복제된 행이면 true. 시·군·구별 공고인데 금액만 같은 경우와 구분한다 */
+  single?: boolean;
 }
 
 /** 지자체별 접수·출고·잔여 현황 (무공해차 통합누리집 "지자체별 보조금 현황" 표 1행) */
