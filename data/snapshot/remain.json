@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-12T17:16:04.989Z",
+  "fetchedAt": "2026-09-12T23:05:20.555Z",
   "note": "무공해차 통합누리집 '지자체별 보조금 현황' 수집 결과. scripts/fetch-snapshot.ts 실행으로 갱신됩니다. rows가 비어 있으면 화면에는 누리집 링크만 표시됩니다.",
   "rows": [
     {
@@ -396,11 +396,11 @@
       "sido": "강원",
       "region": "춘천시",
       "vehicleType": "승용",
-      "announced": 800,
+      "announced": 1200,
       "applied": 822,
       "released": 822,
-      "remaining": 0,
-      "note": "본공고 · 신청마감 · 마감 2026.05.08 18:00"
+      "remaining": 378,
+      "note": "본공고·추경1차 · 마감 2026.12.11 18:00"
     },
     {
       "sido": "강원",
