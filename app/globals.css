@@ -126,3 +126,14 @@ body {
 .table-wrap {
   @apply w-full overflow-x-auto rounded-lg border border-slate-200;
 }
+/* 가이드 본문의 넓은 표: 래퍼 안에서는 표 자체 여백·테두리를 빼고, nowrap 표는 셀 줄바꿈 대신 가로 스크롤 */
+.prose-ev .table-wrap {
+  @apply my-6;
+}
+.prose-ev .table-wrap table {
+  @apply my-0 border-0;
+}
+.prose-ev table.nowrap th,
+.prose-ev table.nowrap td {
+  white-space: nowrap;
+}

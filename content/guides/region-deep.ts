@@ -229,7 +229,7 @@ function buildRegionGuide(sidoSlug: string): Guide | null {
 
   const exampleTable =
     cars.length > 0
-      ? `<table>
+      ? `<div class="table-wrap"><table class="nowrap">
 <thead><tr><th>차종</th><th>국비</th><th>${esc(maxName)} 합산</th>${equal ? "" : `<th>${esc(minName)} 합산</th>`}</tr></thead>
 <tbody>
 ${cars
@@ -240,7 +240,7 @@ ${cars
   })
   .join("\n")}
 </tbody>
-</table>`
+</table></div>`
       : "";
 
   const body = `
@@ -248,12 +248,12 @@ ${cars
 <p>이 글은 무공해차 통합누리집 '지자체별 차종·모델 보조금'에서 ${local.updatedAt} 수집한 일반승용 지방비 최대액과, 같은 누리집의 접수·출고·잔여 현황 수집값을 바탕으로 ${sido.short} 시·군을 한 표로 비교하고 분포의 배경과 신청 요령을 정리한 것입니다. 금액은 국비를 100% 받는 차종 기준 최대액이며, 실제 지방비는 차종별 국비 비율에 비례해 줄어듭니다.</p>
 
 <h2>${esc(sido.short)} ${stats.count}개 시·군 승용 지방비${equal ? "·공고 물량 (공고 대수 순)" : " 순위"}</h2>
-<table>
+<div class="table-wrap"><table class="nowrap">
 <thead><tr><th>${equal ? "번호" : "순위"}</th><th>시·군</th><th>승용 지방비</th><th>국비 합산 최대</th><th>공고 대수</th><th>잔여</th></tr></thead>
 <tbody>
 ${tableRows}
 </tbody>
-</table>
+</table></div>
 <p>공고·잔여 대수는 ${formatFetchedAt(fetchedAt)} 누리집 수집값(승용, 본공고·추경 누적)입니다. 시·군 이름을 누르면 차종별 예상 지원액과 체크리스트가 있는 지역 페이지로 이동합니다.</p>
 ${remainPara}
 
