@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-15T15:04:47.945Z",
+  "fetchedAt": "2026-09-15T23:33:20.644Z",
   "note": "무공해차 통합누리집 '지자체별 보조금 현황' 수집 결과. scripts/fetch-snapshot.ts 실행으로 갱신됩니다. rows가 비어 있으면 화면에는 누리집 링크만 표시됩니다.",
   "rows": [
     {
@@ -40,7 +40,7 @@
       "applied": 6816,
       "released": 6816,
       "remaining": 0,
-      "note": "본공고 · 신청마감 · 마감 2026.07.24 15:26"
+      "note": "본공고·추경1차 · 신청마감 · 마감 2026.07.24 15:26"
     },
     {
       "sido": "광주",
@@ -98,8 +98,8 @@
       "vehicleType": "승용",
       "announced": 3458,
       "applied": 2727,
-      "released": 1779,
-      "remaining": 1679,
+      "released": 1781,
+      "remaining": 1677,
       "note": "본공고·추경1차 · 마감 2026.12.11 18:00"
     },
     {
@@ -678,8 +678,8 @@
       "vehicleType": "승용",
       "announced": 158,
       "applied": 162,
-      "released": 145,
-      "remaining": 13,
+      "released": 146,
+      "remaining": 12,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.09.09 10:10"
     },
     {
@@ -718,7 +718,7 @@
       "vehicleType": "승용",
       "announced": 1154,
       "applied": 1675,
-      "released": 1198,
+      "released": 1199,
       "remaining": 0,
       "note": "본공고·추경1차·추경2차 · 마감 2026.11.27 18:00"
     },
@@ -1048,8 +1048,8 @@
       "vehicleType": "승용",
       "announced": 70,
       "applied": 118,
-      "released": 53,
-      "remaining": 17,
+      "released": 54,
+      "remaining": 16,
       "note": "본공고·추경1차 · 신청마감 · 마감 2026.09.07 18:00"
     },
     {
@@ -1257,7 +1257,7 @@
       "region": "영천시",
       "vehicleType": "승용",
       "announced": 735,
-      "applied": 502,
+      "applied": 501,
       "released": 170,
       "remaining": 565,
       "note": "본공고·추경1차·추경2차 · 마감 2026.12.10 18:00"
@@ -1268,8 +1268,8 @@
       "vehicleType": "승용",
       "announced": 600,
       "applied": 652,
-      "released": 435,
-      "remaining": 165,
+      "released": 439,
+      "remaining": 161,
       "note": "본공고 · 신청마감 · 마감 2026.09.07 10:26"
     },
     {
@@ -1458,8 +1458,8 @@
       "vehicleType": "승용",
       "announced": 2495,
       "applied": 2328,
-      "released": 1974,
-      "remaining": 521,
+      "released": 1975,
+      "remaining": 520,
       "note": "본공고·추경1차·추경2차·추경3차 · 마감 2026.12.18 18:00"
     },
     {
