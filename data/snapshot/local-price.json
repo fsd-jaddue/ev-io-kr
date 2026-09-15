@@ -64,11 +64,6 @@
     },
     {
       "sido": "gyeonggi",
-      "sigungu": "부천시",
-      "amount": 120
-    },
-    {
-      "sido": "gyeonggi",
       "sigungu": "광명시",
       "amount": 280
     },
@@ -365,6 +360,11 @@
     {
       "sido": "chungnam",
       "sigungu": "서산시",
+      "amount": 414
+    },
+    {
+      "sido": "chungnam",
+      "sigungu": "논산시",
       "amount": 414
     },
     {
