@@ -9,6 +9,13 @@ export interface CalcCar { slug: string; name: string; national: number | null; 
 const parseAmount = (text: string) => text.trim() !== "" && Number.isFinite(Number(text)) && Number(text) >= 0 && Number(text) <= 10000 ? Number(text) : null;
 
 export default function Calculator({ regions, cars }: { regions: CalcRegion[]; cars: CalcCar[] }) {
+  if (!regions.length || !cars.length) {
+    return <p className="rounded-xl border border-amber-200 bg-amber-50 p-5 leading-7">현재 계산에 사용할 차종·지역 수집값을 확인할 수 없습니다. <a href={EV_PORTAL.localPrice} className="text-emerald-700 underline" target="_blank" rel="noopener noreferrer">공식 차종·모델 보조금 표</a>에서 금액을 확인해 주세요.</p>;
+  }
+  return <CalculatorForm regions={regions} cars={cars} />;
+}
+
+function CalculatorForm({ regions, cars }: { regions: CalcRegion[]; cars: CalcCar[] }) {
   const [sidoSlug, setSido] = useState(regions[0]?.slug ?? "");
   const sido = regions.find((r) => r.slug === sidoSlug)!;
   const [district, setDistrict] = useState(sido.sigungu[0]?.name ?? "");
