@@ -1,20 +1,21 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import Breadcrumb from "@/components/Breadcrumb";
 import JsonLd from "@/components/JsonLd";
 import AdSlot from "@/components/AdSlot";
 import { articleJsonLd, faqJsonLd, pageMetadata } from "@/lib/seo";
-import { GUIDES, getGuide } from "@/content/guides";
+import { GUIDES, GUIDE_REDIRECTS, getGuide } from "@/content/guides";
 import { SITE } from "@/lib/site";
 import { GuideArt } from "@/components/illustrations";
 
 export function generateStaticParams() {
-  return GUIDES.map((g) => ({ slug: g.slug }));
+  return [...GUIDES.map((g) => ({ slug: g.slug })), ...Object.keys(GUIDE_REDIRECTS).map(slug => ({slug}))];
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
+  if (GUIDE_REDIRECTS[slug]) permanentRedirect(GUIDE_REDIRECTS[slug]);
   const g = getGuide(slug);
   if (!g) notFound();
   return pageMetadata({
@@ -30,6 +31,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function GuidePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  if (GUIDE_REDIRECTS[slug]) permanentRedirect(GUIDE_REDIRECTS[slug]);
   const g = getGuide(slug);
   if (!g) notFound();
   const related = GUIDES.filter((x) => x.slug !== slug && x.category === g.category).slice(0, 3);
@@ -53,7 +55,9 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
         </p>
         <p className="mt-4 rounded-lg bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-700">{g.description}</p>
 
-        <div className="prose-ev mt-2" dangerouslySetInnerHTML={{ __html: g.body }} />
+        <div className="prose-ev mt-2" dangerouslySetInnerHTML={{ __html: g.body.replace(/<table>/g, '<div class="table-wrap" tabindex="0" role="region" aria-label="가로로 스크롤할 수 있는 비교표"><table>').replace(/<\/table>/g, '</table></div>') }} />
+
+        {g.sources && <section className="prose-ev mt-8 rounded-lg border border-slate-200 p-4"><h2>확인한 자료와 기준</h2><p>내용 검토일 {g.updated}. 지침 개정과 지원 당시 지자체 공고가 다르면 해당 적용 문서를 우선 확인하세요. 데이터 수집일은 본문·표에 별도로 표시합니다.</p><ul>{g.sources.map(source => <li key={source.url}><a href={source.url} target={source.url.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer">{source.title}</a></li>)}</ul></section>}
 
         <AdSlot slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_ARTICLE} />
 

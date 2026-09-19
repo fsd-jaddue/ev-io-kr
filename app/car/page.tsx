@@ -4,6 +4,7 @@ import Breadcrumb from "@/components/Breadcrumb";
 import AdSlot from "@/components/AdSlot";
 import { itemListJsonLd, pageMetadata } from "@/lib/seo";
 import JsonLd from "@/components/JsonLd";
+import { verifiedSupport } from "@/lib/ev/verifiedSupport";
 import { CARS, CARS_SNAPSHOT, NATIONAL_MAX, carName } from "@/data/cars";
 import { EV_PORTAL } from "@/lib/ev/parse";
 import { CarArt } from "@/components/illustrations";
@@ -11,7 +12,7 @@ import { CarArt } from "@/components/illustrations";
 export const metadata: Metadata = pageMetadata({
   title: "2026 차종별 전기차 국비 보조금",
   description:
-    "2026년 차종별 전기차 국고보조금: 아이오닉6 570만원, EV6 570만원, 아이오닉5 564만원, EV3·EV4 555만원, EV5 552만원, 코나 514만원, 테슬라 모델3 420만원, 모델Y 210만원 등 승용 전기차 국비(무공해차 통합누리집 수집값)와 가격 구간 정리.",
+    "2026년 무공해차 통합누리집 수집값으로 대표 트림과 전체 모델의 국비·전환지원 국비를 비교합니다. 지역별 지방비 확인 방법과 데이터 기준일을 제공합니다.",
   path: "/car",
   keywords: ["차종별 전기차 보조금", "2026 전기차 국비", "아이오닉6 보조금", "EV3 보조금", "테슬라 보조금"],
 });
@@ -27,17 +28,15 @@ export default function CarIndexPage() {
         <div>
           <h1 className="text-3xl font-black text-slate-900">2026 차종별 전기차 국비 보조금</h1>
           <p className="mt-3 max-w-3xl leading-7 text-slate-600">
-            환경부는 매년 초 차종·트림별 국고보조금을 확정 공고합니다. 2026년 중·대형 승용 상한은 {NATIONAL_MAX.large}만원, 소형·경형은{" "}
-            {NATIONAL_MAX.small}만원이며, 주행거리·에너지효율·배터리 안전성·사후관리 체계·차량 가격에 따라 차등 산정됩니다. 아래 표는 확정 공고와
-            언론 보도를 기준으로 정리한 승용 대표 트림의 국비입니다. 지방비는 국비 비율에 비례하므로, 국비가 높은 차종일수록 지역 합산액도
-            커집니다.
+            환경부는 매년 초 차종·트림별 국고보조금을 확정 공고합니다. 2026년 중·대형 승용 일반 기본 지원 기준은 최대 {NATIONAL_MAX.large}만원, 소형·경형은{" "}
+            {NATIONAL_MAX.small}만원이며, 주행거리·에너지효율·배터리 안전성·사후관리 체계·차량 가격에 따라 차등 산정됩니다. 아래 표는 무공해차 통합누리집에서 수집한 승용 대표 트림의 국비입니다. 특수 사양과 개인 추가 지원은 별도입니다. 지방비는 같은 지역·동일 모델 행에서 확인해야 합니다.
           </p>
         </div>
         <CarArt className="hidden w-44 shrink-0 lg:block" />
       </div>
 
       <section className="mt-8">
-        <h2 className="text-xl font-bold text-slate-900">국비 확정 차종</h2>
+        <h2 className="text-xl font-bold text-slate-900">수집값이 확인된 대표 트림</h2>
         <div className="table-wrap mt-3">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 text-left text-slate-700">
@@ -45,9 +44,7 @@ export default function CarIndexPage() {
                 <th className="px-3 py-2 font-semibold">순위</th>
                 <th className="px-3 py-2 font-semibold">차종·트림</th>
                 <th className="px-3 py-2 text-right font-semibold">국비</th>
-                <th className="px-3 py-2 text-right font-semibold">전환 포함</th>
-                <th className="hidden px-3 py-2 font-semibold md:table-cell">가격 구간</th>
-                <th className="hidden px-3 py-2 text-right font-semibold md:table-cell">주행거리</th>
+                <th className="px-3 py-2 text-right font-semibold">국비+전환 국비</th>
               </tr>
             </thead>
             <tbody>
@@ -60,9 +57,7 @@ export default function CarIndexPage() {
                     </Link>
                   </td>
                   <td className="px-3 py-2 text-right font-semibold tabular-nums text-emerald-700">{c.national}만원</td>
-                  <td className="px-3 py-2 text-right tabular-nums">{(c.national ?? 0) + NATIONAL_MAX.conversion}만원</td>
-                  <td className="hidden px-3 py-2 text-slate-600 md:table-cell">{c.priceBand}</td>
-                  <td className="hidden px-3 py-2 text-right tabular-nums text-slate-600 md:table-cell">{c.range ? `${c.range}km` : "-"}</td>
+                  <td className="px-3 py-2 text-right tabular-nums">{verifiedSupport(c,"seoul").conversion === null ? "확인 필요" : `${(c.national ?? 0) + verifiedSupport(c,"seoul").conversion!}만원`}</td>
                 </tr>
               ))}
             </tbody>
@@ -98,7 +93,7 @@ export default function CarIndexPage() {
 
       {CARS_SNAPSHOT.rows.length > 0 && (
         <section className="mt-10">
-          <h2 className="text-xl font-bold text-slate-900">누리집 등록 승용 전기차 국비 전체 목록 ({CARS_SNAPSHOT.rows.length}종)</h2>
+          <h2 className="text-xl font-bold text-slate-900">누리집 등록 승용 전기차 국비 수집 목록 ({CARS_SNAPSHOT.rows.length}종)</h2>
           <p className="mt-1 text-sm text-slate-500">
             무공해차 통합누리집 &lsquo;지자체별 차종·모델 보조금&rsquo;에서 {CARS_SNAPSHOT.updatedAt} 수집한 일반승용 모델별 국비입니다. 지방비는 거주 지역에 따라
             달라지므로 <Link href="/calculator" className="text-emerald-700 underline">계산기</Link>에서 지역을 골라 확인하세요. 단위: 만원.
@@ -139,9 +134,7 @@ export default function CarIndexPage() {
           50%가 적용되고 8,500만원 이상은 지급되지 않습니다.
         </p>
         <p>
-          테슬라 모델 Y가 210만원, 모델 3 스탠다드가 168만원에 그친 것은 가격 구간(50% 적용)과 LFP 배터리의 환경성 계수, 사후관리 체계
-          평가가 함께 작용한 결과입니다. 반대로 아이오닉 6·EV6 롱레인지가 570만원으로 상단에 있는 것은 긴 주행거리와 높은 에너지밀도, 직영
-          서비스망 덕분입니다. 자세한 산정식은 <Link href="/guide/national-subsidy-calculation-2026">국고보조금 산정 기준 가이드</Link>에서 설명합니다.
+          차종별 최종 금액만으로 어떤 계수가 얼마 적용됐는지를 특정할 수 없습니다. 아래 링크에서는 공식 표의 동일 모델 금액을 대조하고 잘못된 최대액 계산을 피하는 방법을 설명합니다. <Link href="/guide/national-subsidy-calculation-2026">국비·지방비 표 읽는 법</Link>을 참고하세요.
         </p>
       </section>
     </>

@@ -131,7 +131,8 @@ body {
   @apply my-6;
 }
 .prose-ev .table-wrap table {
-  @apply my-0 border-0;
+  @apply my-0 min-w-[560px] border-0;
+  overflow-wrap: normal;
 }
 .prose-ev table.nowrap th,
 .prose-ev table.nowrap td {

@@ -10,7 +10,9 @@
     "fetch:snapshot": "tsx scripts/fetch-snapshot.ts",
     "snapshot:diff": "tsx scripts/snapshot-diff.ts",
     "watch:notices": "tsx scripts/watch-notices.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "audit:site": "node --import tsx scripts/audit-site.ts"
   },
   "dependencies": {
     "@next/third-parties": "^15.5.25",

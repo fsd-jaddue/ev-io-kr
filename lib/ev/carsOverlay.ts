@@ -25,20 +25,20 @@ export function matchCarRows(car: Car, rows: CarSubsidyRow[]): CarMatch {
   const matched = rows.filter((r) => re.test(normalizeModel(r.maker, r.model)));
   if (matched.length === 0) return { slug: car.slug, matched, applied: null, reason: "no-match" };
   const values = Array.from(new Set(matched.map((r) => r.national).filter((v): v is number => v !== null)));
-  if (values.length !== 1 || values[0] <= 0) return { slug: car.slug, matched, applied: null, reason: "ambiguous" };
+  if (matched.some(r => r.national === null) || values.length !== 1 || values[0] <= 0) return { slug: car.slug, matched, applied: null, reason: "ambiguous" };
   return { slug: car.slug, matched, applied: values[0], reason: "applied" };
 }
 
 /**
- * 수기 목록(base)에 누리집 수집 국비를 덮어씌운다. 매칭이 없거나 매칭 행들의 국비가 서로 다르면 수기값을 유지한다
- * (잘못된 금액이 나가는 것보다 수기값이 낫다). 판정 내역은 snapshot-diff 가 Issue 에 적는다.
+ * 수기 목록(base)에 누리집 수집 국비를 덮어씌운다. 매칭이 없거나 매칭 행들의 국비가 서로 다르면 금액을 미확인(null)으로 둔다
+ * (옛 수기 금액이 현행 확정 금액으로 보이지 않도록 한다). 판정 내역은 snapshot-diff 가 Issue 에 적는다.
  */
 export function applyCollectedNational(base: Car[], snap: CarsSnapshot | { rows?: CarSubsidyRow[] }): Car[] {
   const rows = snap.rows ?? [];
-  if (rows.length === 0) return base.map((c) => ({ ...c, nationalSource: "manual" as const }));
+  if (rows.length === 0) return base.map((c) => ({ ...c, national: null, nationalSource: "manual" as const }));
   return base.map((c) => {
     const m = matchCarRows(c, rows);
-    if (m.reason !== "applied" || m.applied === null) return { ...c, nationalSource: "manual" as const };
+    if (m.reason !== "applied" || m.applied === null) return { ...c, national: null, nationalSource: "manual" as const };
     return { ...c, national: m.applied, nationalSource: "collected" as const, evModels: m.matched.map((r) => r.model) };
   });
 }

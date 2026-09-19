@@ -1,155 +1,66 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
+import { passengerConversion, sumSubsidy } from "@/lib/ev/subsidy";
+import { EV_PORTAL } from "@/lib/ev/portal";
 
-export interface CalcRegion {
-  slug: string;
-  name: string;
-  sigungu: { name: string; amount: number | null }[];
-}
-export interface CalcCar {
-  slug: string;
-  name: string;
-  national: number | null;
-}
-
-const NATIONAL_MAX = 580;
-const CONVERSION = 100;
-const ACQ_TAX_MAX = 140;
+export interface CalcRegion { slug: string; name: string; sigungu: { name: string; amount: number | null }[] }
+export interface CalcCar { slug: string; name: string; national: number | null; localBySido: Record<string, number | null>; conversion: number | null }
+const parseAmount = (text: string) => text.trim() !== "" && Number.isFinite(Number(text)) && Number(text) >= 0 && Number(text) <= 10000 ? Number(text) : null;
 
 export default function Calculator({ regions, cars }: { regions: CalcRegion[]; cars: CalcCar[] }) {
   const [sidoSlug, setSido] = useState(regions[0]?.slug ?? "");
-  const sido = regions.find((r) => r.slug === sidoSlug) ?? regions[0];
-  const [sigunguName, setSigungu] = useState(sido?.sigungu[0]?.name ?? "");
-  const [carSlug, setCar] = useState(cars.find((c) => c.national !== null)?.slug ?? "");
+  const sido = regions.find((r) => r.slug === sidoSlug)!;
+  const [district, setDistrict] = useState(sido.sigungu[0]?.name ?? "");
+  const [carSlug, setCar] = useState(cars[0]?.slug ?? "");
+  const [customNational, setCustomNational] = useState("");
+  const [customLocal, setCustomLocal] = useState("");
   const [conversion, setConversion] = useState(false);
-  const [customNational, setCustomNational] = useState<string>("");
+  const car = cars.find((c) => c.slug === carSlug)!;
+  const national = customNational === "" ? car.national : parseAmount(customNational);
+  // 직접 입력 국비는 다른 트림일 수 있으므로 기존 트림 지방비를 재사용하지 않는다.
+  const knownLocal = customNational === "" ? car.localBySido[sidoSlug] ?? null : null;
+  const local = customLocal === "" ? knownLocal : parseAmount(customLocal);
+  const conv = national === null ? null : customNational === "" ? car.conversion ?? passengerConversion(national) : passengerConversion(national);
+  const total = national === null || local === null || conv === null ? null : sumSubsidy(national, local, conversion ? conv : 0);
+  const invalid = (customNational !== "" && parseAmount(customNational) === null) || (customLocal !== "" && parseAmount(customLocal) === null);
+  const inputClass = "mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-base";
 
-  const sigungu = sido?.sigungu.find((g) => g.name === sigunguName) ?? sido?.sigungu[0];
-  const car = cars.find((c) => c.slug === carSlug);
-
-  const result = useMemo(() => {
-    const national = customNational !== "" ? Number(customNational) : car?.national ?? null;
-    const localMax = sigungu?.amount ?? null;
-    if (national === null || Number.isNaN(national) || localMax === null) return null;
-    const ratio = Math.min(1, Math.max(0, national / NATIONAL_MAX));
-    const local = Math.round(localMax * ratio);
-    const conv = conversion ? CONVERSION : 0;
-    return { national, local, conv, total: national + local + conv, ratio };
-  }, [car, sigungu, conversion, customNational]);
-
-  return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
-      <form className="space-y-5 rounded-xl border border-slate-200 p-5" onSubmit={(e) => e.preventDefault()}>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <label className="block text-sm font-medium text-slate-700">
-            시·도
-            <select
-              className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-base"
-              value={sidoSlug}
-              onChange={(e) => {
-                setSido(e.target.value);
-                const next = regions.find((r) => r.slug === e.target.value);
-                setSigungu(next?.sigungu[0]?.name ?? "");
-              }}
-            >
-              {regions.map((r) => (
-                <option key={r.slug} value={r.slug}>
-                  {r.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="block text-sm font-medium text-slate-700">
-            시·군·구
-            <select
-              className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-base"
-              value={sigungu?.name ?? ""}
-              onChange={(e) => setSigungu(e.target.value)}
-            >
-              {sido?.sigungu.map((g) => (
-                <option key={g.name} value={g.name}>
-                  {g.name}
-                  {g.amount !== null ? ` (${g.amount}만원)` : " (공고 확인)"}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-
-        <label className="block text-sm font-medium text-slate-700">
-          차종
-          <select
-            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-base"
-            value={carSlug}
-            onChange={(e) => {
-              setCar(e.target.value);
-              setCustomNational("");
-            }}
-          >
-            {cars.map((c) => (
-              <option key={c.slug} value={c.slug}>
-                {c.name}
-                {c.national !== null ? ` — 국비 ${c.national}만원` : " — 국비 직접 입력"}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className="block text-sm font-medium text-slate-700">
-          국비 직접 입력 (만원, 선택)
-          <input
-            type="number"
-            inputMode="numeric"
-            min={0}
-            max={NATIONAL_MAX}
-            placeholder={car?.national !== null && car?.national !== undefined ? String(car.national) : "예: 450"}
-            value={customNational}
-            onChange={(e) => setCustomNational(e.target.value)}
-            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-base"
-          />
-          <span className="mt-1 block text-xs font-normal text-slate-500">
-            무공해차 통합누리집 &lsquo;보조금 지급대상 차종&rsquo;의 트림별 국비를 알고 있다면 입력하세요.
-          </span>
-        </label>
-
-        <label className="flex items-center gap-2 text-sm text-slate-700">
-          <input type="checkbox" checked={conversion} onChange={(e) => setConversion(e.target.checked)} className="h-4 w-4" />
-          내연기관차를 폐차·이전(처분)하고 구매 — 전환지원금 +{CONVERSION}만원
-        </label>
-      </form>
-
-      <aside className="rounded-xl bg-slate-900 p-5 text-white">
-        <p className="text-sm text-slate-300">예상 보조금 합계</p>
-        {result ? (
-          <>
-            <p className="mt-1 text-4xl font-black tabular-nums">{result.total.toLocaleString()}<span className="ml-1 text-lg font-semibold">만원</span></p>
-            <dl className="mt-4 space-y-2 text-sm">
-              <Row k="국비" v={`${result.national}만원`} />
-              <Row k={`지방비 (${sigungu?.name}, 비율 ${Math.round(result.ratio * 100)}%)`} v={`${result.local}만원`} />
-              {result.conv > 0 && <Row k="전환지원금" v={`${result.conv}만원`} />}
-              <Row k="취득세 감면 (별도)" v={`최대 ${ACQ_TAX_MAX}만원`} muted />
-            </dl>
-            <p className="mt-4 text-xs leading-5 text-slate-400">
-              지방비는 국비 산정액 비율에 비례 지급된다는 원칙으로 계산한 추정치입니다. 지자체 추가 인센티브(다자녀·청년 등)와 예산
-              소진 여부에 따라 실제 지급액은 달라집니다.
-            </p>
-          </>
-        ) : (
-          <p className="mt-2 text-sm text-slate-300">
-            선택한 지역의 지방비 또는 차종의 국비가 확인되지 않았습니다. 국비를 직접 입력하거나 다른 지역·차종을 선택하세요.
-          </p>
-        )}
-      </aside>
-    </div>
-  );
+  return <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
+    <form className="space-y-5 rounded-xl border border-slate-200 p-5" onSubmit={(e) => e.preventDefault()}>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <label className="block text-sm font-medium">시·도<select className={inputClass} value={sidoSlug} onChange={(e) => { setSido(e.target.value); setDistrict(regions.find(r => r.slug === e.target.value)!.sigungu[0]?.name ?? ""); setCustomLocal(""); }}>
+          {regions.map(r => <option key={r.slug} value={r.slug}>{r.name}</option>)}
+        </select></label>
+        <label className="block text-sm font-medium">시·군·구<select className={inputClass} value={district} onChange={(e) => { setDistrict(e.target.value); setCustomLocal(""); }}>
+          {sido.sigungu.map(g => <option key={g.name}>{g.name}</option>)}
+        </select></label>
+      </div>
+      <label className="block text-sm font-medium">차종<select className={inputClass} value={carSlug} onChange={(e) => { setCar(e.target.value); setCustomNational(""); setCustomLocal(""); }}>
+        {cars.map(c => <option key={c.slug} value={c.slug}>{c.name} — 국비 {c.national}만원</option>)}
+      </select></label>
+      <label className="block text-sm font-medium">국비 직접 입력 (만원, 다른 트림을 계산할 때)
+        <input type="number" min="0" max="10000" step="0.01" inputMode="decimal" className={inputClass} placeholder={String(car.national ?? "")} value={customNational} onChange={e => {setCustomNational(e.target.value);setCustomLocal("");}} />
+      </label>
+      <label className="block text-sm font-medium">해당 트림 지방비 (만원)
+        <input type="number" min="0" max="10000" step="0.01" inputMode="decimal" className={inputClass} placeholder={knownLocal === null ? "공식 표의 지방비 입력" : String(knownLocal)} value={customLocal} onChange={e => setCustomLocal(e.target.value)} />
+        <span className="mt-2 block text-xs font-normal leading-5 text-slate-600">{knownLocal === null ? "이 지역의 모델별 지방비는 자동 입력하지 않습니다." : `동일 트림의 ${sido.name} 수집값 ${knownLocal}만원을 사용합니다.`} <a href={EV_PORTAL.localPrice} target="_blank" rel="noopener noreferrer" className="text-emerald-700 underline">공식 차종·모델 보조금 표</a>에서 거주 지역과 정확한 트림을 선택해 확인하세요. 지역 최고액을 입력하면 과대 계산될 수 있습니다.</span>
+      </label>
+      <label className="flex items-start gap-2 text-sm leading-6"><input type="checkbox" className="mt-1 h-4 w-4 shrink-0" checked={conversion} onChange={e => setConversion(e.target.checked)} />승용 전환지원금 조건 충족 시 국비 포함 (최대 100만원)</label>
+      <p className="text-xs leading-5 text-slate-600">최초등록·보유 3년 이상 내연기관차의 판매·폐차, 개인 구매 등 요건을 확인해야 합니다. 하이브리드는 제외되며 가족 간 거래 제한이 있습니다. 체크만으로 자격이 판정되지는 않습니다.</p>
+      {invalid && <p role="alert" className="text-sm text-rose-700">금액은 0~10,000만원 범위의 숫자로 입력하세요.</p>}
+    </form>
+    <aside className="rounded-xl bg-slate-900 p-5 text-white" aria-live="polite">
+      <p className="text-sm text-slate-300">입력·수집 금액 합계</p>
+      {total !== null && !invalid ? <>
+        <p className="mt-2 text-4xl font-black tabular-nums">{total.toLocaleString()}<span className="ml-1 text-lg">만원</span></p>
+        <dl className="mt-5 space-y-3 text-sm">
+          <Row label="국비" value={national!} /><Row label={`지방비 (${district})`} value={local!} />
+          {conversion && <Row label="전환지원 국비 (요건 충족 가정)" value={conv!} />}
+        </dl>
+        <p className="mt-5 text-xs leading-5 text-slate-300">지방비 출처: {customLocal !== "" ? "사용자 입력" : "무공해차 통합누리집 동일 트림 수집값"}. 전환지원 지방비·청년·다자녀 등 추가금과 세제 혜택은 제외했습니다. 예산과 자격 심사에 따라 지급 여부가 달라집니다.</p>
+      </> : <p className="mt-3 text-sm leading-6 text-slate-300">{invalid ? "입력 금액을 확인해 주세요." : "해당 트림의 지방비를 입력하면 합계를 표시합니다. 미확인 금액을 0원이나 지역 최고액으로 대체하지 않습니다."}</p>}
+    </aside>
+  </div>;
 }
-
-function Row({ k, v, muted }: { k: string; v: string; muted?: boolean }) {
-  return (
-    <div className={`flex items-center justify-between gap-3 ${muted ? "text-slate-400" : ""}`}>
-      <dt>{k}</dt>
-      <dd className="font-semibold tabular-nums">{v}</dd>
-    </div>
-  );
-}
+function Row({ label, value }: { label: string; value: number }) { return <div className="flex justify-between gap-3"><dt>{label}</dt><dd className="whitespace-nowrap font-semibold">{value.toLocaleString()}만원</dd></div>; }

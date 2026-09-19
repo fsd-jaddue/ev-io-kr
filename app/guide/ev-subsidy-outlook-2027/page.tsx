@@ -1,0 +1,4 @@
+import Link from "next/link";
+import { pageMetadata } from "@/lib/seo";
+export const metadata = pageMetadata({title:"2027년 보조금 전망 글 정정 안내",description:"검증되지 않은 예산안 수치를 철회하고 공식 확정 자료 확인을 안내합니다.",path:"/guide/ev-subsidy-outlook-2027",noindex:true});
+export default function WithdrawnOutlook() {return <article className="prose-ev max-w-3xl"><h1>2027년 보조금 전망 글 정정 안내</h1><p>2026-09-20 검토에서 이 URL의 2027년 예산·지원 물량 전망을 뒷받침할 공식 원문 확인이 충분하지 않다고 판단해 기존 수치를 철회했습니다. 예산안과 확정 예산, 차종별 업무처리지침은 서로 다른 단계이므로 확정 지급액처럼 사용하면 안 됩니다.</p><p>2027년 금액은 해당 연도 공식 지침과 거주지 공고를 확인한 뒤 판단하세요. 현재 사이트의 표는 2026년 자료이며 다음 연도에 그대로 적용할 수 없습니다.</p><p><a href="https://ev.or.kr" target="_blank" rel="noopener noreferrer">무공해차 통합누리집</a> · <Link href="/guide/ev-subsidy-2026-overview">2026년 지원액 확인 순서</Link> · <Link href="/contact">정정 문의</Link></p></article>}

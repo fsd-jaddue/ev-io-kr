@@ -10,10 +10,9 @@ app/                    라우트 (홈, /region, /region/[sido], /region/[sido]/
                         sitemap.ts, robots.ts, ads.txt/route.ts, not-found.tsx)
 components/             Header, Footer, MobileNav, AdSlot, Breadcrumb, JsonLd, SidoGrid, LocalPriceTable,
                         RemainTable, SourceNote, Calculator(client)
-content/guides/         가이드 16편 (HTML 본문 + FAQ)
+content/guides/         근거·검토일을 표시한 가이드 12편 (reviewed.ts)
 data/regions.ts         17개 시·도 + 시·군·구 목록
 data/cars.ts            차종별 2026 국비
-data/sido-intro.ts      시·도별 소개 문단
 data/snapshot/          지방비 스냅샷(local-price.ts / .json), 접수·출고·잔여 스냅샷(remain.json)
 lib/ev/parse.ts         ev.or.kr HTML 파서 (cheerio)
 lib/ev/getData.ts       실시간 수집(1시간 캐시) → 실패 시 스냅샷 폴백
@@ -29,6 +28,8 @@ npm install
 cp .env.example .env.local   # 필요 시 값 입력
 npm run dev                  # http://localhost:3000
 npm run lint
+npm run test
+npm run typecheck
 npm run build && npm start
 npm run fetch:snapshot       # ev.or.kr 수집 → data/snapshot/*.json 갱신 (국내 네트워크 권장)
 ```
@@ -40,3 +41,5 @@ npm run fetch:snapshot       # ev.or.kr 수집 → data/snapshot/*.json 갱신 (
 - 애드센스 게시자 ID(`ca-pub-9408914409364609`)는 `lib/site.ts` 기본값으로 항상 켜져 있고, `NEXT_PUBLIC_ADSENSE_CLIENT=off` 로 끌 수 있다. 광고 단위는 슬롯 ID 환경변수가 있을 때만 렌더링된다.
 
 배포·도메인·애드센스 절차는 [DEPLOY.md](./DEPLOY.md) 참고.
+
+2026-09-20 재검토: 중복 구·군 문서는 시·도 표로 통합했고, 모델별 지방비는 동일 트림·동일 지역의 확인값만 사용합니다. 검증 서버 실행 후 `npm run audit:site`로 링크·색인·주소 이동을 확인합니다. 상세 내용은 [검토 기록](./ADSENSE_REVIEW_2026-09-20.md)을 참고하세요.

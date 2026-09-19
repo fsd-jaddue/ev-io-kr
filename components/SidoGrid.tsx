@@ -18,7 +18,7 @@ export default function SidoGrid({ items }: { items: SidoSummary[] }) {
           >
             <p className="text-base font-bold text-slate-900">{s.short}</p>
             <p className="mt-0.5 text-xs text-slate-500">{s.name}</p>
-            <p className="mt-3 text-sm text-slate-500">승용 지방비</p>
+            <p className="mt-3 text-sm text-slate-500">수집 지방비 최고액</p>
             <p className="text-lg font-bold tabular-nums text-emerald-700">{range(s)}</p>
             <p className="mt-1 text-xs text-slate-500">
               {s.uniform ? "단일 공고" : s.equal ? `${s.count}개 시·군 동일 금액` : `${s.count}개 시·군·구`}

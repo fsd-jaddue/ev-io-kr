@@ -1,6 +1,5 @@
 import type { LocalPriceRow } from "./types";
 import { SIDO_LIST } from "@/data/regions";
-import { NATIONAL_MAX } from "@/data/cars";
 
 export interface SidoSummary {
   slug: string;
@@ -34,18 +33,6 @@ export function summarizeBySido(rows: LocalPriceRow[]): SidoSummary[] {
       equal: amounts.length > 1 && min === max,
     };
   });
-}
-
-/** 국비 + 지방비 (+전환지원금) 합산. 지방비는 국비 비례 지급이 원칙이므로 국비가 낮은 차종은 지방비도 비례 감소한다. */
-export function estimateTotal(opts: {
-  national: number; // 차종 국비(만원)
-  localMax: number; // 지역 지방비 최대(만원)
-  conversion?: boolean; // 전환지원금
-}): { national: number; local: number; conversion: number; total: number } {
-  const ratio = Math.min(1, opts.national / NATIONAL_MAX.large);
-  const local = Math.round(opts.localMax * ratio);
-  const conversion = opts.conversion ? NATIONAL_MAX.conversion : 0;
-  return { national: opts.national, local, conversion, total: opts.national + local + conversion };
 }
 
 export function won(n: number | null | undefined, suffix = "만원"): string {

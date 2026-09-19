@@ -8,6 +8,7 @@ import { getLocalPriceData, getRemainSnapshot } from "@/lib/ev/getData";
 import { summarizeBySido } from "@/lib/ev/summary";
 import { faqJsonLd, pageMetadata } from "@/lib/seo";
 import { SITE } from "@/lib/site";
+import { verifiedSupport } from "@/lib/ev/verifiedSupport";
 import { CARS, NATIONAL_MAX, carName } from "@/data/cars";
 import { GUIDES } from "@/content/guides";
 import GuideCard from "@/components/GuideCard";
@@ -23,11 +24,11 @@ export const metadata: Metadata = pageMetadata({
 const FAQ = [
   {
     q: "2026년 전기차 보조금은 최대 얼마인가요?",
-    a: "중·대형 승용 전기차 국비는 최대 580만원, 소형은 최대 530만원이며 내연기관차를 처분하고 구매하면 전환지원금 100만원이 추가됩니다. 여기에 거주 지역 지방비(서울 194만원부터 경북 울릉군 756만원까지, 2026년 9월 누리집 수집 기준)가 더해집니다.",
+    a: "일반 승용 기본 지원과 특수 사양·개인 추가 지원을 구분해야 합니다. 같은 모델 행의 국비·거주지 지방비를 확인하고, 전환지원 국비는 자격 충족 시 차등 지급되는 최대 100만원을 별도로 확인하세요.",
   },
   {
     q: "지방비는 어디 기준으로 받나요?",
-    a: "차량을 등록하는 주소지(주민등록상 거주지) 시·군·구 기준입니다. 공고일 기준 해당 지역에 30일 이상 거주 또는 사업장을 둔 경우가 일반적인 요건입니다.",
+    a: "차량을 등록하는 주소지(주민등록상 거주지) 시·군·구 기준입니다. 거주 기간과 기준일, 신청 주체의 요건은 해당 지자체 공고에서 확인해야 합니다.",
   },
   {
     q: "보조금 신청은 어디서 하나요?",
@@ -60,7 +61,7 @@ export default async function HomePage() {
         </h1>
         <p className="mt-4 max-w-2xl text-emerald-50">
           전국 17개 시·도와 시·군·구별 승용 전기차 지방비, 차종별 국고보조금, 접수·출고·잔여 현황과 신청 절차를 정리했습니다.
-          거주지와 차종을 고르면 예상 지원액을 바로 계산할 수 있습니다.
+          거주지 공고와 정확한 차종 금액을 확인하고, 계산기로 확인된 금액을 합산하세요.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Link href="/calculator" className="rounded-lg bg-white px-4 py-2.5 text-sm font-bold text-emerald-700 hover:bg-emerald-50">
@@ -74,8 +75,8 @@ export default async function HomePage() {
 
       <section className="mt-8 grid gap-3 sm:grid-cols-3">
         <Stat label="승용 국비 최대" value={`${NATIONAL_MAX.large}만원`} sub={`소형 ${NATIONAL_MAX.small}만원`} />
-        <Stat label="전환지원금" value={`+${NATIONAL_MAX.conversion}만원`} sub="내연기관차 처분 후 구매 시" />
-        <Stat label="지방비 최대" value={`${nationalMax.toLocaleString()}만원`} sub="경북 울릉군 기준 (시·군·구별 상이)" />
+        <Stat label="승용 전환지원 국비" value={`최대 ${NATIONAL_MAX.conversion}만원`} sub="자격 충족 시 · 차종별 차등" />
+        <Stat label="수집 목록의 지방비 최고액" value={`${nationalMax.toLocaleString()}만원`} sub="특수 사양 포함 가능 · 내 차 지급액과 다름" />
       </section>
 
       <section className="mt-12">
@@ -108,7 +109,7 @@ export default async function HomePage() {
               <tr>
                 <th className="px-3 py-2 font-semibold">차종</th>
                 <th className="px-3 py-2 text-right font-semibold">국비</th>
-                <th className="px-3 py-2 text-right font-semibold">전환지원금 포함</th>
+                <th className="px-3 py-2 text-right font-semibold">국비+전환 국비</th>
               </tr>
             </thead>
             <tbody>
@@ -120,7 +121,7 @@ export default async function HomePage() {
                     </Link>
                   </td>
                   <td className="px-3 py-2 text-right tabular-nums text-emerald-700">{c.national}만원</td>
-                  <td className="px-3 py-2 text-right tabular-nums">{(c.national ?? 0) + NATIONAL_MAX.conversion}만원</td>
+                  <td className="px-3 py-2 text-right tabular-nums">{verifiedSupport(c,"seoul").conversion === null ? "공식 표 확인" : `${(c.national ?? 0) + verifiedSupport(c,"seoul").conversion!}만원`}</td>
                 </tr>
               ))}
             </tbody>
@@ -132,8 +133,8 @@ export default async function HomePage() {
         <h2 className="text-2xl font-bold text-slate-900">보조금은 이렇게 계산됩니다</h2>
         <ol className="mt-4 grid gap-3 md:grid-cols-3">
           <Step n={1} icon={<IconCalc />} title="국비 산정" body="성능보조금(주행거리·에너지효율)과 배터리안전보조금에 배터리효율·환경성·사후관리 계수를 곱하고, 차량가 5,300만원 미만은 100%, 8,500만원 미만은 50%를 적용합니다." />
-          <Step n={2} icon={<IconPercent />} title="지방비 비례" body="지자체 지방비는 국비 산정액에 비례해 지급됩니다. 국비를 100% 받는 차종은 지방비도 최대치를, 국비가 절반이면 지방비도 절반 수준을 받습니다." />
-          <Step n={3} icon={<IconGift />} title="추가 인센티브" body="내연기관차 처분 시 전환지원금 100만원, 지자체별 다자녀·청년·취약계층 추가 지원, 취득세 최대 140만원 감면이 별도로 더해집니다." />
+          <Step n={2} icon={<IconPercent />} title="같은 모델의 지방비" body="지역 최고액을 내 차의 지방비로 사용할 수 없습니다. 공식 지역별 모델 표에서 같은 연식·트림 행의 국비와 지방비를 확인해 합산하세요." />
+          <Step n={3} icon={<IconGift />} title="추가 인센티브" body="전환지원 국비는 최대 100만원이며 차량·보유 기간 등 자격에 따라 달라집니다. 청년·다자녀 추가 지원과 세금 감면은 별도의 조건과 재원을 확인하세요." />
         </ol>
       </section>
 

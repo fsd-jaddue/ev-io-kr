@@ -1,4 +1,4 @@
-import type { Faq } from "@/lib/ev/regionCopy";
+type Faq = { q: string; a: string };
 
 /** 자주 묻는 질문 목록. 같은 배열을 faqJsonLd() 에도 넘겨 본문과 구조화 데이터를 일치시킨다 */
 export default function FaqList({ items, title = "자주 묻는 질문", className = "mt-10" }: { items: Faq[]; title?: string; className?: string }) {

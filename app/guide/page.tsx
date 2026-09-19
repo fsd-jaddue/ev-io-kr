@@ -22,7 +22,7 @@ export default function GuideIndexPage() {
       <h1 className="text-3xl font-black text-slate-900">전기차 보조금 가이드</h1>
       <p className="mt-3 max-w-3xl leading-7 text-slate-600">
         처음 전기차를 사는 분이 보조금을 빠짐없이 받을 수 있도록 제도 구조, 신청 절차, 세제 혜택, 지역·차종별 차이를 2026년 기준으로
-        정리했습니다. 각 글은 환경부 업무처리지침과 지자체 공고를 바탕으로 작성했으며 변경 사항이 생기면 업데이트합니다.
+        정리했습니다. 각 글에서 확인한 자료와 검토일을 제공합니다. 계산 예시는 가정을 명시하고 실제 지급액과 구분합니다.
       </p>
 
       {CATEGORIES.map((cat) => {

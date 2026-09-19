@@ -26,7 +26,7 @@ export function pageMetadata(m: PageMeta): Metadata {
     description: m.description,
     keywords: m.keywords,
     alternates: { canonical: url, types: FEED_ALTERNATES },
-    // noindex 여도 follow 는 유지: 링크 신호는 전달하고 색인만 막는다(중복 시·군·구 페이지용)
+    // 미확인·철회 문서는 색인에서 제외한다. noindex는 광고 정책 면제가 아니다.
     robots: m.noindex ? { index: false, follow: true } : undefined,
     openGraph: {
       title: fullTitle,

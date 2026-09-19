@@ -1,9 +1,8 @@
 import type { MetadataRoute } from "next";
 import { LEGAL_UPDATED_AT, SITE } from "@/lib/site";
-import { getLocalPriceData, getSnapshotDates } from "@/lib/ev/getData";
-import { summarizeBySido } from "@/lib/ev/summary";
-import { SIDO_LIST, sigunguPath } from "@/data/regions";
-import { CARS } from "@/data/cars";
+import { getSnapshotDates } from "@/lib/ev/getData";
+import { SIDO_LIST } from "@/data/regions";
+import { CARS, CARS_SNAPSHOT } from "@/data/cars";
 import { GUIDES } from "@/content/guides";
 
 /**
@@ -12,9 +11,10 @@ import { GUIDES } from "@/content/guides";
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = SITE.url;
-  // 시·도 단일 공고 지역의 구·군 페이지는 noindex 이므로 사이트맵에서도 뺀다 (app/region/[sido]/[sigungu]/page.tsx 참고)
-  const singleNotice = new Set(summarizeBySido((await getLocalPriceData()).rows).filter((s) => s.uniform).map((s) => s.slug));
-  const { latest, localPriceUpdatedAt } = getSnapshotDates();
+  const dates = getSnapshotDates();
+  const reviewed = new Date("2026-09-20T00:00:00+09:00");
+  const latest = new Date(Math.max(dates.latest.getTime(), reviewed.getTime()));
+  const localPriceUpdatedAt = new Date(Math.max(new Date(CARS_SNAPSHOT.updatedAt).getTime(), dates.localPriceUpdatedAt.getTime(), reviewed.getTime()));
   const legal = new Date(`${LEGAL_UPDATED_AT}T00:00:00+09:00`);
   const guideLatest = GUIDES.reduce((m, g) => (g.updated > m ? g.updated : m), GUIDES[0]?.updated ?? LEGAL_UPDATED_AT);
   const statics: MetadataRoute.Sitemap = [
@@ -35,15 +35,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: "daily",
     priority: 0.8,
   }));
-  const sigungus: MetadataRoute.Sitemap = SIDO_LIST.filter((s) => !singleNotice.has(s.slug)).flatMap((s) =>
-    s.sigungu.map((g) => ({
-      url: `${base}${sigunguPath(s.slug, g)}`,
-      lastModified: latest,
-      changeFrequency: "daily" as const,
-      priority: 0.7,
-    })),
-  );
-  const cars: MetadataRoute.Sitemap = CARS.map((c) => ({
+  const cars: MetadataRoute.Sitemap = CARS.filter((c) => c.national !== null).map((c) => ({
     url: `${base}/car/${c.slug}`,
     lastModified: localPriceUpdatedAt,
     changeFrequency: "weekly",
@@ -55,5 +47,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: "monthly",
     priority: 0.7,
   }));
-  return [...statics, ...sidos, ...sigungus, ...cars, ...guides];
+  return [...statics, ...sidos, ...cars, ...guides];
 }

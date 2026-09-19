@@ -171,9 +171,9 @@ export function sigunguSlug(name: string): string {
   return name.replace(/\s/g, "");
 }
 
-/** 시·군·구 페이지 경로 (href·canonical·sitemap 용, 퍼센트 인코딩 적용) */
+/** 통합된 시·도 표의 시·군·구 행으로 이동 */
 export function sigunguPath(sidoSlug: string, name: string): string {
-  return `/region/${sidoSlug}/${encodeURIComponent(sigunguSlug(name))}`;
+  return `/region/${sidoSlug}#district-${encodeURIComponent(sigunguSlug(name))}`;
 }
 
 /** 라우트 파라미터 → 시·군·구명. 디코딩 여부·중복 인코딩과 무관하게 원문을 돌려준다. */

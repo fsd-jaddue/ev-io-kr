@@ -4,238 +4,51 @@ import { notFound } from "next/navigation";
 import Breadcrumb from "@/components/Breadcrumb";
 import LocalPriceTable from "@/components/LocalPriceTable";
 import RemainTable from "@/components/RemainTable";
-import AdSlot from "@/components/AdSlot";
-import FaqList from "@/components/FaqList";
 import JsonLd from "@/components/JsonLd";
 import { filterRemainBySido, formatFetchedAt, getLocalPriceData, getRemainSnapshot } from "@/lib/ev/getData";
-import { estimateTotal, won } from "@/lib/ev/summary";
-import { sidoMaxRanking, sidoPriceStats } from "@/lib/ev/localPriceStats";
-import { summarizeRemainBySido, topSigungu } from "@/lib/ev/remainSummary";
-import { sidoFaq } from "@/lib/ev/regionCopy";
-import { faqJsonLd, pageMetadata, webPageJsonLd } from "@/lib/seo";
+import { sidoPriceStats } from "@/lib/ev/localPriceStats";
+import { summarizeRemainBySido } from "@/lib/ev/remainSummary";
+import { pageMetadata, webPageJsonLd } from "@/lib/seo";
 import { SIDO_LIST, getSido } from "@/data/regions";
-import { SIDO_INTRO } from "@/data/sido-intro";
-import { CARS, NATIONAL_MAX, carName } from "@/data/cars";
-import { GUIDES } from "@/content/guides";
-import { EV_PORTAL } from "@/lib/ev/parse";
-import { RegionArt } from "@/components/illustrations";
+import { EV_PORTAL } from "@/lib/ev/portal";
 
-export function generateStaticParams() {
-  return SIDO_LIST.map((s) => ({ sido: s.slug }));
+export function generateStaticParams() { return SIDO_LIST.map(s=>({sido:s.slug})); }
+export async function generateMetadata({params}:{params:Promise<{sido:string}>}):Promise<Metadata> {
+  const {sido:slug}=await params; const sido=getSido(slug); if(!sido)notFound();
+  return pageMetadata({title:`${sido.name} 전기차 보조금 현황 2026`,description:`${sido.name}의 지역별 수집 지방비와 접수·출고·잔여 현황을 비교합니다. 지역 최고액과 실제 모델별 금액의 차이, 공고 확인 방법을 안내합니다.`,path:`/region/${slug}`});
 }
-
-export async function generateMetadata({ params }: { params: Promise<{ sido: string }> }): Promise<Metadata> {
-  const { sido: slug } = await params;
-  const sido = getSido(slug);
-  if (!sido) notFound();
-  const local = await getLocalPriceData();
-  const amounts = local.rows.filter((r) => r.sido === slug).map((r) => r.amount).filter((a): a is number => a !== null);
-  const max = amounts.length ? Math.max(...amounts) : null;
-  const min = amounts.length ? Math.min(...amounts) : null;
-  const rangeText = max === null ? "" : min === max ? `지방비 ${max}만원` : `지방비 ${min}~${max}만원`;
-  return pageMetadata({
-    title: `${sido.name} 전기차 보조금 현황 2026`,
-    description: `2026년 ${sido.name} 전기차 보조금: 승용 ${rangeText}, 국비 최대 ${NATIONAL_MAX.large}만원 합산 시 최대 ${max === null ? "" : (max + NATIONAL_MAX.large).toLocaleString() + "만원"}. ${sido.short} 시·군·구별 지방비, 접수·출고·잔여 현황과 신청 방법.`,
-    path: `/region/${slug}`,
-    keywords: [`${sido.short} 전기차 보조금`, `${sido.name} 전기차 보조금`, `2026 ${sido.short} 전기차 지방비`],
-  });
-}
-
-export default async function SidoPage({ params }: { params: Promise<{ sido: string }> }) {
-  const { sido: slug } = await params;
-  const sido = getSido(slug);
-  if (!sido) notFound();
-  const local = await getLocalPriceData();
-  const rows = local.rows.filter((r) => r.sido === slug);
-  const amounts = rows.map((r) => r.amount).filter((a): a is number => a !== null);
-  const max = amounts.length ? Math.max(...amounts) : null;
-  const min = amounts.length ? Math.min(...amounts) : null;
-  const intro = SIDO_INTRO[slug];
-  const exampleCars = CARS.filter((c) => c.national !== null).slice(0, 5);
-  const relatedGuides = GUIDES.filter((g) => g.category === "지역" || g.category === "신청").slice(0, 4);
-  // 접수·출고·잔여: 빌드 시 스냅샷을 HTML 에 싣고(검색엔진용), 브라우저에서 /api/remain 으로 갱신
-  const remain = filterRemainBySido(getRemainSnapshot(), slug);
-  const remainSummary = summarizeRemainBySido(remain.rows).find((s) => s.slug === slug) ?? null;
-  const stats = sidoPriceStats(local.rows, slug);
-  const uniform = stats.uniform;
-  const faq = sidoFaq({
-    sido,
-    stats,
-    summary: remainSummary,
-    top: topSigungu(remain.rows, 3),
-    fetchedAt: remain.fetchedAt,
-    sidoRank: sidoMaxRanking(local.rows).find((s) => s.slug === slug),
-  });
-  const title = `${sido.name} 전기차 보조금 현황 2026`;
-
-  return (
-    <>
-      <JsonLd
-        data={[
-          webPageJsonLd({
-            name: title,
-            description: `${sido.name} 시·군·구별 승용 전기차 지방비, 국비 합산액, 접수·출고·잔여 현황과 신청 순서`,
-            path: `/region/${slug}`,
-            dateModified: remain.fetchedAt,
-          }),
-          ...(faq.length ? [faqJsonLd(faq)] : []),
-        ]}
-      />
-      <Breadcrumb items={[{ name: "지역별 보조금", path: "/region" }, { name: sido.name, path: `/region/${slug}` }]} />
-      <div className="flex items-start justify-between gap-6">
-        <div>
-          <h1 className="text-3xl font-black text-slate-900">{title}</h1>
-          <p className="mt-3 max-w-3xl leading-7 text-slate-600">{intro?.summary}</p>
-          <p className="mt-2 text-xs text-slate-500">
-            데이터 기준: 지방비 {local.updatedAt} · 접수 현황 {formatFetchedAt(remain.fetchedAt)} · 출처 무공해차 통합누리집
-          </p>
-        </div>
-        <RegionArt className="hidden w-44 shrink-0 lg:block" />
-      </div>
-
-      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Card label="승용 지방비" value={max === null ? "공고 확인" : uniform ? won(max) : `${min}~${max}만원`} sub={uniform ? `${sido.name} 단일 공고` : stats.equal ? `${stats.count}개 시·군 동일 금액 (공고는 시·군별)` : `${stats.known}개 시·군·구 확인`} />
-        <Card label="국비 최대" value={won(NATIONAL_MAX.large)} sub={`소형 ${NATIONAL_MAX.small}만원`} />
-        <Card label="합산 최대" value={max === null ? "-" : won(max + NATIONAL_MAX.large)} sub="전환지원금 +100만원 별도" />
-        <Card
-          label={`${sido.short} 잔여 대수 (승용)`}
-          value={remainSummary && remainSummary.remaining !== null ? `${remainSummary.remaining.toLocaleString()}대` : "수집값 없음"}
-          sub={
-            remainSummary && remainSummary.rowCount > 0
-              ? `공고 ${remainSummary.announced?.toLocaleString() ?? "-"}대${remainSummary.single ? "" : ` · 소진 ${remainSummary.soldOutCount}곳`} · ${formatFetchedAt(remain.fetchedAt)} 기준`
-              : "누리집 수집값이 있을 때만 표시"
-          }
-        />
-      </div>
-
-      {intro?.points && (
-        <ul className="mt-5 grid gap-2 text-sm text-slate-700 md:grid-cols-3">
-          {intro.points.map((p) => (
-            <li key={p} className="rounded-lg bg-slate-50 px-3 py-2">
-              {p}
-            </li>
-          ))}
-        </ul>
-      )}
-
-      <section className="mt-10">
-        <h2 className="text-xl font-bold text-slate-900">{sido.short} 시·군·구별 승용 지방비</h2>
-        <p className="mt-1 text-sm text-slate-500">
-          국비 100% 지급 차종 기준 최대액. 기준 {local.updatedAt} · {local.basis}
-        </p>
-        <div className="mt-3">
-          <LocalPriceTable sidoSlug={slug} rows={rows} />
-        </div>
-      </section>
-
-      <AdSlot slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_REGION} />
-
-      <RemainTable sido={slug} initial={remain} title={`${sido.short} 접수·출고·잔여 현황`} />
-
-      {max !== null && (
-        <section className="mt-10">
-          <h2 className="text-xl font-bold text-slate-900">{sido.short} 최대 지방비 기준 차종별 예상 지원액</h2>
-          <p className="mt-1 text-sm text-slate-500">
-            지방비는 국비 산정액에 비례합니다. 표는 {sido.short} 내 최대 지방비({won(max)}) 지역, 전환지원금 미적용 기준입니다.
-          </p>
-          <div className="table-wrap mt-3">
-            <table className="w-full text-sm">
-              <thead className="bg-slate-50 text-left text-slate-700">
-                <tr>
-                  <th className="px-3 py-2 font-semibold">차종</th>
-                  <th className="px-3 py-2 text-right font-semibold">국비</th>
-                  <th className="px-3 py-2 text-right font-semibold">지방비(비례)</th>
-                  <th className="px-3 py-2 text-right font-semibold">예상 합계</th>
-                </tr>
-              </thead>
-              <tbody>
-                {exampleCars.map((c) => {
-                  const e = estimateTotal({ national: c.national!, localMax: max });
-                  return (
-                    <tr key={c.slug} className="border-t border-slate-100">
-                      <td className="px-3 py-2">
-                        <Link href={`/car/${c.slug}`} className="font-medium text-slate-900 hover:text-emerald-700 hover:underline">
-                          {carName(c)}
-                        </Link>
-                      </td>
-                      <td className="px-3 py-2 text-right tabular-nums">{e.national}만원</td>
-                      <td className="px-3 py-2 text-right tabular-nums">{e.local}만원</td>
-                      <td className="px-3 py-2 text-right font-semibold tabular-nums text-emerald-700">{e.total.toLocaleString()}만원</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-          <p className="mt-2 text-xs text-slate-500">
-            <Link href="/calculator" className="text-emerald-700 underline">
-              보조금 계산기
-            </Link>
-            에서 시·군·구와 차종을 직접 선택해 계산할 수 있습니다.
-          </p>
-        </section>
-      )}
-
-      <section className="prose-ev mt-10 max-w-3xl">
-        <h2>{sido.short}에서 전기차 보조금 신청하는 순서</h2>
-        <ol>
-          <li>{sido.name}(또는 해당 시·군·구) 2026년 전기차 보급사업 공고 확인 — 접수 기간, 물량, 우선순위 대상, 추가 인센티브</li>
-          <li>구매하려는 차종의 국비 산정액을 <Link href="/car">차종별 국비</Link>에서 확인</li>
-          <li>대리점과 구매계약 체결 → 대리점이 무공해차 통합누리집에 구매지원 신청서 접수</li>
-          <li>지자체 대상자 선정(출고 선착순 또는 접수 순) → 2개월 이내 출고·등록</li>
-          <li>출고 후 10일 이내 지급 신청 서류 제출 → 지자체가 제작사에 보조금 지급(구매자는 보조금 차감액만 결제)</li>
-        </ol>
-        <p>
-          공고 원문과 잔여 물량은{" "}
-          <a href={EV_PORTAL.remain} target="_blank" rel="noopener noreferrer">
-            무공해차 통합누리집 지자체별 보조금 현황
-          </a>
-          에서, 지자체 담당 부서 연락처는{" "}
-          <a href={EV_PORTAL.inquiries} target="_blank" rel="noopener noreferrer">
-            지자체 문의처
-          </a>
-          에서 확인할 수 있습니다.
-        </p>
-      </section>
-
-      <FaqList items={faq} title={`${sido.short} 전기차 보조금 자주 묻는 질문`} />
-
-      <section className="mt-10">
-        <h2 className="text-xl font-bold text-slate-900">함께 보면 좋은 가이드</h2>
-        <ul className="mt-3 grid gap-3 md:grid-cols-2">
-          {relatedGuides.map((g) => (
-            <li key={g.slug} className="rounded-lg border border-slate-200 p-3">
-              <Link href={`/guide/${g.slug}`} className="font-semibold text-slate-900 hover:text-emerald-700 hover:underline">
-                {g.title}
-              </Link>
-              <p className="mt-1 line-clamp-2 text-sm text-slate-600">{g.description}</p>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="mt-10">
-        <h2 className="text-lg font-bold text-slate-900">다른 시·도 보기</h2>
-        <ul className="mt-3 flex flex-wrap gap-2">
-          {SIDO_LIST.filter((s) => s.slug !== slug).map((s) => (
-            <li key={s.slug}>
-              <Link href={`/region/${s.slug}`} className="rounded-full border border-slate-200 px-3 py-1 text-sm text-slate-700 hover:border-emerald-300 hover:text-emerald-700">
-                {s.short}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </section>
-    </>
-  );
-}
-
-function Card({ label, value, sub }: { label: string; value: string; sub?: string }) {
-  return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4">
-      <p className="text-sm text-slate-500">{label}</p>
-      <p className="mt-1 text-2xl font-black tabular-nums text-emerald-700">{value}</p>
-      {sub && <p className="mt-1 text-xs text-slate-500">{sub}</p>}
+export default async function SidoPage({params}:{params:Promise<{sido:string}>}) {
+  const {sido:slug}=await params; const sido=getSido(slug); if(!sido)notFound();
+  const local=await getLocalPriceData(); const rows=local.rows.filter(r=>r.sido===slug); const stats=sidoPriceStats(rows,slug);
+  const remain=filterRemainBySido(getRemainSnapshot(),slug); const summary=summarizeRemainBySido(remain.rows).find(s=>s.slug===slug);
+  const range=stats.max===null?"미확인":stats.min===stats.max?`${stats.max}만원`:`${stats.min}~${stats.max}만원`;
+  return <>
+    <JsonLd data={webPageJsonLd({name:`${sido.name} 전기차 보조금 현황`,description:`${sido.name} 지역별 수집 금액과 접수 현황`,path:`/region/${slug}`,dateModified:remain.fetchedAt})} />
+    <Breadcrumb items={[{name:"지역별 보조금",path:"/region"},{name:sido.name,path:`/region/${slug}`}]} />
+    <h1 className="text-3xl font-black text-slate-900">{sido.name} 전기차 보조금 현황 2026</h1>
+    <p className="mt-4 max-w-3xl leading-7 text-slate-600">{stats.uniform ? `${sido.name}는 수집 자료에서 하나의 지역 공고로 집계됩니다. 아래 구·군 금액은 같은 공고의 값을 표시하며 각각 별도 예산을 뜻하지 않습니다.` : `${sido.name}는 시·군별 공고를 확인해야 합니다. ${stats.known}개 지역에서 관측된 지방비 최고액의 범위는 ${range}입니다. 금액이 같아도 접수 기간·물량·마감 상태는 다를 수 있습니다.`}</p>
+    <p className="mt-2 text-xs text-slate-500">지방비 수집 기준 {local.updatedAt} · 현황 {formatFetchedAt(remain.fetchedAt)} · 출처 무공해차 통합누리집</p>
+    <div className="mt-6 grid gap-3 sm:grid-cols-3">
+      <Card label="지역별 수집 최고액 범위" value={range} sub="모든 구매자의 지급액이 아닙니다" />
+      <Card label="공고 단위" value={stats.uniform?"시·도 단일":"시·군별 확인"} sub={stats.equal&&!stats.uniform?"관측 금액이 같아도 공고는 별도":"신청 주체·차종별 공고 확인"} />
+      <Card label="승용 출고잔여" value={summary?.remaining===null||summary?.remaining===undefined?"미확인":`${summary.remaining.toLocaleString()}대`} sub="신규 신청 가능 대수와 다를 수 있음" />
     </div>
-  );
+    <section className="prose-ev mt-8 max-w-3xl">
+      <h2>이 지역 금액을 읽는 방법</h2>
+      <p>아래 값은 누리집 일반승용 목록에서 수집된 지방비 중 가장 큰 값입니다. 특수 사양·단종 재고 차량이 포함될 수 있어 일반 승용차의 공통 지급액으로 사용할 수 없습니다. 국비 상한과 이 최고액을 더한 ‘합산 최대’는 표시하지 않습니다.</p>
+      {!stats.uniform&&stats.min!==stats.max&&<p>현재 관측 최고액이 큰 지역은 {stats.maxNames.join("·")}({stats.max}만원), 작은 지역은 {stats.minNames.join("·")}({stats.min}만원)입니다. 이는 서로 다른 지역의 목록 최고값 비교이며, 같은 차량의 지역별 차액은 공식 모델별 표로 다시 확인해야 합니다.</p>}
+      {stats.equal&&!stats.uniform&&<p>{stats.count}개 지역의 관측 금액이 같다는 사실만으로 예산·도비 분담 구조나 선정 난도가 같다고 결론 낼 수는 없습니다. 아래 접수 현황과 각 공고의 대상·물량을 비교하세요.</p>}
+      <p><Link href="/guide/national-subsidy-calculation-2026">서울 실제 수집 행으로 보는 잘못된 최대액 계산 사례</Link>와 <Link href="/calculator">확인 금액 합산 도구</Link>를 참고하세요.</p>
+    </section>
+    <section className="mt-8"><h2 className="text-xl font-bold">{sido.short} 시·군·구별 지방비 수집값</h2><p className="my-3 text-sm leading-6 text-slate-600">최고액은 비교용 관측값입니다. 본인 차량의 지방비는 공식 표에서 정확한 트림으로 확인하세요. 수집되지 않은 행을 보완한 경우 비고에 기존 자료 기준일을 표시합니다.</p><LocalPriceTable sidoSlug={slug} rows={rows} /></section>
+    <RemainTable sido={slug} initial={remain} title={`${sido.short} 접수·출고·출고잔여 현황`} />
+    <section className="prose-ev mt-10 max-w-3xl">
+      <h2>{sido.short} 거주자가 계약 전에 확인할 순서</h2>
+      <ol><li><a href={EV_PORTAL.remain} target="_blank" rel="noopener noreferrer">공식 공고·지급현황</a>에서 {sido.short}와 주소지 지역을 선택하고 최신 차수의 공고문을 읽습니다.</li><li>거주 기간과 기준일, 신청 가능한 개인·법인 구분, 일반·우선순위 물량을 확인합니다. 전국 공통 30일로 가정하지 않습니다.</li><li><a href={EV_PORTAL.localPrice} target="_blank" rel="noopener noreferrer">차종·모델별 표</a>에서 연식·구동방식·휠·가격 조건까지 일치하는 행의 국비와 지방비를 기록합니다.</li><li>차량 출고 가능일을 선정 후 기한과 대조하고 대리점의 접수 완료 여부를 확인합니다.</li></ol>
+      <h2>잔여 대수가 있어도 마감일 수 있습니다</h2><p>이 표의 잔여는 출고 기준입니다. 접수·선정된 차량이 아직 출고되지 않은 경우, 출고잔여가 남아도 신규 접수는 종료됐을 수 있습니다. 표의 비고와 공식 신청마감 상태를 함께 보세요. 2026년 9월 이후 지방비 소진 시 개인의 국비만 지원하는 민간보조사업 적용 가능성도 최신 시행 공고에서 확인해야 합니다.</p>
+      <p><a href={EV_PORTAL.inquiries} target="_blank" rel="noopener noreferrer">공식 지자체 문의처</a> · <Link href="/guide/how-to-check-remaining-quota">잔여대수 해설</Link> · <Link href="/guide/how-to-apply-ev-subsidy-2026">신청 절차</Link> · <Link href="/guide/ev-subsidy-documents-checklist">서류 확인표</Link></p>
+    </section>
+    <section className="mt-10"><h2 className="text-lg font-bold">다른 시·도</h2><ul className="mt-3 flex flex-wrap gap-3">{SIDO_LIST.filter(s=>s.slug!==slug).map(s=><li key={s.slug}><Link href={`/region/${s.slug}`} className="text-sm text-emerald-700 underline">{s.name}</Link></li>)}</ul></section>
+  </>;
 }
+function Card({label,value,sub}:{label:string;value:string;sub:string}) {return <div className="rounded-xl border border-slate-200 p-4"><p className="text-sm text-slate-600">{label}</p><p className="mt-2 text-2xl font-bold text-emerald-700">{value}</p><p className="mt-2 text-xs text-slate-500">{sub}</p></div>;}

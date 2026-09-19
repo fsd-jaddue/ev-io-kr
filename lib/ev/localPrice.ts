@@ -22,7 +22,7 @@ export function normalizeLocalPrice(collected: { updatedAt: string; rows: LocalP
           sido: sido.slug,
           sigungu: name,
           amount: exact?.amount ?? whole?.amount ?? fallback?.amount ?? null,
-          note: exact || whole ? "누리집 수집값" : fallback?.note,
+          note: exact || whole ? "누리집 수집값" : fallback ? `기존 자료 보완 (${LOCAL_PRICE_UPDATED_AT}) · ${fallback.note ?? "최신 공고 재확인"}` : "미수집",
           ...(exact ? {} : whole ? { single: true } : fallback?.single ? { single: true } : {}),
         });
       }
