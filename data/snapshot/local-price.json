@@ -134,6 +134,11 @@
     },
     {
       "sido": "gyeonggi",
+      "sigungu": "용인시",
+      "amount": 173
+    },
+    {
+      "sido": "gyeonggi",
       "sigungu": "파주시",
       "amount": 200
     },
@@ -325,6 +330,11 @@
     {
       "sido": "chungbuk",
       "sigungu": "괴산군",
+      "amount": 400
+    },
+    {
+      "sido": "chungbuk",
+      "sigungu": "음성군",
       "amount": 400
     },
     {

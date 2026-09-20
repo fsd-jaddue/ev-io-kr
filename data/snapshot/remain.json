@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-20T06:24:59.050Z",
+  "fetchedAt": "2026-09-20T12:28:21.176Z",
   "note": "무공해차 통합누리집 '지자체별 보조금 현황' 수집 결과. scripts/fetch-snapshot.ts 실행으로 갱신됩니다. rows가 비어 있으면 화면에는 누리집 링크만 표시됩니다.",
   "rows": [
     {
@@ -58,7 +58,7 @@
       "vehicleType": "승용",
       "announced": 1726,
       "applied": 2380,
-      "released": 2324,
+      "released": 2326,
       "remaining": 0,
       "note": "본공고·추경1차 · 신청마감 · 마감 2026.07.07 18:00"
     },
@@ -97,7 +97,7 @@
       "region": "성남시",
       "vehicleType": "승용",
       "announced": 3458,
-      "applied": 2784,
+      "applied": 2786,
       "released": 2000,
       "remaining": 1458,
       "note": "본공고·추경1차 · 마감 2026.12.11 18:00"
@@ -1268,8 +1268,8 @@
       "vehicleType": "승용",
       "announced": 600,
       "applied": 650,
-      "released": 499,
-      "remaining": 101,
+      "released": 501,
+      "remaining": 99,
       "note": "본공고 · 신청마감 · 마감 2026.09.07 10:26"
     },
     {
