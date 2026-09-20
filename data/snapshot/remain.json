@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-20T16:52:20.279Z",
+  "fetchedAt": "2026-09-20T23:17:37.502Z",
   "note": "무공해차 통합누리집 '지자체별 보조금 현황' 수집 결과. scripts/fetch-snapshot.ts 실행으로 갱신됩니다. rows가 비어 있으면 화면에는 누리집 링크만 표시됩니다.",
   "rows": [
     {
@@ -8,8 +8,8 @@
       "vehicleType": "승용",
       "announced": 19648,
       "applied": 17298,
-      "released": 15042,
-      "remaining": 4606,
+      "released": 15043,
+      "remaining": 4605,
       "note": "본공고·추경1차·추경2차 · 마감 2026.11.30 18:00"
     },
     {
@@ -98,8 +98,8 @@
       "vehicleType": "승용",
       "announced": 3458,
       "applied": 2786,
-      "released": 2000,
-      "remaining": 1458,
+      "released": 2003,
+      "remaining": 1455,
       "note": "본공고·추경1차 · 마감 2026.12.11 18:00"
     },
     {
@@ -108,8 +108,8 @@
       "vehicleType": "승용",
       "announced": 909,
       "applied": 1069,
-      "released": 826,
-      "remaining": 83,
+      "released": 827,
+      "remaining": 82,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.09.14 12:00"
     },
     {
@@ -348,8 +348,8 @@
       "vehicleType": "승용",
       "announced": 473,
       "applied": 445,
-      "released": 333,
-      "remaining": 140,
+      "released": 334,
+      "remaining": 139,
       "note": "본공고·추경1차·추경2차 · 마감 2026.12.18 18:00"
     },
     {
@@ -448,8 +448,8 @@
       "vehicleType": "승용",
       "announced": 216,
       "applied": 218,
-      "released": 186,
-      "remaining": 30,
+      "released": 187,
+      "remaining": 29,
       "note": "본공고 · 신청마감 · 마감 2026.09.08 09:03"
     },
     {
@@ -1048,8 +1048,8 @@
       "vehicleType": "승용",
       "announced": 70,
       "applied": 116,
-      "released": 65,
-      "remaining": 5,
+      "released": 66,
+      "remaining": 4,
       "note": "본공고·추경1차 · 신청마감 · 마감 2026.09.07 18:00"
     },
     {
@@ -1458,8 +1458,8 @@
       "vehicleType": "승용",
       "announced": 2495,
       "applied": 2374,
-      "released": 2023,
-      "remaining": 472,
+      "released": 2025,
+      "remaining": 470,
       "note": "본공고·추경1차·추경2차·추경3차 · 마감 2026.12.18 18:00"
     },
     {
