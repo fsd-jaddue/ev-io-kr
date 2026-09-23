@@ -1,0 +1,105 @@
+name: ads.txt external probe (diagnostic)
+
+# 읽기 전용 진단. GitHub 러너(외부 네트워크)에서 운영 도메인의 DNS·DNSSEC·TLS·리다이렉트·ads.txt 응답을 기록한다.
+# 저장소·배포를 변경하지 않는다.
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/awesome-newton-vbi9p5]
+    paths: [.github/workflows/ads-txt-probe.yml]
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Tools
+        run: |
+          (command -v dig && command -v delv) || { sudo apt-get update -qq && sudo apt-get install -y -qq bind9-dnsutils >/dev/null; }
+          dig -v 2>&1; curl --version | head -1; openssl version; date -u
+
+      - name: DNS
+        run: |
+          set +e
+          for r in 8.8.8.8 1.1.1.1 9.9.9.9; do
+            for n in ev.io.kr www.ev.io.kr; do
+              for t in A AAAA CNAME; do
+                echo "== @$r $n $t"
+                dig @$r +noall +comments +answer "$n" "$t" | grep -E 'status:|IN[[:space:]]'
+              done
+            done
+          done
+          echo "== NS ev.io.kr";  dig @8.8.8.8 +short NS ev.io.kr
+          echo "== SOA ev.io.kr"; dig @8.8.8.8 +short SOA ev.io.kr
+          echo "== NS io.kr";     dig @8.8.8.8 +short NS io.kr
+          echo "== SOA io.kr";    dig @8.8.8.8 +short SOA io.kr
+          echo "== A io.kr";      dig @8.8.8.8 +short A io.kr
+          echo "== DS ev.io.kr";  dig @8.8.8.8 +short DS ev.io.kr
+          echo "== DS io.kr";     dig @8.8.8.8 +short DS io.kr
+          echo "== DNSKEY ev.io.kr"; dig @8.8.8.8 +short DNSKEY ev.io.kr | cut -c1-60
+          echo "== DNSSEC validating resolvers (flags / status)"
+          for r in 8.8.8.8 1.1.1.1 9.9.9.9; do echo "-- @$r"; dig @$r +dnssec ev.io.kr A | grep -E 'status:|flags:'; done
+          echo "== delv"; delv @8.8.8.8 ev.io.kr A 2>&1 | head -5
+          echo "== CAA"; dig @8.8.8.8 +short CAA ev.io.kr
+          echo "== TXT"; dig @8.8.8.8 +short TXT ev.io.kr
+          echo "== trace"; dig +trace +nodnssec ev.io.kr A 2>&1 | grep -vE '^;|^$' | tail -30
+
+      - name: TLS
+        run: |
+          set +e
+          for h in ev.io.kr www.ev.io.kr; do
+            echo "== SNI $h"
+            echo | openssl s_client -connect "$h:443" -servername "$h" 2>/dev/null | openssl x509 -noout -subject -issuer -dates -ext subjectAltName
+            echo | openssl s_client -connect "$h:443" -servername "$h" 2>&1 | grep -E 'Verify return code|Protocol|Cipher' | head -3
+          done
+          echo "== no SNI ev.io.kr"
+          echo | openssl s_client -connect ev.io.kr:443 -noservername 2>/dev/null | openssl x509 -noout -subject -ext subjectAltName
+
+      - name: ads.txt matrix
+        run: |
+          set +e
+          GB='Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
+          MP='Mediapartners-Google'
+          AB='AdsBot-Google (+http://www.google.com/adsbot.html)'
+          W='code=%{http_code}|http=%{http_version}|ip=%{remote_ip}|redir=%{redirect_url}|bytes=%{size_download}|ctype=%{content_type}|t=%{time_total}\n'
+          one() { # label, curl args...
+            echo; echo "=================== $1"; shift
+            curl -sS -m 20 -o /tmp/body -D /tmp/hdr -w "$W" "$@"
+            tr -d '\r' < /tmp/hdr | grep -viE '^(date|strict-transport-security|x-frame-options|referrer-policy|x-content-type-options):'
+            if [ -s /tmp/body ]; then echo "--- body (first 160 bytes, hex)"; head -c 160 /tmp/body | xxd | head -10; fi
+          }
+          for u in https://ev.io.kr/ads.txt http://ev.io.kr/ads.txt https://www.ev.io.kr/ads.txt http://www.ev.io.kr/ads.txt; do
+            one "GET $u (curl UA)" "$u"
+            one "GET $u (Googlebot UA)" -A "$GB" "$u"
+            one "GET $u follow redirects (Googlebot UA)" -L -A "$GB" "$u"
+          done
+          one "GET https://ev.io.kr/ads.txt Mediapartners" -A "$MP" https://ev.io.kr/ads.txt
+          one "GET https://ev.io.kr/ads.txt AdsBot" -A "$AB" https://ev.io.kr/ads.txt
+          one "GET no User-Agent header" -H 'User-Agent:' https://ev.io.kr/ads.txt
+          one "HEAD https://ev.io.kr/ads.txt" -I https://ev.io.kr/ads.txt
+          one "GET HTTP/1.0" --http1.0 https://ev.io.kr/ads.txt
+          one "GET HTTP/1.1" --http1.1 https://ev.io.kr/ads.txt
+          one "GET HTTP/2" --http2 https://ev.io.kr/ads.txt
+          one "GET gzip/br accepted" -H 'Accept-Encoding: gzip, deflate, br' https://ev.io.kr/ads.txt
+          one "GET Accept text/plain" -H 'Accept: text/plain' https://ev.io.kr/ads.txt
+          one "GET conditional (If-None-Match *)" -H 'If-None-Match: *' https://ev.io.kr/ads.txt
+          one "GET trailing slash" https://ev.io.kr/ads.txt/
+          one "GET uppercase" https://ev.io.kr/ADS.TXT
+          one "GET query string" 'https://ev.io.kr/ads.txt?x=1'
+          one "GET app-ads.txt" https://ev.io.kr/app-ads.txt
+          one "GET io.kr https" -L https://io.kr/ads.txt
+          one "GET io.kr http" -L http://io.kr/ads.txt
+          echo; echo "=================== repeat x12 (Googlebot UA)"
+          for i in $(seq 1 12); do curl -sS -m 20 -o /dev/null -A "$GB" -w "%{http_code} %{size_download}B " -D - https://ev.io.kr/ads.txt | tr -d '\r' | grep -iE '^(x-vercel-cache|age):' | tr '\n' ' '; echo; done
+
+      - name: robots / home / sitemap
+        run: |
+          set +e
+          echo "== robots.txt"; curl -sS -D - https://ev.io.kr/robots.txt | tr -d '\r'
+          echo; echo "== home headers"; curl -sS -o /tmp/home -D - -A 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)' https://ev.io.kr/ | tr -d '\r' | grep -viE '^(date|strict-transport-security):'
+          echo "== home adsense markers"
+          grep -oE 'pagead2\.googlesyndication\.com/pagead/js/adsbygoogle\.js\?client=[a-z0-9-]+|<meta name="google-adsense-account" content="[^"]+"|<meta name="robots" content="[^"]+"' /tmp/home | sort | uniq -c
+          echo "== sitemap"; curl -sS https://ev.io.kr/sitemap.xml -o /tmp/sm -w '%{http_code} %{content_type}\n'; grep -o '<loc>' /tmp/sm | wc -l
