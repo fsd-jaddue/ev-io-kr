@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-26T05:08:24.896Z",
+  "fetchedAt": "2026-09-26T09:57:21.347Z",
   "note": "무공해차 통합누리집 '지자체별 보조금 현황' 수집 결과. scripts/fetch-snapshot.ts 실행으로 갱신됩니다. rows가 비어 있으면 화면에는 누리집 링크만 표시됩니다.",
   "rows": [
     {
@@ -37,7 +37,7 @@
       "region": "인천광역시",
       "vehicleType": "승용",
       "announced": 9306,
-      "applied": 9011,
+      "applied": 9012,
       "released": 6816,
       "remaining": 2490,
       "note": "본공고·추경1차 · 마감 2026.11.30 18:00"
@@ -407,7 +407,7 @@
       "region": "원주시",
       "vehicleType": "승용",
       "announced": 2012,
-      "applied": 1727,
+      "applied": 1726,
       "released": 1091,
       "remaining": 921,
       "note": "본공고·추경1차·추경2차 · 마감 2026.12.04 18:00"
