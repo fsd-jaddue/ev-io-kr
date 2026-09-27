@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-09-27T05:25:59.304Z",
+  "fetchedAt": "2026-09-27T12:11:49.014Z",
   "note": "무공해차 통합누리집 '지자체별 보조금 현황' 수집 결과. scripts/fetch-snapshot.ts 실행으로 갱신됩니다. rows가 비어 있으면 화면에는 누리집 링크만 표시됩니다.",
   "rows": [
     {
@@ -26,18 +26,18 @@
       "sido": "대구",
       "region": "대구광역시",
       "vehicleType": "승용",
-      "announced": 4087,
+      "announced": 5187,
       "applied": 4291,
       "released": 4288,
-      "remaining": 0,
-      "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.07.08 18:00"
+      "remaining": 899,
+      "note": "본공고·추경1차·추경2차·추경3차 · 마감 2026.12.04 17:00"
     },
     {
       "sido": "인천",
       "region": "인천광역시",
       "vehicleType": "승용",
       "announced": 9306,
-      "applied": 9012,
+      "applied": 9013,
       "released": 6816,
       "remaining": 2490,
       "note": "본공고·추경1차 · 마감 2026.11.30 18:00"
@@ -678,8 +678,8 @@
       "vehicleType": "승용",
       "announced": 158,
       "applied": 162,
-      "released": 156,
-      "remaining": 2,
+      "released": 155,
+      "remaining": 3,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.09.09 10:10"
     },
     {
@@ -1258,8 +1258,8 @@
       "vehicleType": "승용",
       "announced": 735,
       "applied": 497,
-      "released": 208,
-      "remaining": 527,
+      "released": 209,
+      "remaining": 526,
       "note": "본공고·추경1차·추경2차 · 마감 2026.12.10 18:00"
     },
     {
