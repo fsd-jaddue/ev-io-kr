@@ -8,12 +8,22 @@
       "amount": 194
     },
     {
+      "sido": "busan",
+      "sigungu": "전체",
+      "amount": 194
+    },
+    {
       "sido": "daegu",
       "sigungu": "전체",
       "amount": 194
     },
     {
       "sido": "incheon",
+      "sigungu": "전체",
+      "amount": 194
+    },
+    {
+      "sido": "gwangju",
       "sigungu": "전체",
       "amount": 194
     },
