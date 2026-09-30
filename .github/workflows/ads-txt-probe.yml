@@ -103,3 +103,43 @@ jobs:
           echo "== home adsense markers"
           grep -oE 'pagead2\.googlesyndication\.com/pagead/js/adsbygoogle\.js\?client=[a-z0-9-]+|<meta name="google-adsense-account" content="[^"]+"|<meta name="robots" content="[^"]+"' /tmp/home | sort | uniq -c
           echo "== sitemap"; curl -sS https://ev.io.kr/sitemap.xml -o /tmp/sm -w '%{http_code} %{content_type}\n'; grep -o '<loc>' /tmp/sm | wc -l
+
+      - name: Fetch via Google infrastructure (PageSpeed Insights, Translate proxy)
+        run: |
+          set +e
+          # PSI 는 Google 서버(Google IP)에서 URL 을 연다. Vercel 이 Google IP 를 막는지 간접 확인용.
+          for target in https://ev.io.kr/ads.txt https://ev.io.kr/; do
+            echo "== PSI $target"
+            enc=$(jq -rn --arg u "$target" '$u|@uri')
+            curl -sS -m 120 -o /tmp/psi.json -w 'api_http=%{http_code}\n' \
+              "https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${enc}&strategy=mobile&category=seo"
+            jq -c '{error: .error.message, requested: .lighthouseResult.requestedUrl, final: .lighthouseResult.finalDisplayedUrl,
+                    runtimeError: .lighthouseResult.runtimeError, fetchTime: .lighthouseResult.fetchTime,
+                    httpStatusAudit: .lighthouseResult.audits["http-status-code"].score,
+                    robotsTxtAudit: .lighthouseResult.audits["robots-txt"].score,
+                    crawlable: .lighthouseResult.audits["is-crawlable"].score,
+                    docRequest: [.lighthouseResult.audits["network-requests"].details.items[]? | select(.resourceType=="Document" or (.url|test("ads\\.txt|robots\\.txt"))) | {url, statusCode, mimeType}]}' /tmp/psi.json
+          done
+          echo "== translate.goog proxy"
+          curl -sS -m 30 -o /tmp/tr -w 'code=%{http_code} ctype=%{content_type} bytes=%{size_download}\n' \
+            'https://ev-io-kr.translate.goog/ads.txt?_x_tr_sl=ko&_x_tr_tl=en&_x_tr_hl=en'
+          grep -o 'pub-9408914409364609[^<]\{0,40\}' /tmp/tr | head -3
+
+      - name: Live content spot checks
+        run: |
+          set +e
+          get() { curl -sS -m 30 -o "/tmp/$1.html" -w "$1 code=%{http_code} bytes=%{size_download}\n" "$2"; }
+          get home https://ev.io.kr/
+          get seoul https://ev.io.kr/region/seoul
+          get gyeonggi https://ev.io.kr/region/gyeonggi
+          get kona https://ev.io.kr/car/kona-electric-long-range
+          get polestar https://ev.io.kr/car/polestar4
+          get calc https://ev.io.kr/calculator
+          get nf https://ev.io.kr/no-such-page-probe
+          echo "== particle errors";  grep -o '서울와' /tmp/seoul.html | head -1; grep -o '코나 일렉트릭<!-- -->와\|코나 일렉트릭와' /tmp/kona.html | head -1
+          echo "== polestar title"; grep -o '<title>[^<]*</title>' /tmp/polestar.html
+          echo "== hidden 공고·마감 column (mobile)"; grep -o '<th class="hidden[^"]*md:table-cell">공고·마감</th>' /tmp/gyeonggi.html | head -1
+          echo "== home TOP list contains 파주시?"; grep -o '파주시' /tmp/home.html | head -1; grep -o '전국[^<]\{0,20\}잔여[^<]\{0,40\}' /tmp/home.html | head -2
+          echo "== home 580 stat"; grep -o '승용 국비 최대' /tmp/home.html | head -1
+          echo "== calculator hard-coded example"; grep -o '국비 420만원[^<]\{0,80\}' /tmp/calc.html | head -1
+          echo "== 404 page: ad loader + robots metas"; grep -c 'adsbygoogle.js?client=' /tmp/nf.html; grep -o '<meta name="\(robots\|googlebot\)" content="[^"]*"' /tmp/nf.html
