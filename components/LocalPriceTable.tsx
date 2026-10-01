@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { LocalPriceRow } from "@/lib/ev/types";
 import { sigunguPath, sigunguSlug } from "@/data/regions";
-import { won } from "@/lib/ev/summary";
+import { TOP_CAR_LABEL, headlineTotal, won } from "@/lib/ev/summary";
 
 /** highlight: 강조할 시·군·구명 (비교표에서 현재 지역 표시) */
 export default function LocalPriceTable({ sidoSlug, rows, highlight }: { sidoSlug: string; rows: LocalPriceRow[]; highlight?: string }) {
@@ -11,7 +11,8 @@ export default function LocalPriceTable({ sidoSlug, rows, highlight }: { sidoSlu
         <thead className="bg-slate-50 text-left text-slate-700">
           <tr>
             <th className="px-3 py-2 font-semibold">시·군·구</th>
-            <th className="px-3 py-2 text-right font-semibold">수집된 지방비 최고액</th>
+            <th className="px-3 py-2 text-right font-semibold">지방비 최대</th>
+            <th className="px-3 py-2 text-right font-semibold" title={`${TOP_CAR_LABEL} 기준, 지방비 비례 추정`}>합산 예상</th>
             <th className="hidden px-3 py-2 font-semibold md:table-cell">비고</th>
           </tr>
         </thead>
@@ -29,6 +30,7 @@ export default function LocalPriceTable({ sidoSlug, rows, highlight }: { sidoSlu
                 </Link>
               </td>
               <td className="px-3 py-2 text-right tabular-nums text-emerald-700">{won(r.amount)}</td>
+              <td className="px-3 py-2 text-right font-semibold tabular-nums text-slate-900">{won(headlineTotal(r.amount))}</td>
               <td className="hidden px-3 py-2 text-xs text-slate-500 md:table-cell">{r.note ?? ""}</td>
             </tr>
           ))}
