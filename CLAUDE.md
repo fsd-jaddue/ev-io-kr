@@ -9,7 +9,7 @@
 ## 콘텐츠와 색인 구조 (2026-10-01)
 - **구조 변경 이력**: 9/12 보강(사이트맵 225) → 9/20 축소(56, 시·군·구 229페이지를 시·도로 308 이동, 가이드 12편) → 서치콘솔 클릭이 9/26부터 0 → 10/1 2차 거절 → **9/20 이전 구조로 복구**(사이트맵 225). 근거와 수치는 `ADSENSE_REVIEW_2026-10-01.md`. 다시 페이지를 대량 삭제·통합하지 않는다. 클릭의 대부분이 시·군 단위 검색어였다.
 - 시·군·구 229페이지는 `app/region/[sido]/[sigungu]/page.tsx`가 개별 문서로 렌더한다. 시·도 단일 공고 지역(서울·부산·대구·인천·광주·대전·울산·세종·제주)의 구·군 78페이지는 시·도 페이지와 중복이라 `noindex,follow` + 사이트맵 제외(열리기는 한다). 도 지역 151페이지는 잔여 물량이 서로 달라 색인. `sigunguPath()`는 페이지 경로, `LocalPriceTable` 행에는 `id="district-…"` 앵커가 남아 9/20식 링크도 깨지지 않는다.
-- 지역 페이지 본문은 `lib/ev/regionCopy.ts`(비교 문단·체크리스트·FAQ, 수치는 데이터에서만)와 `data/sido-intro.ts`. 차종 해설은 `content/cars/index.ts`(소개·산정 배경·확인할 점·비교·FAQ, "추정" 안내문 포함). 가이드는 `content/guides/{basic,apply,benefit,region-car,practical}.ts`(수기) + `region-deep.ts`(도 8곳 시·군 비교, 수치는 스냅샷 계산) 26편. `reviewed.ts`는 9/20 재작성본 보관용이며 사용하지 않는다. 2027 전망 글은 `app/guide/ev-subsidy-outlook-2027/page.tsx` 철회 안내(noindex)만 남긴다.
+- 지역 페이지 본문은 `lib/ev/regionCopy.ts`(비교 문단·체크리스트·FAQ, 수치는 데이터에서만)와 `data/sido-intro.ts`. 차종 해설은 `content/cars/index.ts`(소개·산정 배경·확인할 점·비교·FAQ, "추정" 안내문 포함). 가이드는 `content/guides/{basic,apply,benefit,region-car,practical}.ts`(수기) + `region-deep.ts`(도 8곳 시·군 비교, 수치는 스냅샷 계산) + `timely.ts`(하반기 추경·소진 현황은 remain.json 계산, 대리점 질문 10가지는 수기) 28편. 글은 주 1~2편씩 추가한다. `reviewed.ts`는 9/20 재작성본 보관용이며 사용하지 않는다. 2027 전망 글은 `app/guide/ev-subsidy-outlook-2027/page.tsx` 철회 안내(noindex)만 남긴다.
 - 차종 20종 중 국비 미확인 3종(캐스퍼·레이·무쏘)은 noindex·사이트맵 제외. 인포그래픽은 `scripts/gen-guide-figures.mjs` → `public/images/guides/*.svg`(2026-10-01 재생성, 2년 의무운행·구 비례식 수치 제거).
 - 소개 페이지는 9/20 판(자동화·AI 활용 고지)을 유지한다. 수기 작성·전문가 검수 주장을 쓰지 않는다. 페이지 수·글자 수를 승인 조건으로 단정하지 않는다.
 
