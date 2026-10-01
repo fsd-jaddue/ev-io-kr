@@ -1,21 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound, permanentRedirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import Breadcrumb from "@/components/Breadcrumb";
 import JsonLd from "@/components/JsonLd";
 import AdSlot from "@/components/AdSlot";
 import { articleJsonLd, faqJsonLd, pageMetadata } from "@/lib/seo";
-import { GUIDES, GUIDE_REDIRECTS, getGuide } from "@/content/guides";
+import { GUIDES, getGuide } from "@/content/guides";
 import { SITE } from "@/lib/site";
 import { GuideArt } from "@/components/illustrations";
 
 export function generateStaticParams() {
-  return [...GUIDES.map((g) => ({ slug: g.slug })), ...Object.keys(GUIDE_REDIRECTS).map(slug => ({slug}))];
+  return GUIDES.map((g) => ({ slug: g.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  if (GUIDE_REDIRECTS[slug]) permanentRedirect(GUIDE_REDIRECTS[slug]);
   const g = getGuide(slug);
   if (!g) notFound();
   return pageMetadata({
@@ -31,7 +30,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function GuidePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  if (GUIDE_REDIRECTS[slug]) permanentRedirect(GUIDE_REDIRECTS[slug]);
   const g = getGuide(slug);
   if (!g) notFound();
   const related = GUIDES.filter((x) => x.slug !== slug && x.category === g.category).slice(0, 3);
