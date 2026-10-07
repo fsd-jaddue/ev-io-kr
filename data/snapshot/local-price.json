@@ -696,6 +696,66 @@
       "sido": "gyeongbuk",
       "sigungu": "봉화군",
       "amount": 667
+    },
+    {
+      "sido": "gyeongbuk",
+      "sigungu": "울진군",
+      "amount": 667
+    },
+    {
+      "sido": "gyeongbuk",
+      "sigungu": "울릉군",
+      "amount": 1224
+    },
+    {
+      "sido": "gyeongnam",
+      "sigungu": "창원시",
+      "amount": 195
+    },
+    {
+      "sido": "gyeongnam",
+      "sigungu": "진주시",
+      "amount": 195
+    },
+    {
+      "sido": "gyeongnam",
+      "sigungu": "통영시",
+      "amount": 616
+    },
+    {
+      "sido": "gyeongnam",
+      "sigungu": "사천시",
+      "amount": 227
+    },
+    {
+      "sido": "gyeongnam",
+      "sigungu": "김해시",
+      "amount": 195
+    },
+    {
+      "sido": "gyeongnam",
+      "sigungu": "밀양시",
+      "amount": 260
+    },
+    {
+      "sido": "gyeongnam",
+      "sigungu": "거제시",
+      "amount": 227
+    },
+    {
+      "sido": "gyeongnam",
+      "sigungu": "양산시",
+      "amount": 194
+    },
+    {
+      "sido": "gyeongnam",
+      "sigungu": "의령군",
+      "amount": 195
+    },
+    {
+      "sido": "gyeongnam",
+      "sigungu": "함안군",
+      "amount": 195
     }
   ]
 }
