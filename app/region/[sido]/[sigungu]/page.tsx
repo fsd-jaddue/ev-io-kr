@@ -12,7 +12,8 @@ import { LOCAL_REF_NATIONAL, TOP_CAR_LABEL, estimateTotal, headlineTotal, won } 
 import { passengerConversion } from "@/lib/ev/subsidy";
 import { neighborRows, rankInSido, rankNational, sidoMaxRanking, sidoPriceStats } from "@/lib/ev/localPriceStats";
 import { matchRemainRows } from "@/lib/ev/remainSummary";
-import { eunNeun, sidoPoints, sigunguChecklist, sigunguComparison, sigunguFaq, type SigunguFacts } from "@/lib/ev/regionCopy";
+import { eunNeun, sigunguChecklist, sigunguComparison, sigunguFaq, type SigunguFacts } from "@/lib/ev/regionCopy";
+import { historyFacts, historyFor, historyParagraphs } from "@/lib/ev/remainHistory";
 import { faqJsonLd, pageMetadata, webPageJsonLd } from "@/lib/seo";
 import { SIDO_LIST, decodeSigungu, getSido, sigunguPath, sigunguSlug } from "@/data/regions";
 import { CARS, NATIONAL_MAX, carName } from "@/data/cars";
@@ -71,13 +72,24 @@ export default async function SigunguPage({ params }: { params: Params }) {
   const d = await load(params);
   if (!d) notFound();
   const { sido, name, local, row, remain, remainRow, stats, facts } = d;
-  const siblings = local.rows.filter((r) => r.sido === sido.slug && r.sigungu !== name);
-  const cars = CARS.filter((c) => c.national !== null);
+  // 다른 시·군 링크: 지방비 순위에서 가까운 8곳 (도 전체 목록은 시·도 페이지에 있음)
+  const sortedSido = stats.sorted.filter((r) => r.sigungu !== name);
+  const selfIdx = stats.sorted.findIndex((r) => r.sigungu === name);
+  const siblings = sortedSido
+    .map((r, i) => ({ r, d: Math.abs((i >= selfIdx ? i + 1 : i) - selfIdx) }))
+    .sort((a, b) => a.d - b.d)
+    .slice(0, 8)
+    .map((x) => x.r);
+  // 차종 표: 국비 확인된 대표 차종 중 국비 상위 8종 (전체는 /car·계산기)
+  const cars = CARS.filter((c) => c.national !== null).sort((a, b) => (b.national ?? 0) - (a.national ?? 0)).slice(0, 8);
   const neighbors = neighborRows(local.rows, sido.slug, name);
   const sidoRanking = stats.uniform ? sidoMaxRanking(local.rows) : [];
   const faq = sigunguFaq(facts);
   const checklist = sigunguChecklist(facts);
-  const points = sidoPoints(sido.slug);
+  // 이 지역 공고의 9월 이후 수집 이력: 물량 증감·마감·재개·출고 속도 (지역마다 다른 내용)
+  const hist = remainRow ? historyFacts(historyFor(remainRow)) : null;
+  const histLabel = remainRow && remainRow.region === sido.name ? `${sido.name}(단일 공고)` : name;
+  const histParas = hist && remainRow ? historyParagraphs(histLabel, remainRow.sido, remainRow.region, hist) : [];
   const path = sigunguPath(sido.slug, name);
   const title = `${sido.short} ${name} 전기차 보조금 2026`;
 
@@ -146,11 +158,42 @@ export default async function SigunguPage({ params }: { params: Params }) {
         </div>
       )}
 
+      {hist && histParas.length > 0 && (
+        <section className="prose-ev mt-10 max-w-3xl">
+          <h2>{histLabel} 보조금 물량 흐름 ({Number(hist.first.date.slice(5, 7))}월 {Number(hist.first.date.slice(8, 10))}일 이후 수집 기록)</h2>
+          {histParas.map((p) => (
+            <p key={p.slice(0, 32)}>{p}</p>
+          ))}
+          <div className="table-wrap" tabIndex={0} role="region" aria-label={`${histLabel} 주간 물량 기록`}>
+            <table className="nowrap">
+              <thead>
+                <tr><th>날짜</th><th>공고</th><th>접수</th><th>출고</th><th>출고잔여</th><th>상태</th></tr>
+              </thead>
+              <tbody>
+                {hist.weekly.map((w) => (
+                  <tr key={w.date}>
+                    <td>{w.date.slice(5).replace("-", ".")}</td>
+                    <td>{w.announced?.toLocaleString() ?? "-"}</td>
+                    <td>{w.applied?.toLocaleString() ?? "-"}</td>
+                    <td>{w.released?.toLocaleString() ?? "-"}</td>
+                    <td>{w.remaining === null ? "-" : w.remaining <= 0 ? "소진" : w.remaining.toLocaleString()}</td>
+                    <td>{w.closed ? "신청마감" : "접수 가능"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-xs text-slate-500">
+            무공해차 통합누리집 &lsquo;지자체별 보조금 현황&rsquo;을 매시간 수집해 하루 마지막 값을 7일 간격으로 정리한 표입니다(단위: 대). 누리집 표시값 그대로이며 행정기관의 처리 시각과 다를 수 있습니다.
+          </p>
+        </section>
+      )}
+
       {neighbors.length > 0 && (
         <section className="mt-10">
           <h2 className="text-xl font-bold text-slate-900">{sido.short} 시·군·구 지방비 비교</h2>
           <p className="mt-1 text-sm text-slate-500">
-            {sido.short} 안에서 지방비가 가장 많은 곳과 적은 곳, 그리고 {name}을 함께 놓은 표입니다. 전체 {stats.count}곳 목록은{" "}
+            {sido.short} 최고·최저 지역과 지방비 순위에서 {name} 앞뒤 지역을 함께 놓은 표입니다. 전체 {stats.count}곳 목록은{" "}
             <Link href={`/region/${sido.slug}`} className="text-emerald-700 underline">
               {sido.name} 페이지
             </Link>
@@ -200,7 +243,10 @@ export default async function SigunguPage({ params }: { params: Params }) {
       {row.amount !== null && (
         <section className="mt-10">
           <h2 className="text-xl font-bold text-slate-900">{name} 차종별 예상 지원액</h2>
-          <p className="mt-1 text-sm text-slate-500">지방비는 지역 최고액 × (차종 국비 ÷ 수집 목록 최고 국비 {LOCAL_REF_NATIONAL}만원)으로 추정했습니다. 서울은 누리집 수집값과 일치하지만 다른 지역은 공식 표로 다시 확인하세요. 전환 포함 열은 자격 충족 시 전환지원 국비(최대 {NATIONAL_MAX.conversion}만원, 국비 500만원 미만 차종은 차등)를 더한 값입니다.</p>
+          <p className="mt-1 text-sm text-slate-500">
+            {name} 지방비 최대 {won(row.amount)}에 차종 국비 비율(국비 ÷ {LOCAL_REF_NATIONAL})을 곱한 비례 추정치입니다. 계산 근거는{" "}
+            <Link href="/calculator" className="text-emerald-700 underline">계산기 설명</Link>에 있고, 계약 전에는 공식 표의 같은 모델 행으로 확인하세요.
+          </p>
           <div className="table-wrap mt-3">
             <table className="w-full text-sm">
               <thead className="bg-slate-50 text-left text-slate-700">
@@ -232,7 +278,10 @@ export default async function SigunguPage({ params }: { params: Params }) {
               </tbody>
             </table>
           </div>
-          <p className="mt-1 text-xs text-slate-500">단위: 만원</p>
+          <p className="mt-1 text-xs text-slate-500">
+            단위: 만원. 국비 상위 8개 차종만 실었습니다. 다른 차종은 <Link href="/car" className="text-emerald-700 underline">차종별 국비</Link>와{" "}
+            <Link href="/calculator" className="text-emerald-700 underline">계산기</Link>에서 확인하세요.
+          </p>
         </section>
       )}
 
@@ -241,22 +290,14 @@ export default async function SigunguPage({ params }: { params: Params }) {
       <RemainTable sido={sido.slug} regionFilter={name} sidoName={sido.name} initial={remain} title={`${name} 접수·출고·잔여 현황`} />
 
       <section className="prose-ev mt-10 max-w-3xl">
-        <h2>{name} 보조금 신청 전 체크리스트</h2>
-        <ul>
-          {checklist.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-        {points.length > 0 && (
-          <>
-            <h3>{sido.short} 공고 특징</h3>
-            <ul>
-              {points.map((p) => (
-                <li key={p}>{p}</li>
-              ))}
-            </ul>
-          </>
-        )}
+        <h2>{name}에서 신청하기 전에</h2>
+        <p>{checklist[0]}.</p>
+        <p>
+          거주 기간·재지원 제한·차량가 기준선·전환지원 자격·출고 기한처럼 모든 지역에 공통인 확인 사항은{" "}
+          <Link href="/guide/ev-subsidy-documents-checklist">서류 체크리스트</Link>와{" "}
+          <Link href="/guide/ev-subsidy-common-mistakes">자주 하는 실수 10가지</Link>에 정리해 두었습니다. {sido.short} 공고의 특징은{" "}
+          <Link href={`/region/${sido.slug}`}>{sido.name} 페이지</Link>에서 볼 수 있습니다.
+        </p>
         <p>
           공고 원문은 <a href={EV_PORTAL.remain} target="_blank" rel="noopener noreferrer">무공해차 통합누리집</a>과 {sido.name} 또는 {name} 홈페이지 고시·공고에서 확인할 수 있습니다.
         </p>
@@ -265,8 +306,11 @@ export default async function SigunguPage({ params }: { params: Params }) {
       <FaqList items={faq} title={`${name} 전기차 보조금 자주 묻는 질문`} />
 
       <section className="mt-10">
-        <h2 className="text-lg font-bold text-slate-900">{sido.short} 다른 시·군·구</h2>
-        <p className="mt-1 text-sm text-slate-500">지역명 옆 금액은 2026년 승용 전기차 지방비 최대액입니다. 국비 최대 {won(NATIONAL_MAX.large)}은 별도로 더해집니다.</p>
+        <h2 className="text-lg font-bold text-slate-900">{waGwa(name)} 지방비가 비슷한 {sido.short} 시·군</h2>
+        <p className="mt-1 text-sm text-slate-500">
+          지방비 순위에서 {waGwa(name)} 가까운 지역입니다. {sido.short} 전체 {stats.count}곳은{" "}
+          <Link href={`/region/${sido.slug}`} className="text-emerald-700 underline">{sido.name} 페이지</Link>에서 볼 수 있습니다.
+        </p>
         <ul className="mt-3 flex flex-wrap gap-2">
           {siblings.map((s) => (
             <li key={s.sigungu}>
@@ -295,4 +339,11 @@ function Card({ label, value, sub, tone = "emerald" }: { label: string; value: s
       {sub && <p className="mt-1 text-xs text-slate-500">{sub}</p>}
     </div>
   );
+}
+
+/** 와/과 조사: 마지막 글자 받침 유무 */
+function waGwa(word: string): string {
+  const code = word.charCodeAt(word.length - 1) - 0xac00;
+  if (code < 0 || code > 11171) return `${word}와(과)`;
+  return `${word}${code % 28 === 0 ? "와" : "과"}`;
 }

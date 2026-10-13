@@ -6,8 +6,7 @@
 import type { Car, RemainRow, Sido } from "./types";
 import type { RankInfo, SidoMaxRank, SidoPriceStats } from "./localPriceStats";
 import { LEVEL_META, parseRemainNote, remainLevel, type SidoRemainSummary, type TopSigunguRow } from "./remainSummary";
-import { TOP_CAR_LABEL, estimateTotal, headlineTotal } from "./summary";
-import { passengerConversion } from "./subsidy";
+import { TOP_CAR_LABEL, headlineTotal } from "./summary";
 import { formatFetchedAt } from "./format";
 import { NATIONAL_MAX } from "@/data/cars";
 import { SIDO_INTRO } from "@/data/sido-intro";
@@ -152,13 +151,6 @@ export function sigunguFaq(f: SigunguFacts): Faq[] {
   if (f.remainRow) {
     const label = f.remainRow.region === sido.name ? `${sido.name}(단일 공고)` : name;
     out.push({ q: `지금 ${name} 전기차 보조금 잔여 물량이 남아 있나요?`, a: remainAnswer(label, f.remainRow, f.fetchedAt) });
-  }
-  if (amount !== null && f.topCar.national !== null) {
-    const e = estimateTotal({ national: f.topCar.national, localMax: amount });
-    out.push({
-      q: `${name}에서 ${f.topCar.brand} ${f.topCar.model}를 사면 보조금을 얼마나 받나요?`,
-      a: `${f.topCar.brand} ${f.topCar.model} ${f.topCar.trim}의 국비 ${n(e.national)}만원에 ${name} 지방비 추정 ${n(e.local)}만원을 더해 약 ${n(e.total)}만원, 전환지원 국비 포함 ${n(e.total + passengerConversion(e.national))}만원입니다. 지방비는 비례 추정값이므로 공식 표로 재확인하세요. 다른 차종은 위 표와 보조금 계산기에서 확인할 수 있습니다.`,
-    });
   }
   return out;
 }
