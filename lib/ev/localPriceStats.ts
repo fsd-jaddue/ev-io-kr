@@ -86,17 +86,18 @@ export function rankNational(rows: LocalPriceRow[], sidoSlug: string, sigungu: s
 }
 
 /**
- * 같은 시·도 안에서 비교표에 실을 행: 상위 n + 하위 n + 본인. 금액 내림차순. 단일 공고 시·도면 빈 배열.
+ * 같은 시·도 안에서 비교표에 실을 행: 최고·최저 1곳 + 금액 순위에서 본인 앞뒤 n곳 + 본인. 금액 내림차순. 단일 공고·동일 금액 시·도면 빈 배열.
+ * 페이지마다 본인 주변 지역이 달라 같은 도의 시·군 페이지끼리 표가 똑같아지지 않는다(2026-10-13).
  */
-export function neighborRows(rows: LocalPriceRow[], sidoSlug: string, sigungu: string, n = 5): LocalPriceRow[] {
+export function neighborRows(rows: LocalPriceRow[], sidoSlug: string, sigungu: string, n = 3): LocalPriceRow[] {
   const stats = sidoPriceStats(rows, sidoSlug);
   if (stats.uniform || stats.equal || stats.known === 0) return [];
   const known = stats.sorted.filter((r) => r.amount !== null);
+  const idx = known.findIndex((r) => r.sigungu === sigungu);
   const picked = new Map<string, LocalPriceRow>();
-  for (const r of known.slice(0, n)) picked.set(r.sigungu, r);
-  for (const r of known.slice(-n)) picked.set(r.sigungu, r);
-  const me = known.find((r) => r.sigungu === sigungu);
-  if (me) picked.set(me.sigungu, me);
+  picked.set(known[0].sigungu, known[0]);
+  picked.set(known[known.length - 1].sigungu, known[known.length - 1]);
+  if (idx >= 0) for (const r of known.slice(Math.max(0, idx - n), idx + n + 1)) picked.set(r.sigungu, r);
   return Array.from(picked.values()).sort(byAmountDesc);
 }
 

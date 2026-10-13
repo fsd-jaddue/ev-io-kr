@@ -8,6 +8,10 @@ import { LOCAL_REF_NATIONAL, estimateLocal, estimateTotal, headlineTotal, summar
 import { getLocalPriceSnapshot } from "../lib/ev/localPrice";
 import { GUIDES } from "../content/guides";
 import { SIDO_LIST, sigunguPath } from "../data/regions";
+import { historyFacts, historyFor } from "../lib/ev/remainHistory";
+import { passengerRows } from "../lib/ev/remainSummary";
+import remainSnapshot from "../data/snapshot/remain.json";
+import type { RemainRow } from "../lib/ev/types";
 
 test("승용 전환지원 국비의 임계값·반올림·음수 거부", () => {
   for (const [national, expected] of [[570, 100], [500, 100], [420, 84], [210, 42], [168, 34], [0, 0]]) assert.equal(passengerConversion(national), expected);
@@ -49,4 +53,16 @@ test("시·군·구 링크는 개별 페이지 경로, 단일 공고 시·도만
   assert.deepEqual(single, ["busan", "daegu", "daejeon", "gwangju", "incheon", "jeju", "sejong", "seoul", "ulsan"]);
   assert.equal(new Set(GUIDES.map((g) => g.slug)).size, GUIDES.length);
   assert.ok(!GUIDES.some((g) => g.slug === "ev-subsidy-outlook-2027"));
+});
+
+test("지역 이력: 날짜 오름차순·중복 없음, 마지막 점이 현재 remain.json 값과 일치", () => {
+  const rows = passengerRows((remainSnapshot as { rows: RemainRow[] }).rows);
+  assert.ok(rows.length > 100);
+  for (const r of rows) {
+    const pts = historyFor(r);
+    assert.ok(pts.length > 0, `history missing: ${r.sido}|${r.region}`);
+    for (let i = 1; i < pts.length; i++) assert.ok(pts[i - 1].date < pts[i].date, `order: ${r.region}`);
+    const f = historyFacts(pts)!;
+    assert.deepEqual([f.last.announced, f.last.released, f.last.remaining], [r.announced, r.released, r.remaining], r.region);
+  }
 });

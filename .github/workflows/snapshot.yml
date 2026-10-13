@@ -57,6 +57,12 @@ jobs:
           if-no-files-found: ignore
           retention-days: 3
 
+      # 지역별 일별 이력(시·군 페이지의 '물량 흐름' 섹션)에 오늘 값을 반영한다
+      - name: Update remain history
+        if: steps.fetch.outcome == 'success'
+        run: npx tsx scripts/build-remain-history.ts
+        continue-on-error: true
+
       # 커밋 전에 직전 값(HEAD)과 비교해 의미 있는 변경만 보고서로 만든다
       - name: Detect material changes
         id: diff
@@ -66,7 +72,7 @@ jobs:
         run: |
           git config user.name "ev-snapshot-bot"
           git config user.email "eviokr@icloud.com"
-          git add data/snapshot/remain.json data/snapshot/local-price.json data/snapshot/cars.json
+          git add data/snapshot/remain.json data/snapshot/remain-history.json data/snapshot/local-price.json data/snapshot/cars.json
           if git diff --cached --quiet; then
             echo "no changes"
             exit 0
