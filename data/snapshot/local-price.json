@@ -614,6 +614,21 @@
     },
     {
       "sido": "gyeongbuk",
+      "sigungu": "안동시",
+      "amount": 667
+    },
+    {
+      "sido": "gyeongbuk",
+      "sigungu": "구미시",
+      "amount": 667
+    },
+    {
+      "sido": "gyeongbuk",
+      "sigungu": "영주시",
+      "amount": 667
+    },
+    {
+      "sido": "gyeongbuk",
       "sigungu": "영천시",
       "amount": 667
     },
@@ -624,7 +639,17 @@
     },
     {
       "sido": "gyeongbuk",
+      "sigungu": "문경시",
+      "amount": 667
+    },
+    {
+      "sido": "gyeongbuk",
       "sigungu": "경산시",
+      "amount": 667
+    },
+    {
+      "sido": "gyeongbuk",
+      "sigungu": "의성군",
       "amount": 667
     },
     {
@@ -656,6 +681,36 @@
       "sido": "gyeongbuk",
       "sigungu": "성주군",
       "amount": 667
+    },
+    {
+      "sido": "gyeongbuk",
+      "sigungu": "칠곡군",
+      "amount": 667
+    },
+    {
+      "sido": "gyeongbuk",
+      "sigungu": "예천군",
+      "amount": 667
+    },
+    {
+      "sido": "gyeongbuk",
+      "sigungu": "봉화군",
+      "amount": 667
+    },
+    {
+      "sido": "gyeongbuk",
+      "sigungu": "울진군",
+      "amount": 667
+    },
+    {
+      "sido": "gyeongbuk",
+      "sigungu": "울릉군",
+      "amount": 1224
+    },
+    {
+      "sido": "gyeongnam",
+      "sigungu": "창원시",
+      "amount": 195
     }
   ]
 }
