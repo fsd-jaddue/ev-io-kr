@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-13",
+  "updatedAt": "2026-10-14",
   "note": "scripts/fetch-snapshot.ts 가 ev.or.kr '지자체별 차종·모델 보조금'을 수집해 채웁니다. rows가 비어 있으면 data/snapshot/local-price.ts 의 취합값이 사용됩니다.",
   "rows": [
     {
@@ -614,21 +614,6 @@
     },
     {
       "sido": "gyeongbuk",
-      "sigungu": "안동시",
-      "amount": 667
-    },
-    {
-      "sido": "gyeongbuk",
-      "sigungu": "구미시",
-      "amount": 667
-    },
-    {
-      "sido": "gyeongbuk",
-      "sigungu": "영주시",
-      "amount": 667
-    },
-    {
-      "sido": "gyeongbuk",
       "sigungu": "영천시",
       "amount": 667
     },
@@ -639,17 +624,7 @@
     },
     {
       "sido": "gyeongbuk",
-      "sigungu": "문경시",
-      "amount": 667
-    },
-    {
-      "sido": "gyeongbuk",
       "sigungu": "경산시",
-      "amount": 667
-    },
-    {
-      "sido": "gyeongbuk",
-      "sigungu": "의성군",
       "amount": 667
     },
     {
@@ -681,36 +656,6 @@
       "sido": "gyeongbuk",
       "sigungu": "성주군",
       "amount": 667
-    },
-    {
-      "sido": "gyeongbuk",
-      "sigungu": "칠곡군",
-      "amount": 667
-    },
-    {
-      "sido": "gyeongbuk",
-      "sigungu": "예천군",
-      "amount": 667
-    },
-    {
-      "sido": "gyeongbuk",
-      "sigungu": "봉화군",
-      "amount": 667
-    },
-    {
-      "sido": "gyeongbuk",
-      "sigungu": "울진군",
-      "amount": 667
-    },
-    {
-      "sido": "gyeongbuk",
-      "sigungu": "울릉군",
-      "amount": 1224
-    },
-    {
-      "sido": "gyeongnam",
-      "sigungu": "창원시",
-      "amount": 195
     }
   ]
 }
