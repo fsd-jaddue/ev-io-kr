@@ -791,6 +791,16 @@
       "sido": "gyeongnam",
       "sigungu": "거창군",
       "amount": 365
+    },
+    {
+      "sido": "gyeongnam",
+      "sigungu": "합천군",
+      "amount": 715
+    },
+    {
+      "sido": "jeju",
+      "sigungu": "전체",
+      "amount": 447
     }
   ]
 }
