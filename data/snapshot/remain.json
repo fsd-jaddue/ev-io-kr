@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-18T23:21:04.331Z",
+  "fetchedAt": "2026-10-19T04:51:58.550Z",
   "note": "무공해차 통합누리집 '지자체별 보조금 현황' 수집 결과. scripts/fetch-snapshot.ts 실행으로 갱신됩니다. rows가 비어 있으면 화면에는 누리집 링크만 표시됩니다.",
   "rows": [
     {
@@ -8,8 +8,8 @@
       "vehicleType": "승용",
       "announced": 19648,
       "applied": 18656,
-      "released": 16929,
-      "remaining": 2719,
+      "released": 17059,
+      "remaining": 2589,
       "note": "본공고·추경1차·추경2차 · 마감 2026.11.30 18:00"
     },
     {
@@ -17,9 +17,9 @@
       "region": "부산광역시",
       "vehicleType": "승용",
       "announced": 8629,
-      "applied": 9374,
-      "released": 7332,
-      "remaining": 1297,
+      "applied": 9371,
+      "released": 7335,
+      "remaining": 1294,
       "note": "본공고·추경1차·추경2차·추경3차 · 마감 2026.12.11 18:00"
     },
     {
@@ -27,9 +27,9 @@
       "region": "대구광역시",
       "vehicleType": "승용",
       "announced": 5187,
-      "applied": 5667,
-      "released": 4673,
-      "remaining": 514,
+      "applied": 5662,
+      "released": 4752,
+      "remaining": 435,
       "note": "본공고·추경1차·추경2차·추경3차 · 신청마감 · 마감 2026.10.08 17:00"
     },
     {
@@ -37,9 +37,9 @@
       "region": "인천광역시",
       "vehicleType": "승용",
       "announced": 9306,
-      "applied": 9141,
-      "released": 8664,
-      "remaining": 642,
+      "applied": 9154,
+      "released": 8694,
+      "remaining": 612,
       "note": "본공고·추경1차 · 마감 2026.11.30 18:00"
     },
     {
@@ -68,7 +68,7 @@
       "vehicleType": "승용",
       "announced": 3186,
       "applied": 3861,
-      "released": 3839,
+      "released": 3843,
       "remaining": 0,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.09.18 11:02"
     },
@@ -97,9 +97,9 @@
       "region": "성남시",
       "vehicleType": "승용",
       "announced": 2827,
-      "applied": 2827,
-      "released": 2809,
-      "remaining": 18,
+      "applied": 2829,
+      "released": 2816,
+      "remaining": 11,
       "note": "본공고·추경1차 · 마감 2026.12.11 18:00"
     },
     {
@@ -117,7 +117,7 @@
       "region": "안양시",
       "vehicleType": "승용",
       "announced": 1755,
-      "applied": 1830,
+      "applied": 1829,
       "released": 1750,
       "remaining": 5,
       "note": "본공고 · 신청마감 · 마감 2026.09.22 14:05"
@@ -138,8 +138,8 @@
       "vehicleType": "승용",
       "announced": 1050,
       "applied": 897,
-      "released": 748,
-      "remaining": 302,
+      "released": 756,
+      "remaining": 294,
       "note": "본공고·추경1차·추경2차 · 마감 2026.12.04 18:00"
     },
     {
@@ -147,8 +147,8 @@
       "region": "평택시",
       "vehicleType": "승용",
       "announced": 165,
-      "applied": 2600,
-      "released": 2242,
+      "applied": 2599,
+      "released": 2250,
       "remaining": 0,
       "note": "본공고 · 신청마감 · 마감 2026.10.06 10:00"
     },
@@ -167,9 +167,9 @@
       "region": "안산시",
       "vehicleType": "승용",
       "announced": 1389,
-      "applied": 1385,
-      "released": 1207,
-      "remaining": 182,
+      "applied": 1383,
+      "released": 1221,
+      "remaining": 168,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.10.15 18:00"
     },
     {
@@ -177,9 +177,9 @@
       "region": "고양시",
       "vehicleType": "승용",
       "announced": 3001,
-      "applied": 3254,
-      "released": 2929,
-      "remaining": 72,
+      "applied": 3252,
+      "released": 2941,
+      "remaining": 60,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.09.29 14:10"
     },
     {
@@ -188,8 +188,8 @@
       "vehicleType": "승용",
       "announced": 354,
       "applied": 303,
-      "released": 279,
-      "remaining": 75,
+      "released": 277,
+      "remaining": 77,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.09.21 10:24"
     },
     {
@@ -198,9 +198,9 @@
       "vehicleType": "승용",
       "announced": 840,
       "applied": 739,
-      "released": 699,
-      "remaining": 141,
-      "note": "본공고·추경1차 · 마감 2026.12.04 18:00"
+      "released": 703,
+      "remaining": 137,
+      "note": "본공고·추경1차 · 신청마감 · 마감 2026.10.16 18:00"
     },
     {
       "sido": "경기",
@@ -217,7 +217,7 @@
       "region": "오산시",
       "vehicleType": "승용",
       "announced": 1150,
-      "applied": 951,
+      "applied": 950,
       "released": 800,
       "remaining": 350,
       "note": "본공고·추경1차 · 신청마감 · 마감 2026.09.21 16:05"
@@ -276,10 +276,10 @@
       "sido": "경기",
       "region": "파주시",
       "vehicleType": "승용",
-      "announced": 1654,
-      "applied": 2012,
-      "released": 1562,
-      "remaining": 92,
+      "announced": 1640,
+      "applied": 2006,
+      "released": 1563,
+      "remaining": 77,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.10.16 16:20"
     },
     {
@@ -298,8 +298,8 @@
       "vehicleType": "승용",
       "announced": 689,
       "applied": 698,
-      "released": 675,
-      "remaining": 14,
+      "released": 676,
+      "remaining": 13,
       "note": "본공고·추경1차·추경2차·추경3차 · 신청마감 · 마감 2026.09.29 10:02"
     },
     {
@@ -308,7 +308,7 @@
       "vehicleType": "승용",
       "announced": 1699,
       "applied": 1798,
-      "released": 1717,
+      "released": 1720,
       "remaining": 0,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.09.28 10:00"
     },
@@ -317,9 +317,9 @@
       "region": "화성시",
       "vehicleType": "승용",
       "announced": 4271,
-      "applied": 4563,
-      "released": 4052,
-      "remaining": 219,
+      "applied": 4562,
+      "released": 4076,
+      "remaining": 195,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.09.30 10:10"
     },
     {
@@ -358,8 +358,8 @@
       "vehicleType": "승용",
       "announced": 709,
       "applied": 490,
-      "released": 381,
-      "remaining": 328,
+      "released": 398,
+      "remaining": 311,
       "note": "본공고·추경1차 · 신청마감 · 마감 2026.10.07 08:00"
     },
     {
@@ -398,8 +398,8 @@
       "vehicleType": "승용",
       "announced": 1700,
       "applied": 1336,
-      "released": 1139,
-      "remaining": 561,
+      "released": 1141,
+      "remaining": 559,
       "note": "본공고·추경1차 · 신청마감 · 마감 2026.09.29 09:00"
     },
     {
@@ -407,9 +407,9 @@
       "region": "원주시",
       "vehicleType": "승용",
       "announced": 2012,
-      "applied": 1627,
-      "released": 1335,
-      "remaining": 677,
+      "applied": 1626,
+      "released": 1341,
+      "remaining": 671,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.10.01 14:40"
     },
     {
@@ -477,9 +477,9 @@
       "region": "횡성군",
       "vehicleType": "승용",
       "announced": 165,
-      "applied": 126,
-      "released": 110,
-      "remaining": 55,
+      "applied": 120,
+      "released": 112,
+      "remaining": 53,
       "note": "본공고 · 신청마감 · 마감 2026.09.28 10:01"
     },
     {
@@ -498,8 +498,8 @@
       "vehicleType": "승용",
       "announced": 130,
       "applied": 132,
-      "released": 97,
-      "remaining": 33,
+      "released": 100,
+      "remaining": 30,
       "note": "본공고·추경1차 · 신청마감 · 마감 2026.09.30 16:00"
     },
     {
@@ -528,8 +528,8 @@
       "vehicleType": "승용",
       "announced": 144,
       "applied": 104,
-      "released": 82,
-      "remaining": 62,
+      "released": 84,
+      "remaining": 60,
       "note": "본공고·추경1차·추경2차·추경3차 · 신청마감 · 마감 2026.10.12 16:04"
     },
     {
@@ -558,8 +558,8 @@
       "vehicleType": "승용",
       "announced": 86,
       "applied": 83,
-      "released": 71,
-      "remaining": 15,
+      "released": 74,
+      "remaining": 12,
       "note": "본공고·추경1차 · 신청마감 · 마감 2026.10.06 12:00"
     },
     {
@@ -577,8 +577,8 @@
       "region": "청주시",
       "vehicleType": "승용",
       "announced": 2250,
-      "applied": 3344,
-      "released": 2762,
+      "applied": 3342,
+      "released": 2763,
       "remaining": 0,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.09.15 11:26"
     },
@@ -588,8 +588,8 @@
       "vehicleType": "승용",
       "announced": 1020,
       "applied": 1373,
-      "released": 999,
-      "remaining": 21,
+      "released": 1006,
+      "remaining": 14,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.10.01 10:00"
     },
     {
@@ -607,9 +607,9 @@
       "region": "보은군",
       "vehicleType": "승용",
       "announced": 140,
-      "applied": 147,
-      "released": 125,
-      "remaining": 15,
+      "applied": 145,
+      "released": 129,
+      "remaining": 11,
       "note": "본공고·추경1차 · 신청마감 · 마감 2026.10.06 10:01"
     },
     {
@@ -647,7 +647,7 @@
       "region": "진천군",
       "vehicleType": "승용",
       "announced": 15,
-      "applied": 731,
+      "applied": 728,
       "released": 528,
       "remaining": 0,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.10.01 13:00"
@@ -698,7 +698,7 @@
       "vehicleType": "승용",
       "announced": 195,
       "applied": 476,
-      "released": 345,
+      "released": 348,
       "remaining": 0,
       "note": "본공고·추경1차 · 마감 2026.12.24 18:00"
     },
@@ -727,9 +727,9 @@
       "region": "서산시",
       "vehicleType": "승용",
       "announced": 553,
-      "applied": 843,
-      "released": 356,
-      "remaining": 197,
+      "applied": 842,
+      "released": 366,
+      "remaining": 187,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.10.08 18:00"
     },
     {
@@ -737,7 +737,7 @@
       "region": "논산시",
       "vehicleType": "승용",
       "announced": 256,
-      "applied": 421,
+      "applied": 420,
       "released": 281,
       "remaining": 0,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.09.15 13:40"
@@ -748,8 +748,8 @@
       "vehicleType": "승용",
       "announced": 257,
       "applied": 421,
-      "released": 183,
-      "remaining": 74,
+      "released": 185,
+      "remaining": 72,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.10.12 18:00"
     },
     {
@@ -757,7 +757,7 @@
       "region": "당진시",
       "vehicleType": "승용",
       "announced": 721,
-      "applied": 924,
+      "applied": 923,
       "released": 760,
       "remaining": 0,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.09.29 18:00"
@@ -767,7 +767,7 @@
       "region": "금산군",
       "vehicleType": "승용",
       "announced": 215,
-      "applied": 261,
+      "applied": 257,
       "released": 201,
       "remaining": 14,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.10.01 18:00"
@@ -777,7 +777,7 @@
       "region": "부여군",
       "vehicleType": "승용",
       "announced": 300,
-      "applied": 215,
+      "applied": 213,
       "released": 197,
       "remaining": 103,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.07.15 18:00"
@@ -788,8 +788,8 @@
       "vehicleType": "승용",
       "announced": 146,
       "applied": 219,
-      "released": 100,
-      "remaining": 46,
+      "released": 104,
+      "remaining": 42,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.10.08 09:01"
     },
     {
@@ -807,7 +807,7 @@
       "region": "홍성군",
       "vehicleType": "승용",
       "announced": 259,
-      "applied": 457,
+      "applied": 455,
       "released": 241,
       "remaining": 18,
       "note": "본공고·추경1차 · 신청마감 · 마감 2026.10.15 18:00"
@@ -828,8 +828,8 @@
       "vehicleType": "승용",
       "announced": 277,
       "applied": 282,
-      "released": 174,
-      "remaining": 103,
+      "released": 177,
+      "remaining": 100,
       "note": "본공고·추경3차 · 신청마감 · 마감 2026.10.12 11:00"
     },
     {
@@ -837,7 +837,7 @@
       "region": "전주시",
       "vehicleType": "승용",
       "announced": 940,
-      "applied": 1398,
+      "applied": 1384,
       "released": 981,
       "remaining": 0,
       "note": "본공고·추경1차 · 신청마감 · 마감 2026.07.29 18:00"
@@ -847,7 +847,7 @@
       "region": "군산시",
       "vehicleType": "승용",
       "announced": 774,
-      "applied": 1216,
+      "applied": 1214,
       "released": 783,
       "remaining": 0,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.09.09 18:00"
@@ -858,8 +858,8 @@
       "vehicleType": "승용",
       "announced": 408,
       "applied": 939,
-      "released": 291,
-      "remaining": 117,
+      "released": 293,
+      "remaining": 115,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.10.02 18:00"
     },
     {
@@ -878,8 +878,8 @@
       "vehicleType": "승용",
       "announced": 236,
       "applied": 404,
-      "released": 208,
-      "remaining": 28,
+      "released": 212,
+      "remaining": 24,
       "note": "본공고·추경1차·추경2차·추경3차 · 신청마감 · 마감 2026.10.02 18:00"
     },
     {
@@ -897,7 +897,7 @@
       "region": "완주군",
       "vehicleType": "승용",
       "announced": 305,
-      "applied": 674,
+      "applied": 671,
       "released": 193,
       "remaining": 112,
       "note": "본공고·추경1차·추경2차 · 마감 2026.10.30 18:00"
@@ -980,7 +980,7 @@
       "applied": 320,
       "released": 122,
       "remaining": 79,
-      "note": "본공고·추경1차·추경2차 · 마감 2026.11.27 18:00"
+      "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.10.19 09:00"
     },
     {
       "sido": "전남",
@@ -1007,7 +1007,7 @@
       "region": "나주시",
       "vehicleType": "승용",
       "announced": 280,
-      "applied": 281,
+      "applied": 452,
       "released": 281,
       "remaining": 0,
       "note": "본공고·추경1차·추경2차 · 마감 2026.11.30 18:00"
@@ -1127,9 +1127,9 @@
       "region": "무안군",
       "vehicleType": "승용",
       "announced": 340,
-      "applied": 431,
-      "released": 172,
-      "remaining": 168,
+      "applied": 427,
+      "released": 182,
+      "remaining": 158,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.10.01 18:00"
     },
     {
@@ -1158,8 +1158,8 @@
       "vehicleType": "승용",
       "announced": 238,
       "applied": 251,
-      "released": 175,
-      "remaining": 63,
+      "released": 186,
+      "remaining": 52,
       "note": "본공고·추경1차·추경2차·추경3차 · 신청마감 · 마감 2026.10.02 15:00"
     },
     {
@@ -1167,7 +1167,7 @@
       "region": "완도군",
       "vehicleType": "승용",
       "announced": 96,
-      "applied": 130,
+      "applied": 129,
       "released": 93,
       "remaining": 3,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.09.23 18:00"
@@ -1198,7 +1198,7 @@
       "vehicleType": "승용",
       "announced": 1084,
       "applied": 1675,
-      "released": 1235,
+      "released": 1236,
       "remaining": 0,
       "note": "본공고·추경1차·추경2차·추경3차 · 신청마감 · 마감 2026.08.07 18:00"
     },
@@ -1217,9 +1217,9 @@
       "region": "김천시",
       "vehicleType": "승용",
       "announced": 1350,
-      "applied": 1210,
-      "released": 1107,
-      "remaining": 243,
+      "applied": 1208,
+      "released": 1109,
+      "remaining": 241,
       "note": "본공고·추경1차 · 신청마감 · 마감 2026.10.16 18:00"
     },
     {
@@ -1228,8 +1228,8 @@
       "vehicleType": "승용",
       "announced": 1020,
       "applied": 992,
-      "released": 961,
-      "remaining": 59,
+      "released": 962,
+      "remaining": 58,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.07.06 18:00"
     },
     {
@@ -1238,8 +1238,8 @@
       "vehicleType": "승용",
       "announced": 1300,
       "applied": 1942,
-      "released": 1155,
-      "remaining": 145,
+      "released": 1172,
+      "remaining": 128,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.10.01 18:00"
     },
     {
@@ -1258,8 +1258,8 @@
       "vehicleType": "승용",
       "announced": 728,
       "applied": 455,
-      "released": 339,
-      "remaining": 389,
+      "released": 343,
+      "remaining": 385,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.09.30 18:00"
     },
     {
@@ -1278,8 +1278,8 @@
       "vehicleType": "승용",
       "announced": 302,
       "applied": 314,
-      "released": 200,
-      "remaining": 102,
+      "released": 203,
+      "remaining": 99,
       "note": "본공고 · 신청마감 · 마감 2026.10.01 10:00"
     },
     {
@@ -1307,7 +1307,7 @@
       "region": "청송군",
       "vehicleType": "승용",
       "announced": 150,
-      "applied": 157,
+      "applied": 156,
       "released": 121,
       "remaining": 29,
       "note": "본공고·추경1차·추경2차·추경3차 · 신청마감 · 마감 2026.10.16 10:00"
@@ -1378,7 +1378,7 @@
       "vehicleType": "승용",
       "announced": 120,
       "applied": 351,
-      "released": 344,
+      "released": 345,
       "remaining": 0,
       "note": "본공고 · 신청마감 · 마감 2026.09.21 09:00"
     },
@@ -1407,7 +1407,7 @@
       "region": "울릉군",
       "vehicleType": "승용",
       "announced": 130,
-      "applied": 168,
+      "applied": 167,
       "released": 125,
       "remaining": 5,
       "note": "본공고·추경1차 · 신청마감 · 마감 2026.09.01 10:02"
@@ -1417,9 +1417,9 @@
       "region": "창원시",
       "vehicleType": "승용",
       "announced": 4300,
-      "applied": 4164,
-      "released": 3597,
-      "remaining": 703,
+      "applied": 4179,
+      "released": 3664,
+      "remaining": 636,
       "note": "본공고·추경1차·추경2차 · 마감 2026.12.31 18:00"
     },
     {
@@ -1427,8 +1427,8 @@
       "region": "진주시",
       "vehicleType": "승용",
       "announced": 950,
-      "applied": 1067,
-      "released": 957,
+      "applied": 1066,
+      "released": 959,
       "remaining": 0,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.09.21 09:10"
     },
@@ -1437,9 +1437,9 @@
       "region": "통영시",
       "vehicleType": "승용",
       "announced": 320,
-      "applied": 473,
-      "released": 286,
-      "remaining": 34,
+      "applied": 471,
+      "released": 288,
+      "remaining": 32,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.10.14 15:00"
     },
     {
@@ -1457,9 +1457,9 @@
       "region": "김해시",
       "vehicleType": "승용",
       "announced": 2495,
-      "applied": 2484,
-      "released": 2374,
-      "remaining": 121,
+      "applied": 2483,
+      "released": 2380,
+      "remaining": 115,
       "note": "본공고·추경1차·추경2차·추경3차 · 신청마감 · 마감 2026.10.08 16:40"
     },
     {
@@ -1467,7 +1467,7 @@
       "region": "밀양시",
       "vehicleType": "승용",
       "announced": 342,
-      "applied": 349,
+      "applied": 348,
       "released": 343,
       "remaining": 0,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.09.29 15:50"
@@ -1487,8 +1487,8 @@
       "region": "양산시",
       "vehicleType": "승용",
       "announced": 1455,
-      "applied": 1589,
-      "released": 1477,
+      "applied": 1588,
+      "released": 1483,
       "remaining": 0,
       "note": "본공고·추경1차·추경2차 · 마감 2026.12.11 18:00"
     },
@@ -1558,8 +1558,8 @@
       "vehicleType": "승용",
       "announced": 190,
       "applied": 109,
-      "released": 96,
-      "remaining": 94,
+      "released": 97,
+      "remaining": 93,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.09.29 10:19"
     },
     {
@@ -1587,9 +1587,9 @@
       "region": "합천군",
       "vehicleType": "승용",
       "announced": 126,
-      "applied": 249,
-      "released": 100,
-      "remaining": 26,
+      "applied": 247,
+      "released": 104,
+      "remaining": 22,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.10.12 11:00"
     },
     {
