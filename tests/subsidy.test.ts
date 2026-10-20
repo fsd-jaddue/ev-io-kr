@@ -36,7 +36,11 @@ test("공식 수집 전환 열과 계산식 일치", () => {
 });
 test("지방비 비례 추정식이 서울 수집 전 행과 ±1만원 안에서 일치 (분모 = 수집 최고 국비)", () => {
   const seoulMax = getLocalPriceSnapshot().rows.find((r) => r.sido === "seoul")!.amount!;
-  const rows = CARS_SNAPSHOT.rows.filter((r) => r.national !== null && r.local !== null);
+  // 지방비 0원 행은 누리집에 새로 등록돼 지방비가 아직 정해지지 않은 모델(예: 2026-10-20 "Model Y premium L AWD")이라 비례식 검증에서 뺀다.
+  // 이런 행이 많아지면 비례 규칙 자체가 바뀐 것일 수 있으니 상한을 둔다.
+  const zero = CARS_SNAPSHOT.rows.filter((r) => r.national !== null && r.local === 0);
+  assert.ok(zero.length <= 3, `지방비 0원 행이 많음: ${zero.map((r) => r.model).join(", ")}`);
+  const rows = CARS_SNAPSHOT.rows.filter((r) => r.national !== null && r.local !== null && r.local > 0);
   assert.ok(rows.length > 50);
   assert.equal(LOCAL_REF_NATIONAL, Math.max(...rows.map((r) => r.national!)));
   for (const r of rows) assert.ok(Math.abs(estimateLocal(seoulMax, r.national!) - r.local!) <= 1, `${r.model}: est ${estimateLocal(seoulMax, r.national!)} vs ${r.local}`);
