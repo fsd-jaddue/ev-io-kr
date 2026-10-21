@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-20T17:18:12.273Z",
+  "fetchedAt": "2026-10-20T23:57:40.973Z",
   "note": "무공해차 통합누리집 '지자체별 보조금 현황' 수집 결과. scripts/fetch-snapshot.ts 실행으로 갱신됩니다. rows가 비어 있으면 화면에는 누리집 링크만 표시됩니다.",
   "rows": [
     {
@@ -7,7 +7,7 @@
       "region": "서울특별시",
       "vehicleType": "승용",
       "announced": 19648,
-      "applied": 18694,
+      "applied": 18693,
       "released": 17261,
       "remaining": 2387,
       "note": "본공고·추경1차·추경2차 · 마감 2026.11.30 18:00"
@@ -18,8 +18,8 @@
       "vehicleType": "승용",
       "announced": 8629,
       "applied": 9372,
-      "released": 7355,
-      "remaining": 1274,
+      "released": 7356,
+      "remaining": 1273,
       "note": "본공고·추경1차·추경2차·추경3차 · 마감 2026.12.11 18:00"
     },
     {
@@ -137,7 +137,7 @@
       "region": "광명시",
       "vehicleType": "승용",
       "announced": 1050,
-      "applied": 894,
+      "applied": 893,
       "released": 776,
       "remaining": 274,
       "note": "본공고·추경1차·추경2차 · 마감 2026.12.04 18:00"
@@ -167,7 +167,7 @@
       "region": "안산시",
       "vehicleType": "승용",
       "announced": 1389,
-      "applied": 1380,
+      "applied": 1379,
       "released": 1242,
       "remaining": 147,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.10.15 18:00"
@@ -198,8 +198,8 @@
       "vehicleType": "승용",
       "announced": 840,
       "applied": 739,
-      "released": 710,
-      "remaining": 130,
+      "released": 711,
+      "remaining": 129,
       "note": "본공고·추경1차 · 신청마감 · 마감 2026.10.16 18:00"
     },
     {
@@ -308,7 +308,7 @@
       "vehicleType": "승용",
       "announced": 1699,
       "applied": 1795,
-      "released": 1725,
+      "released": 1727,
       "remaining": 0,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.09.28 10:00"
     },
@@ -318,8 +318,8 @@
       "vehicleType": "승용",
       "announced": 4271,
       "applied": 4550,
-      "released": 4116,
-      "remaining": 155,
+      "released": 4118,
+      "remaining": 153,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.09.30 10:10"
     },
     {
@@ -577,8 +577,8 @@
       "region": "청주시",
       "vehicleType": "승용",
       "announced": 2250,
-      "applied": 3321,
-      "released": 2768,
+      "applied": 3320,
+      "released": 2769,
       "remaining": 0,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.09.15 11:26"
     },
@@ -847,7 +847,7 @@
       "region": "군산시",
       "vehicleType": "승용",
       "announced": 774,
-      "applied": 1167,
+      "applied": 1165,
       "released": 784,
       "remaining": 0,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.09.09 18:00"
@@ -897,7 +897,7 @@
       "region": "완주군",
       "vehicleType": "승용",
       "announced": 305,
-      "applied": 660,
+      "applied": 658,
       "released": 196,
       "remaining": 109,
       "note": "본공고·추경1차·추경2차 · 마감 2026.10.30 18:00"
@@ -1077,7 +1077,7 @@
       "region": "화순군",
       "vehicleType": "승용",
       "announced": 115,
-      "applied": 194,
+      "applied": 193,
       "released": 115,
       "remaining": 0,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.09.17 12:00"
@@ -1237,7 +1237,7 @@
       "region": "구미시",
       "vehicleType": "승용",
       "announced": 1300,
-      "applied": 1927,
+      "applied": 1926,
       "released": 1226,
       "remaining": 74,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.10.01 18:00"
@@ -1418,8 +1418,8 @@
       "vehicleType": "승용",
       "announced": 4300,
       "applied": 4193,
-      "released": 3774,
-      "remaining": 526,
+      "released": 3775,
+      "remaining": 525,
       "note": "본공고·추경1차·추경2차 · 마감 2026.12.31 18:00"
     },
     {
@@ -1427,7 +1427,7 @@
       "region": "진주시",
       "vehicleType": "승용",
       "announced": 950,
-      "applied": 1059,
+      "applied": 1058,
       "released": 966,
       "remaining": 0,
       "note": "본공고·추경1차·추경2차 · 신청마감 · 마감 2026.09.21 09:10"
@@ -1507,7 +1507,7 @@
       "region": "함안군",
       "vehicleType": "승용",
       "announced": 186,
-      "applied": 164,
+      "applied": 163,
       "released": 146,
       "remaining": 40,
       "note": "본공고·추경1차 · 신청마감 · 마감 2026.09.10 16:30"
