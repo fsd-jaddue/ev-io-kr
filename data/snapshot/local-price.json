@@ -756,6 +756,26 @@
       "sido": "gyeongnam",
       "sigungu": "함안군",
       "amount": 195
+    },
+    {
+      "sido": "gyeongnam",
+      "sigungu": "창녕군",
+      "amount": 455
+    },
+    {
+      "sido": "gyeongnam",
+      "sigungu": "고성군",
+      "amount": 195
+    },
+    {
+      "sido": "gyeongnam",
+      "sigungu": "남해군",
+      "amount": 195
+    },
+    {
+      "sido": "gyeongnam",
+      "sigungu": "하동군",
+      "amount": 195
     }
   ]
 }
