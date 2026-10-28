@@ -502,6 +502,14 @@
     {
       "carClass": "전기승용 일반승용",
       "maker": "볼보자동차코리아",
+      "model": "EX30 P5 LR",
+      "national": 263,
+      "local": 78,
+      "conversionNational": 53
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "볼보자동차코리아",
       "model": "볼보 EX30 Single Motor ER",
       "national": 247,
       "local": 74,
