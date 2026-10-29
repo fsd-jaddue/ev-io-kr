@@ -771,36 +771,6 @@
       "sido": "gyeongnam",
       "sigungu": "남해군",
       "amount": 195
-    },
-    {
-      "sido": "gyeongnam",
-      "sigungu": "하동군",
-      "amount": 195
-    },
-    {
-      "sido": "gyeongnam",
-      "sigungu": "산청군",
-      "amount": 195
-    },
-    {
-      "sido": "gyeongnam",
-      "sigungu": "함양군",
-      "amount": 246
-    },
-    {
-      "sido": "gyeongnam",
-      "sigungu": "거창군",
-      "amount": 365
-    },
-    {
-      "sido": "gyeongnam",
-      "sigungu": "합천군",
-      "amount": 715
-    },
-    {
-      "sido": "jeju",
-      "sigungu": "전체",
-      "amount": 447
     }
   ]
 }
