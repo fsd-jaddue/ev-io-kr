@@ -1,10 +1,97 @@
 /** 주간 자동 작성 가이드 모음. 주제는 BACKLOG.md 순서대로, 규칙은 CLAUDE.md. */
 import type { Guide } from "./index";
+import type { RemainRow } from "@/lib/ev/types";
+import { parseRemainNote, passengerRows } from "@/lib/ev/remainSummary";
+import { formatFetchedAt } from "@/lib/ev/format";
+import { EV_PORTAL } from "@/lib/ev/portal";
+import remainSnapshot from "@/data/snapshot/remain.json";
+import { regionLink } from "./timely";
 
 const portal = { title: "무공해차 통합누리집 (충전인프라·공지사항)", url: "https://ev.or.kr" };
 const law = { title: "국가법령정보센터 · 환경친화적 자동차의 개발 및 보급 촉진에 관한 법률", url: "https://www.law.go.kr/LSW/lsInfoP.do?lsId=010026" };
 
+/** 연말 계약 글: 신청마감 표시가 없는 공고와 누리집 마감 표시일은 빌드 시 remain.json 에서 계산한다 */
+function buildYearEndGuide(): Guide {
+  const snap = remainSnapshot as { fetchedAt: string; rows: RemainRow[] };
+  const rows = passengerRows(snap.rows);
+  const at = formatFetchedAt(snap.fetchedAt);
+  const open = rows
+    .map((r) => ({ r, p: parseRemainNote(r.note) }))
+    .filter(({ p }) => !p.status?.includes("마감"))
+    .sort((a, b) => (a.p.deadline ?? "9999").localeCompare(b.p.deadline ?? "9999"));
+  const byMonth = (m: string) => open.filter(({ p }) => p.deadline?.startsWith(m)).length;
+  const nov = byMonth("2026.11");
+  const dec = byMonth("2026.12");
+  const n = (v: number | null) => (v === null ? "-" : `${v.toLocaleString("ko-KR")}대`);
+  const table = open
+    .map(({ r, p }) => `<tr><td>${regionLink(r)}</td><td>${n(r.announced)}</td><td>${n(r.remaining)}</td><td>${p.deadline ?? p.period ?? "-"}</td></tr>`)
+    .join("\n");
+
+  return {
+    slug: "year-end-ev-contract-delivery-next-year",
+    title: "연말에 전기차 계약하고 출고가 해를 넘기면: 보조금은 어떻게 되나, 계약 전에 확인할 것",
+    description:
+      "전기차 보조금은 그해 공고와 예산으로 집행됩니다. 11~12월에 계약했는데 출고가 다음 해로 밀릴 때 선정·지급이 어떻게 되는지 확인하는 순서, 누리집에 표시된 지자체별 접수 마감일, 계약서에 남겨 둘 조건을 정리했습니다. 다음 해 금액은 다음 해 지침과 공고가 나와야 알 수 있습니다.",
+    category: "신청",
+    published: "2026-10-30",
+    updated: "2026-10-30",
+    keywords: ["전기차 연말 계약 보조금", "전기차 출고 해넘김 보조금", "전기차 보조금 출고기한 연말", "전기차 보조금 접수 마감일"],
+    sources: [
+      { title: "기후에너지환경부 · 2026년 전기자동차 보급사업 업무처리지침 (2026-06-23 개정)", url: "https://mcee.go.kr/home/web/public_info/read.do?menuId=10123&publicInfoId=1144" },
+      { title: "무공해차 통합누리집 · 지자체별 공고·지급현황", url: EV_PORTAL.remain },
+    ],
+    body: `
+<p>11월이 되면 "지금 계약하면 올해 보조금을 받을 수 있나", "출고가 내년으로 밀리면 어떻게 되나"라는 질문이 늘어납니다. 전기차 구매 보조금은 해마다 새로 나오는 지침과 지자체 공고, 그해 예산으로 집행되는 사업입니다. 그래서 계약 시점보다 <strong>선정·출고·등록·지급 신청이 어느 해 공고 안에서 끝나는지</strong>가 중요합니다. 이 글은 연말 계약자가 확인할 순서를 정리했습니다. 해를 넘겼을 때의 구체적인 처리는 지자체마다 다르므로 <strong>거주지 공고와 담당 부서 답변이 기준</strong>입니다.</p>
+
+<h2>1. 보조금은 '그해 공고' 단위로 움직인다</h2>
+<p>국비 금액은 그해 지침, 지방비 금액과 물량은 그해 지자체 공고로 정해집니다. 신청자는 공고에 접수해 대상자로 선정되고, 정해진 출고 기한 안에 차를 받아 등록한 뒤 제작사·대리점이 지급 신청을 하는 흐름입니다. 선정 뒤 출고 기한은 통상 2개월(지자체별 상이)이고, 넘기면 선정이 취소될 수 있습니다(<a href="/guide/delivery-deadline-mandatory-period-refund">출고기한·의무운행 정리</a>).</p>
+<p>연말에는 이 흐름에 '연도'라는 경계가 하나 더 붙습니다. 공고문에는 접수 기간과 함께 지급 신청 마감 같은 연내 일정이 적혀 있는 경우가 많고, 그 일정 안에 출고·등록을 마치지 못하면 올해 공고로는 지급이 어려워질 수 있습니다. 선정이 유지되는지, 다음 해 공고에 다시 신청해야 하는지는 공고와 담당 부서에 확인해야 합니다.</p>
+
+<h2>2. 누리집 마감 표시: 남은 공고는 ${open.length}건</h2>
+<p>${at} 무공해차 통합누리집 수집값 기준, 승용 공고 ${rows.length}건 가운데 '신청마감' 표시가 없는 공고는 ${open.length}건입니다. 이 중 누리집 마감 표시일이 11월인 곳이 ${nov}건, 12월인 곳이 ${dec}건입니다. 표시는 수집 시각의 누리집 값이며 지금 접수할 수 있다는 뜻은 아닙니다. 물량이 소진되면 마감일 전에 닫히고, 출고잔여가 0이어도 접수 대기를 받는 지역이 있습니다.</p>
+<div class="table-wrap"><table class="nowrap">
+<thead><tr><th>지역</th><th>공고</th><th>출고잔여</th><th>누리집 마감 표시</th></tr></thead>
+<tbody>
+${table}
+</tbody>
+</table></div>
+<p>표의 마감 표시일은 모두 올해 날짜입니다. 연말 계약자에게는 이 날짜가 <strong>출고 예정일보다 앞서는지</strong>가 먼저 볼 점입니다. 최신값은 각 지역 페이지(매시간 갱신)와 <a href="${EV_PORTAL.remain}" target="_blank" rel="noopener noreferrer">누리집 원표</a>에서 확인하세요. 전체 소진 현황은 <a href="/guide/ev-subsidy-h2-2026-remaining-status">하반기 추경·소진 현황</a>에 있습니다.</p>
+
+<h2>3. 출고가 해를 넘길 때 확인할 것</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>확인 항목</th><th>왜 중요한가</th><th>어디서</th></tr></thead>
+<tbody>
+<tr><td>출고 예정일</td><td>선정 후 출고 기한과 연내 지급 일정 안에 들어오는지 결정</td><td>대리점(문자로 받아 두기)</td></tr>
+<tr><td>지급 신청 마감 등 연내 일정</td><td>올해 공고로 지급받을 수 있는 마지막 시점</td><td>거주지 공고문</td></tr>
+<tr><td>해를 넘기면 선정 유지 여부</td><td>다음 해 공고에 다시 신청해야 하는지</td><td>지자체 담당 부서</td></tr>
+<tr><td>출고 지연 사유와 연장 가능성</td><td>구매자 책임이 아닌 지연은 연장이 인정되는 경우가 있음</td><td>공고문, 대리점</td></tr>
+<tr><td>보조금 미지급 시 계약 처리</td><td>계약금 환불·계약 해제 조건이 없으면 분쟁 소지</td><td>계약서 특약</td></tr>
+</tbody>
+</table></div>
+
+<h2>4. 다음 해 공고로 넘어가면 금액이 같다고 볼 수 없다</h2>
+<p>다음 해 국비 단가, 차종별 국비, 지방비와 물량은 다음 해 지침과 공고가 나와야 확정됩니다. 이 사이트는 아직 나오지 않은 금액을 추정하지 않습니다. 올해 금액을 기준으로 견적을 받았다면 "보조금은 출고 시점 공고 기준"이라는 문구가 견적서나 계약서에 있는지 보고, 금액이 달라질 때의 처리를 대리점에 확인하세요. 올해 차종별 국비는 <a href="/car">차종별 국비</a>, 지역 금액은 <a href="/region">지역별 보조금</a>에서 볼 수 있습니다.</p>
+<p>전환지원 국비(국비 500만원 이상 차종 최대 100만원, 그 미만은 국비에 비례)를 받으려는 경우 내연기관차 처분 시점도 공고 기준에 맞춰야 합니다. 해가 바뀌어 다음 해 공고로 신청하면 처분 시점 기준도 그 공고를 따라야 하니, 기존 차를 먼저 팔기 전에 확인하세요(<a href="/guide/conversion-incentive-100">전환지원금 조건</a>).</p>
+
+<h2>5. 계약 전 대리점에 남겨 둘 질문</h2>
+<ul>
+<li>지금 접수하면 올해 공고로 선정될 가능성이 있는가, 대기 순번은 몇 번째인가</li>
+<li>출고 예정일은 언제이며, 지연되면 연장 사유서 제출을 해 주는가</li>
+<li>올해 지급 일정을 넘기면 계약은 어떻게 처리되는가(계약금 환불, 다음 해 재신청 지원)</li>
+<li>견적의 보조금은 어느 해, 어느 지자체 공고 기준인가</li>
+</ul>
+<p>더 자세한 질문 목록은 <a href="/guide/questions-to-ask-dealer-before-ev-contract">대리점에 확인할 질문 10가지</a>에 있습니다. 답은 구두가 아니라 문자나 계약서 특약으로 남겨 두는 것이 안전합니다.</p>
+`,
+    faq: [
+      { q: "12월에 계약했는데 출고가 1월이면 올해 보조금을 받을 수 있나요?", a: "보조금은 그해 공고와 예산 일정 안에서 출고·등록·지급 신청이 끝나야 지급되는 구조라, 해를 넘기면 올해 공고로 받기 어려울 수 있습니다. 선정 유지 여부와 다음 해 재신청 필요 여부는 거주지 공고와 지자체 담당 부서에 확인하세요." },
+      { q: "다음 해 보조금이 올해보다 많을지 적을지 알 수 있나요?", a: "다음 해 지침과 지자체 공고가 나오기 전에는 알 수 없습니다. 이 사이트는 발표되지 않은 금액을 추정하지 않으며, 공고가 나오면 수집해 반영합니다." },
+      { q: "누리집에 마감일이 남아 있으면 지금 신청할 수 있나요?", a: "마감 표시일은 공고문의 접수 기한이고 수집 시각 기준 값입니다. 물량이 소진되면 그 전에 접수가 끝날 수 있으니 누리집 원표와 공고, 대리점을 통해 접수 가능 여부를 확인하세요." },
+    ],
+  };
+}
+
 export const GUIDES_WEEKLY: Guide[] = [
+  buildYearEndGuide(),
   {
     slug: "business-ev-subsidy-guide",
     title: "법인·개인사업자 전기차 보조금: 어느 지자체에 신청하나, 물량은 어떻게 다른가, 세무에서 흔한 오해",

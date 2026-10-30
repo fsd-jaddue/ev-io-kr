@@ -15,7 +15,7 @@ const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replac
 const notices = { title: "무공해차 통합누리집 · 지자체별 공고·지급현황", url: EV_PORTAL.remain };
 const guideline = { title: "기후에너지환경부 · 2026년 전기자동차 보급사업 업무처리지침 (2026-06-23 개정)", url: "https://mcee.go.kr/home/web/public_info/read.do?menuId=10123&publicInfoId=1144" };
 
-function regionLink(r: RemainRow): string {
+export function regionLink(r: RemainRow): string {
   const slug = sidoSlugOfRow(r);
   const sido = slug ? getSido(slug) : undefined;
   if (!sido) return esc(r.region);
