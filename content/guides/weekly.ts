@@ -1,7 +1,8 @@
 /** 주간 자동 작성 가이드 모음. 주제는 BACKLOG.md 순서대로, 규칙은 CLAUDE.md. */
 import type { Guide } from "./index";
 import type { RemainRow } from "@/lib/ev/types";
-import { parseRemainNote, passengerRows } from "@/lib/ev/remainSummary";
+import { parseRemainNote, passengerRows, sidoSlugOfRow } from "@/lib/ev/remainSummary";
+import { SIDO_LIST } from "@/data/regions";
 import { formatFetchedAt } from "@/lib/ev/format";
 import { EV_PORTAL } from "@/lib/ev/portal";
 import remainSnapshot from "@/data/snapshot/remain.json";
@@ -90,7 +91,86 @@ ${table}
   };
 }
 
+/** 선정 취소 글: 시·도별 접수·출고 집계는 빌드 시 remain.json 에서 계산한다(원인 해석 없이 표시값만) */
+function buildCancellationGuide(): Guide {
+  const snap = remainSnapshot as { fetchedAt: string; rows: RemainRow[] };
+  const rows = passengerRows(snap.rows).filter((r) => r.applied !== null && r.released !== null);
+  const at = formatFetchedAt(snap.fetchedAt);
+  const n = (v: number) => v.toLocaleString("ko-KR");
+  const sum = (rs: RemainRow[], k: "announced" | "applied" | "released") => rs.reduce((a, r) => a + (r[k] ?? 0), 0);
+  const bySido = SIDO_LIST.map((s) => {
+    const mine = rows.filter((r) => sidoSlugOfRow(r) === s.slug);
+    return { s, ann: sum(mine, "announced"), ap: sum(mine, "applied"), rel: sum(mine, "released"), count: mine.length };
+  }).filter((x) => x.count > 0);
+  const totalAp = sum(rows, "applied");
+  const totalRel = sum(rows, "released");
+  const over = rows.filter((r) => (r.applied ?? 0) > (r.announced ?? 0)).length;
+  const table = bySido
+    .map((x) => `<tr><td><a href="/region/${x.s.slug}">${x.s.name}</a></td><td>${n(x.ann)}</td><td>${n(x.ap)}</td><td>${n(x.rel)}</td><td>${n(Math.max(0, x.ap - x.rel))}</td></tr>`)
+    .join("\n");
+
+  return {
+    slug: "ev-subsidy-selection-cancellation-reasons",
+    title: "전기차 보조금 선정 취소·반려 유형 정리: 접수·선정·출고·지급 단계별로 무엇이 걸리고 어떻게 대응하나",
+    description:
+      "전기차 보조금은 접수 반려, 선정 전 부적격, 선정 후 출고 기한 초과, 지급 단계 서류 미비처럼 단계마다 다른 이유로 멈출 수 있습니다. 단계별로 자주 걸리는 지점과 대응, 취소 뒤 다시 신청할 때 확인할 것을 정리하고, 누리집에 표시된 시·도별 접수·출고 집계를 함께 실었습니다. 세부 기준은 지자체 공고가 우선합니다.",
+    category: "신청",
+    published: "2026-11-06",
+    updated: "2026-11-06",
+    keywords: ["전기차 보조금 선정 취소", "전기차 보조금 반려", "전기차 보조금 취소 사유", "전기차 보조금 재신청"],
+    sources: [
+      { title: "기후에너지환경부 · 2026년 전기자동차 보급사업 업무처리지침 (2026-06-23 개정)", url: "https://mcee.go.kr/home/web/public_info/read.do?menuId=10123&publicInfoId=1144" },
+      { title: "무공해차 통합누리집 · 지자체별 공고·지급현황", url: EV_PORTAL.remain },
+    ],
+    body: `
+<p>보조금 신청은 접수, 대상자 선정, 출고·등록, 지급 신청의 네 단계를 거칩니다. "취소됐다"는 말도 어느 단계에서 멈췄는지에 따라 뜻과 대응이 다릅니다. 접수 단계의 반려는 서류를 고쳐 다시 내면 되는 경우가 많지만, 선정 뒤 출고 기한을 넘긴 취소는 물량을 처음부터 다시 다퉈야 합니다. 이 글은 단계별로 자주 걸리는 지점을 정리했습니다. 실수 목록은 <a href="/guide/ev-subsidy-common-mistakes">자주 하는 실수 10가지</a>에 따로 있고, 여기서는 <strong>멈춘 뒤 무엇을 확인하고 어떻게 다시 진행하는지</strong>에 초점을 둡니다. 판단 기준은 거주지 공고와 담당 부서 답변입니다.</p>
+
+<h2>1. 단계별로 멈추는 지점</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>단계</th><th>자주 걸리는 지점</th><th>대응</th></tr></thead>
+<tbody>
+<tr><td>접수</td><td>서류 발급일 기준 초과, 주소·명의 표기 불일치, 누락 서류</td><td>공고의 발급일 기준으로 다시 발급해 보완 제출</td></tr>
+<tr><td>선정 전 검토</td><td>공고가 정한 거주 기간 미충족, 재지원 제한 기간 해당, 우선순위 증빙 부족</td><td>요건 충족 시점 이후 재접수 또는 일반 물량으로 접수</td></tr>
+<tr><td>선정 후 출고</td><td>출고 기한(통상 2개월, 지자체별 상이) 초과, 제작사 변경</td><td>기한 전 연장 가능 여부 확인, 안 되면 재접수</td></tr>
+<tr><td>지급 신청</td><td>등록 후 제출 기한 내 서류 미제출, 계약·등록 명의 불일치</td><td>대리점과 제출 담당·기한을 미리 정해 두기</td></tr>
+</tbody>
+</table></div>
+<p>각 단계의 서류 목록은 <a href="/guide/ev-subsidy-documents-checklist">신청 서류 체크리스트</a>, 기한은 <a href="/guide/delivery-deadline-mandatory-period-refund">출고기한·의무운행 정리</a>에서 볼 수 있습니다.</p>
+
+<h2>2. 접수·선정 단계: 고칠 수 있는 반려와 요건 문제</h2>
+<p>접수 단계에서 돌아오는 경우는 대부분 서류 문제입니다. 주민등록등본 같은 서류는 공고마다 발급일 기준이 있고, 계약서·신청서·등본의 주소나 이름 표기가 다르면 보완을 요청받습니다. 이때는 반려 사유를 정확히 받아 같은 공고에 다시 내면 되지만, 그사이 접수 순번이 뒤로 밀릴 수 있으니 처음부터 공고 기준에 맞춰 준비하는 편이 낫습니다.</p>
+<p>선정 전 검토에서 걸리는 것은 요건입니다. 거주 요건은 공고가 정한 기간(대개 30일 이상, 지자체별 상이)을 채워야 하고, 최근 보조금을 받은 이력이 있으면 재지원 제한(보통 2년)에 걸릴 수 있습니다. 우선순위 물량으로 냈는데 증빙이 부족하면 일반 물량으로 넘기는지, 반려하는지는 공고마다 다릅니다. 요건 문제는 서류를 고친다고 풀리지 않으니 접수 전에 확인해야 합니다.</p>
+
+<h2>3. 선정 후 출고 단계: 가장 아픈 취소</h2>
+<p>대상자로 선정되면 정해진 기한 안에 출고·등록을 마쳐야 하고, 넘기면 선정이 취소될 수 있습니다. 제작사 생산·운송 지연처럼 구매자 책임이 아닌 사유는 연장을 인정하는 지자체가 있지만, 기한이 지나기 전에 대리점이 사유서를 내야 하는 경우가 많습니다. 선정 뒤 차종을 바꾸면 국비가 달라져 다시 산정되고, 제작사를 바꾸면 취소 뒤 재접수가 필요할 수 있습니다. 연말에는 연내 지급 일정까지 겹치니 <a href="/guide/year-end-ev-contract-delivery-next-year">연말 계약·출고 해넘김</a>도 함께 보세요.</p>
+
+<h2>4. 누리집 집계로 보는 접수와 출고의 차이</h2>
+<p>${at} 무공해차 통합누리집 수집값 기준, 승용 공고 ${rows.length}건의 접수는 ${n(totalAp)}대, 출고는 ${n(totalRel)}대입니다. 접수가 공고 대수보다 많은 공고는 ${over}건입니다. 아래 '접수−출고'는 누리집에 접수로 잡혔지만 아직 출고로 집계되지 않은 대수로, 선정 대기·출고 대기·취소가 섞여 있으며 이 표만으로 어느 쪽인지 알 수 없습니다.</p>
+<div class="table-wrap"><table class="nowrap">
+<thead><tr><th>시·도</th><th>공고</th><th>접수</th><th>출고</th><th>접수−출고</th></tr></thead>
+<tbody>
+${table}
+</tbody>
+</table></div>
+<p>값은 수집 시각의 누리집 표시값이며 행정기관의 처리 현황과 다를 수 있습니다. 시·군별 값과 최근 흐름은 <a href="/region">지역별 보조금</a>의 각 지역 페이지에서 볼 수 있습니다.</p>
+
+<h2>5. 취소된 뒤 다시 신청할 때</h2>
+<ul>
+<li>취소 사유와 취소일을 문서나 문자로 받아 둡니다. 재접수 때 같은 문제가 반복되지 않게 하는 근거가 됩니다.</li>
+<li>같은 공고의 물량이 남았는지, 신청마감 표시가 붙었는지 먼저 봅니다. 마감됐다면 추경이나 취소분 재공고를 기다려야 합니다.</li>
+<li>재접수하면 접수 순번은 새로 매겨지는 것이 일반적입니다. 대기 접수를 받는 지역인지 대리점에 확인하세요.</li>
+<li>계약서에 보조금 미선정·취소 때의 계약 처리 조항이 있는지 확인합니다(<a href="/guide/questions-to-ask-dealer-before-ev-contract">대리점 질문 10가지</a>).</li>
+</ul>
+`,
+    faq: [
+      { q: "선정이 취소되면 같은 해에 다시 신청할 수 있나요?", a: "물량이 남아 있거나 추경·취소분 재공고가 나오면 다시 접수할 수 있는 것이 일반적입니다. 다만 순번은 새로 매겨지고, 지자체에 따라 재접수 조건이 다를 수 있으니 공고와 담당 부서에 확인하세요." },
+      { q: "출고가 늦어지는 게 제 잘못이 아니면 취소되지 않나요?", a: "제작사 생산·운송 지연 같은 사유는 연장을 인정하는 지자체가 있지만, 기한 전에 사유서를 내야 하는 경우가 많고 인정 범위도 공고마다 다릅니다. 출고 예정일이 기한을 넘길 것 같으면 미리 대리점과 지자체에 확인하세요." },
+    ],
+  };
+}
+
 export const GUIDES_WEEKLY: Guide[] = [
+  buildCancellationGuide(),
   {
     slug: "winter-ev-range-and-subsidy-choice",
     title: "겨울철 전기차 주행거리, 보조금 차종 고를 때 같이 봐야 하는 이유: 히트펌프·배터리 용량·충전 환경",
