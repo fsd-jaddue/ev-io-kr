@@ -494,6 +494,14 @@
     {
       "carClass": "전기승용 일반승용",
       "maker": "볼보자동차코리아",
+      "model": "ES90 Single Motor ER",
+      "national": 163,
+      "local": 48,
+      "conversionNational": 33
+    },
+    {
+      "carClass": "전기승용 일반승용",
+      "maker": "볼보자동차코리아",
       "model": "ES90 Twin Motor",
       "national": 174,
       "local": 52,
