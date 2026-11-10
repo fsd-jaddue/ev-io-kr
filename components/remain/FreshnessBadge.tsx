@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { EV_PORTAL } from "@/lib/ev/portal";
-import { formatFetchedAt } from "@/lib/ev/format";
+import { formatFetchedAt, isFreshFetch } from "@/lib/ev/format";
 import type { DataSource } from "@/lib/ev/types";
 
 export type RefreshState = "idle" | "loading" | "done" | "failed";
@@ -16,15 +16,14 @@ interface Props {
 }
 
 /**
- * 기준 시각·출처 배지. SourceNote 와 같은 규칙(live 이거나 6시간 이내면 "누리집 수집")이지만,
+ * 기준 시각·출처 배지. SourceNote 와 같은 규칙(isFreshFetch: live 이거나 12시간 이내면 "누리집 수집")이지만,
  * 신선도 판정은 마운트 후에만 하여 서버·클라이언트 마크업이 어긋나지 않게 한다.
  */
 export default function FreshnessBadge({ source, fetchedAt, variant, refresh, className = "" }: Props) {
   const [fresh, setFresh] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const age = Date.now() - new Date(fetchedAt).getTime();
-    setFresh(source === "live" || (Number.isFinite(age) && age < 6 * 60 * 60 * 1000));
+    setFresh(isFreshFetch(source, fetchedAt));
   }, [source, fetchedAt]);
 
   const dark = variant === "dark";

@@ -1,5 +1,5 @@
 import { EV_PORTAL } from "@/lib/ev/portal";
-import { formatFetchedAt } from "@/lib/ev/format";
+import { formatFetchedAt, isFreshFetch } from "@/lib/ev/format";
 import type { DataSource } from "@/lib/ev/types";
 
 export default function SourceNote({
@@ -11,9 +11,8 @@ export default function SourceNote({
   fetchedAt: string;
   basis?: string;
 }) {
-  // GitHub Actions 가 매시간 수집해 커밋한 스냅샷도 누리집 수집값이다. 6시간 이내면 "누리집 수집", 그보다 오래됐으면 "스냅샷(오래됨)".
-  const ageMs = Date.now() - new Date(fetchedAt).getTime();
-  const fresh = source === "live" || (Number.isFinite(ageMs) && ageMs < 6 * 60 * 60 * 1000);
+  // GitHub Actions 가 수집해 커밋한 스냅샷도 누리집 수집값이다. 12시간 이내면 "누리집 수집", 그보다 오래됐으면 "스냅샷(오래됨)".
+  const fresh = isFreshFetch(source, fetchedAt);
   return (
     <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
       <span
