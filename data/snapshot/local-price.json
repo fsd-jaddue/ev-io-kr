@@ -691,6 +691,16 @@
       "sido": "gyeongbuk",
       "sigungu": "예천군",
       "amount": 667
+    },
+    {
+      "sido": "gyeongbuk",
+      "sigungu": "봉화군",
+      "amount": 667
+    },
+    {
+      "sido": "gyeongbuk",
+      "sigungu": "울진군",
+      "amount": 667
     }
   ]
 }
