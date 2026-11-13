@@ -169,7 +169,87 @@ ${table}
   };
 }
 
+/** 공고문 읽는 법: 공고 차수 분포는 빌드 시 remain.json 에서 계산한다 */
+function buildNoticeReadingGuide(): Guide {
+  const snap = remainSnapshot as { fetchedAt: string; rows: RemainRow[] };
+  const rows = passengerRows(snap.rows);
+  const at = formatFetchedAt(snap.fetchedAt);
+  const extras = (r: RemainRow) => ((parseRemainNote(r.note).rounds ?? "").match(/추경/g) ?? []).length;
+  const max = rows.reduce((m, r) => Math.max(m, extras(r)), 0);
+  const label = (k: number) => (k === 0 ? "본공고만" : `추경 ${k}차까지`);
+  const groups = Array.from({ length: max + 1 }, (_, k) => {
+    const mine = rows.filter((r) => extras(r) === k);
+    return { k, count: mine.length, announced: mine.reduce((a, r) => a + (r.announced ?? 0), 0), closed: mine.filter((r) => parseRemainNote(r.note).status?.includes("마감")).length };
+  }).filter((g) => g.count > 0);
+  const withExtra = rows.filter((r) => extras(r) > 0).length;
+  const table = groups
+    .map((g) => `<tr><td>${label(g.k)}</td><td>${g.count}건</td><td>${g.announced.toLocaleString("ko-KR")}대</td><td>${g.closed}건</td></tr>`)
+    .join("\n");
+
+  return {
+    slug: "how-to-read-ev-subsidy-notice",
+    title: "전기차 보조금 공고문 읽는 법: 지원 대상·물량 구분·금액표·접수 방법·기한을 항목별로 확인하는 순서",
+    description:
+      "지자체 전기차 보조금 공고문은 길고 항목이 많습니다. 신청 자격, 물량 구분과 우선순위, 차종별 금액표, 접수 방법과 선정 방식, 출고·서류 기한, 공고 차수를 어떤 순서로 읽고 무엇을 표시해 두면 되는지 정리했습니다. 누리집에 표시된 공고 차수 분포도 함께 실었습니다.",
+    category: "신청",
+    published: "2026-11-13",
+    updated: "2026-11-13",
+    keywords: ["전기차 보조금 공고문", "전기차 보조금 공고 보는 법", "전기차 보조금 물량 구분", "전기차 보조금 추경 공고"],
+    sources: [
+      { title: "기후에너지환경부 · 2026년 전기자동차 보급사업 업무처리지침 (2026-06-23 개정)", url: "https://mcee.go.kr/home/web/public_info/read.do?menuId=10123&publicInfoId=1144" },
+      { title: "무공해차 통합누리집 · 지자체별 공고·지급현황", url: EV_PORTAL.remain },
+    ],
+    body: `
+<p>전기차 보조금의 기준은 결국 거주지 지자체 공고문입니다. 국비 기준은 환경부 지침이 정하지만 지방비 금액, 물량, 거주 요건, 접수 기간, 선정 방식은 공고문마다 다릅니다. 공고문은 보통 여러 쪽의 본문과 별표로 되어 있어 처음 보면 어디부터 읽어야 할지 막막합니다. 이 글은 계약 전에 공고문에서 확인할 항목을 <strong>읽는 순서대로</strong> 정리했습니다. 항목 이름과 배치는 지자체마다 다르니 같은 내용을 찾는 기준으로 쓰세요.</p>
+
+<h2>1. 먼저 찾을 곳: 최신 공고인지 확인</h2>
+<p>공고문은 무공해차 통합누리집의 지자체별 공고 목록이나 시·군·구 홈페이지 고시·공고 게시판에 올라옵니다. 같은 해에도 본공고 뒤에 추경 공고가 여러 번 나오고, 추경 공고가 앞선 공고의 물량·기간을 바꾸는 경우가 있습니다. 공고 번호와 게시일을 보고 <strong>가장 최근 공고</strong>를 기준으로 읽으세요. 앞선 공고의 금액이나 서류 기준이 그대로인지도 최신 공고 본문에서 확인해야 합니다.</p>
+
+<h2>2. 항목별로 볼 것</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>공고문 항목</th><th>확인할 것</th><th>자세한 글</th></tr></thead>
+<tbody>
+<tr><td>신청 자격</td><td>거주 기간(공고가 정한 기간, 대개 30일 이상, 지자체별 상이), 개인·법인 구분, 재지원 제한</td><td><a href="/guide/ev-subsidy-common-mistakes">자주 하는 실수</a></td></tr>
+<tr><td>물량 구분</td><td>우선순위·일반·법인·기관 등 칸별 대수, 우선순위 자격과 증빙</td><td><a href="/guide/priority-vs-general-vs-corporate">물량 구분</a></td></tr>
+<tr><td>지원 금액</td><td>차종별 국비·지방비 표, 추가 지원(전환지원 등) 조건</td><td><a href="/car">차종별 국비</a></td></tr>
+<tr><td>접수 방법·선정 방식</td><td>대리점 접수 여부, 접수순·출고순 등 선정 기준, 대기 접수 여부</td><td><a href="/guide/how-to-apply-ev-subsidy-2026">신청 방법 7단계</a></td></tr>
+<tr><td>기한</td><td>접수 기간, 선정 후 출고 기한, 지급 신청 서류 제출 기한</td><td><a href="/guide/delivery-deadline-mandatory-period-refund">출고기한·의무운행</a></td></tr>
+<tr><td>제출 서류</td><td>서류 목록과 발급일 기준, 명의·주소 표기</td><td><a href="/guide/ev-subsidy-documents-checklist">서류 체크리스트</a></td></tr>
+</tbody>
+</table></div>
+<p>이 가운데 가장 놓치기 쉬운 항목이 선정 방식입니다. 접수 순서로 선정하는 곳과 실제 출고·등록 순서로 확정하는 곳은 계약 전략이 다릅니다. 접수순이면 접수를 서두르는 것이 중요하고, 출고순이면 접수를 해 두어도 출고가 늦으면 물량이 먼저 소진될 수 있습니다. 공고문에 "선정 기준", "지원 순위", "배정 방법" 같은 이름으로 적혀 있으니 이 문단을 먼저 찾아 표시해 두세요. 물량 칸 사이에 남는 대수를 다른 칸으로 옮기는지, 대기 접수를 받는지도 같은 곳에 적혀 있는 경우가 많습니다.</p>
+
+<h2>3. 금액표를 읽을 때 주의할 점</h2>
+<p>공고문의 금액표는 차종(모델·트림)별로 국비와 지방비를 나란히 적는 경우가 많습니다. 같은 모델이라도 트림이나 휠 크기에 따라 국비가 달라질 수 있으니, 계약할 트림과 <strong>같은 행</strong>을 찾아야 합니다. 이 사이트의 지역 페이지에 있는 차종별 지방비는 지역 최대 지방비에 국비 비율을 곱한 비례 추정입니다. 서울은 수집값과 일치했지만 다른 지역은 공고문 표로 다시 확인해야 합니다. 전환지원 국비는 국비 500만원 이상 차종에서 최대 100만원, 그 미만은 국비에 비례하며, 지자체가 별도 추가 지원을 두는지는 공고마다 다릅니다.</p>
+
+<h2>4. 공고 차수: 누리집 표시로 본 분포</h2>
+<p>${at} 무공해차 통합누리집 수집값 기준, 승용 공고 ${rows.length}건 가운데 추경 공고가 한 번 이상 붙은 곳은 ${withExtra}건입니다. 공고 차수는 그 지역이 올해 물량을 몇 번 다시 열었는지 보여 주는 표시입니다.</p>
+<div class="table-wrap"><table class="nowrap">
+<thead><tr><th>공고 차수</th><th>공고 수</th><th>공고 대수 합계</th><th>신청마감 표시</th></tr></thead>
+<tbody>
+${table}
+</tbody>
+</table></div>
+<p>값은 수집 시각의 누리집 표시값이며 행정기관의 처리 현황과 다를 수 있습니다. 추경이 나온 이유나 다음 추경 여부는 이 표로 알 수 없으니, 지역 페이지의 공고 흐름과 최신 공고문을 함께 보세요. 전체 소진 현황은 <a href="/guide/ev-subsidy-h2-2026-remaining-status">하반기 추경·소진 현황</a>에 있습니다.</p>
+
+<h2>5. 읽고 나서 남겨 둘 메모</h2>
+<ul>
+<li>공고 번호·게시일, 접수 기간, 내가 넣을 물량 칸</li>
+<li>계약할 트림 행의 국비·지방비, 추가 지원 조건</li>
+<li>선정 방식과 대기 접수 여부, 출고 기한과 서류 제출 기한</li>
+<li>헷갈리는 조항과 담당 부서 연락처(공고문 하단 문의처)</li>
+</ul>
+<p>이 메모를 들고 대리점과 상담하면 질문이 짧아집니다. 대리점에 확인할 질문은 <a href="/guide/questions-to-ask-dealer-before-ev-contract">계약 전 질문 10가지</a>에 정리돼 있습니다.</p>
+`,
+    faq: [
+      { q: "공고문과 대리점 설명이 다르면 어느 쪽을 따르나요?", a: "지자체 공고문이 기준입니다. 설명이 다르면 공고문의 해당 조항을 근거로 다시 확인하고, 필요하면 공고문 하단의 담당 부서에 문의하세요." },
+      { q: "추경 공고가 나오면 금액도 바뀌나요?", a: "추경 공고는 주로 물량을 다시 여는 공고이지만, 금액이나 조건을 함께 바꾸는 경우도 있을 수 있습니다. 최신 공고문의 금액표와 조건을 다시 확인하세요." },
+    ],
+  };
+}
+
 export const GUIDES_WEEKLY: Guide[] = [
+  buildNoticeReadingGuide(),
   {
     slug: "ev-acquisition-tax-excise-reduction-process",
     title: "전기차 취득세·개별소비세 감면은 어떻게 적용되나: 등록 창구와 견적서에서 확인할 것",
