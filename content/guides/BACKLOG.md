@@ -19,7 +19,7 @@
 - [x] 전기차 보조금 선정 취소 사유 모음: 출고 지연·명의 변경·서류 미비 사례와 대응 (ev-subsidy-selection-cancellation-reasons, 2026-11-06 · 사례 대신 단계별 유형, 시·도별 접수·출고 표는 remain.json 빌드 시 계산)
 - [x] 전기차 취득세·개별소비세 감면 신청 흐름: 등록 창구에서 무엇을 확인하는가 (ev-acquisition-tax-excise-reduction-process, 2026-11-10 · 감면액 대신 산출 내역 확인 항목, 법령 링크)
 - [x] 전기차 보조금 공고문 읽는 법: 물량 구분·우선순위·접수 방법 항목별 해설 (how-to-read-ev-subsidy-notice, 2026-11-13 · 공고 차수 분포 표는 remain.json 빌드 시 계산)
-- [ ] 리스·장기렌트 전기차 보조금: 견적서에서 국비·지방비 반영 확인하는 법
+- [x] 리스·장기렌트 전기차 보조금: 견적서에서 국비·지방비 반영 확인하는 법 (lease-long-term-rent-ev-subsidy-quote-check, 2026-11-17 · 시·도별 지방비 범위·대표 차종 합산 예상 표는 local-price.json 빌드 시 계산, 기준 지역은 "공고 확인")
 - [ ] 시·도별 전기차 보조금 공고 패턴: 단일 공고 vs 시·군별 공고의 차이와 신청 전략 (local-price.json·remain.json 계산)
 - [ ] 전기차 보조금 잔여 물량이 가장 빨리 소진된 지역 유형 분석 (remain.json 계산, 원인은 추정으로 표기)
 - [ ] 전기차 보조금 신청 서류 반려 사유 TOP: 등본 발급일·명의·주소 표기 문제
