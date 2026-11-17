@@ -7,6 +7,8 @@ import { formatFetchedAt } from "@/lib/ev/format";
 import { EV_PORTAL } from "@/lib/ev/portal";
 import remainSnapshot from "@/data/snapshot/remain.json";
 import { regionLink } from "./timely";
+import { getLocalPriceSnapshot } from "@/lib/ev/localPrice";
+import { LOCAL_REF_NATIONAL, TOP_CAR_LABEL, headlineTotal, summarizeBySido } from "@/lib/ev/summary";
 
 const portal = { title: "무공해차 통합누리집 (충전인프라·공지사항)", url: "https://ev.or.kr" };
 const law = { title: "국가법령정보센터 · 환경친화적 자동차의 개발 및 보급 촉진에 관한 법률", url: "https://www.law.go.kr/LSW/lsInfoP.do?lsId=010026" };
@@ -248,7 +250,92 @@ ${table}
   };
 }
 
+/** 리스·장기렌트 글: 시·도별 지방비 범위와 대표 차종 합산 예상은 빌드 시 local-price.json 에서 계산한다(비례 추정 문구 포함) */
+function buildLeaseGuide(): Guide {
+  const lp = getLocalPriceSnapshot();
+  const sums = summarizeBySido(lp.rows).filter((s) => s.min !== null && s.max !== null);
+  const won = (v: number | null) => (v === null ? "공고 확인" : `${v.toLocaleString("ko-KR")}만원`);
+  const range = (a: number | null, b: number | null) => (a === b ? won(a) : `${won(a)} ~ ${won(b)}`);
+  const table = sums
+    .map(
+      (s) =>
+        `<tr><td><a href="/region/${s.slug}">${s.name}</a></td><td>${s.uniform ? "시·도 단일" : `시·군·구별 ${s.known}곳`}</td><td>${range(s.min, s.max)}</td><td>${range(headlineTotal(s.min), headlineTotal(s.max))}</td></tr>`,
+    )
+    .join("\n");
+
+  return {
+    slug: "lease-long-term-rent-ev-subsidy-quote-check",
+    title: "리스·장기렌트 전기차 보조금: 견적서에서 국비·지방비가 반영됐는지 확인하는 법",
+    description:
+      "리스·장기렌트 전기차는 소유자인 리스사·렌트사가 보조금을 신청하고, 받은 보조금은 취득가에서 빠져 월 납입금에 반영되는 구조가 일반적입니다. 개인 구매와 다른 점, 견적서에서 확인할 줄, 시·도별 지방비 범위와 대표 차종 합산 예상, 보조금이 안 나올 때의 계약 조건을 정리했습니다.",
+    category: "혜택",
+    published: "2026-11-17",
+    updated: "2026-11-17",
+    keywords: ["전기차 리스 보조금", "전기차 장기렌트 보조금", "리스 견적서 보조금 확인", "전기차 리스 지방비"],
+    sources: [
+      { title: "기후에너지환경부 · 2026년 전기자동차 보급사업 업무처리지침 (2026-06-23 개정)", url: "https://mcee.go.kr/home/web/public_info/read.do?menuId=10123&publicInfoId=1144" },
+      { title: "무공해차 통합누리집 · 지자체별 공고·차종별 보조금", url: EV_PORTAL.remain },
+    ],
+    body: `
+<p>리스나 장기렌트로 전기차를 타면 차의 소유자는 이용자가 아니라 리스사·렌트사입니다. 그래서 보조금도 소유자가 신청하고, 받은 보조금은 차량 취득가에서 빠져 <strong>월 납입금을 낮추는 방식으로 반영</strong>되는 것이 일반적입니다. 이용자는 보조금을 직접 받지 않으므로, 할 일은 견적서에 보조금이 제대로 들어갔는지 확인하는 것입니다. 이 글은 확인 순서를 정리했습니다. 신청 자격·기준 지역·물량 구분은 <strong>지자체 공고와 리스사 계약서가 기준</strong>입니다.</p>
+
+<h2>1. 개인 구매와 무엇이 다른가</h2>
+<div class="table-wrap"><table class="nowrap">
+<thead><tr><th>항목</th><th>개인 구매(현금·할부)</th><th>리스·장기렌트</th></tr></thead>
+<tbody>
+<tr><td>차량 소유자</td><td>구매자 본인</td><td>리스사·렌트사</td></tr>
+<tr><td>보조금 신청</td><td>대리점이 구매자 명의로 신청</td><td>소유자인 리스사·렌트사가 신청</td></tr>
+<tr><td>지방비 기준 지역</td><td>구매자 주소지</td><td>이용자 주소지 또는 소유자 사업장 (공고 확인)</td></tr>
+<tr><td>물량 구분</td><td>개인(일반·우선순위) 물량</td><td>공고에 따라 개인·법인·기타 물량 (공고 확인)</td></tr>
+<tr><td>보조금이 가는 곳</td><td>차값에서 차감</td><td>취득가에서 차감 → 월 납입금에 반영</td></tr>
+<tr><td>의무운행 8년</td><td>구매자</td><td>차량 소유자 기준 (반납·인수 때 처리는 계약서 확인)</td></tr>
+</tbody>
+</table></div>
+<p>기준 지역과 물량 구분은 지자체마다 다르게 정하는 항목이라 같은 차를 같은 리스사로 계약해도 지역에 따라 결과가 달라질 수 있습니다. 법인·개인사업자 명의 리스라면 <a href="/guide/business-ev-subsidy-guide">법인·개인사업자 전기차 보조금</a>의 사업장 기준과 대수 상한도 함께 보세요.</p>
+
+<h2>2. 견적서에서 확인할 다섯 줄</h2>
+<ol>
+<li><strong>차량 가격</strong>: 개별소비세 등 세제 혜택이 반영된 가격인지(<a href="/guide/ev-acquisition-tax-excise-reduction-process">세금 감면 적용 흐름</a>)</li>
+<li><strong>보조금 차감 항목</strong>: 국비와 지방비가 따로 적혀 있는지, '보조금' 한 줄로 묶여 있는지. 묶여 있으면 내역을 요청</li>
+<li><strong>취득원가</strong>: 차량 가격에서 보조금이 빠진 뒤 등록비·부대비용이 더해진 금액이 얼마인지</li>
+<li><strong>보증금·선납금·잔존가치</strong>: 월 납입금은 이 세 값에 따라 크게 달라지므로 같은 조건으로 비교</li>
+<li><strong>월 납입금 산정 기준</strong>: 보조금이 반영된 금액인지, 보조금 확정 전 임시 금액인지</li>
+</ol>
+<p>두 곳 이상의 견적을 비교할 때는 보증금·선납금·기간·주행거리 약정을 맞춘 뒤 월 납입금을 봐야 보조금 반영 차이가 보입니다.</p>
+
+<h2>3. 지역별 보조금 참고표</h2>
+<p>견적서의 보조금이 아래 범위와 크게 다르면 어느 지역·어느 차종 기준인지 물어볼 근거가 됩니다. 지방비는 ${lp.updatedAt} 기준 누리집 수집값의 시·군·구별 '지방비 최대'이고, 오른쪽 열은 ${TOP_CAR_LABEL} 기준 국비 + 비례 추정 지방비입니다.</p>
+<div class="table-wrap"><table class="nowrap">
+<thead><tr><th>시·도</th><th>공고 형태</th><th>지방비 최대</th><th>합산 예상(대표 차종)</th></tr></thead>
+<tbody>
+${table}
+</tbody>
+</table></div>
+<p>차종별 지방비는 지방비 최대 × 차종 국비 ÷ ${LOCAL_REF_NATIONAL}의 비례 추정입니다. 서울은 수집값과 일치하고, 다른 지역은 공고의 공식 표로 다시 확인하세요. 기준 지역이 리스사 사업장으로 정해지는 공고라면 이용자 주소가 아니라 그 지역 값을 봐야 합니다. 차종별 국비는 <a href="/car">차종별 국비</a>에 있습니다.</p>
+
+<h2>4. 보조금이 안 나오거나 줄어들 때</h2>
+<p>리스 계약을 먼저 하고 보조금이 나중에 확정되는 경우가 많아, 확정 전에 물량이 소진되거나 출고가 늦어져 선정이 취소될 수 있습니다(<a href="/guide/ev-subsidy-selection-cancellation-reasons">선정 취소 사유</a>). 리스사가 법인 물량 상한에 걸리는 경우도 공고에 따라 생길 수 있습니다. 이때 월 납입금을 다시 계산하는지, 계약을 위약금 없이 해제할 수 있는지는 계약서 조항으로 정해집니다. 서명 전에 해당 조항이 있는지 확인하세요.</p>
+
+<h2>5. 계약 전에 리스사·렌트사에 물어볼 것</h2>
+<ul>
+<li>보조금은 어느 지자체 공고, 어느 물량으로 신청하는가</li>
+<li>견적의 보조금 금액은 확정값인가, 공고 기준 예상값인가</li>
+<li>보조금이 지급되지 않으면 월 납입금과 계약은 어떻게 되는가</li>
+<li>만기 인수·반납·중도 해지 때 의무운행 관련 비용을 누가 부담하는가</li>
+<li>전환지원 국비 대상이 되는지(내연기관차 처분 요건은 <a href="/guide/conversion-incentive-100">전환지원금 조건</a>)</li>
+</ul>
+<p>답은 문자나 견적서·계약서 특약으로 남겨 두세요. 리스·렌트 기본 구조는 <a href="/guide/used-ev-and-corporate-subsidy">중고·법인·리스 보조금</a>, 계약 전 질문 목록은 <a href="/guide/questions-to-ask-dealer-before-ev-contract">대리점에 확인할 질문 10가지</a>에 있습니다.</p>
+`,
+    faq: [
+      { q: "리스로 타면 보조금을 제가 직접 받나요?", a: "아닙니다. 소유자인 리스사·렌트사가 신청하고 받은 보조금은 취득가에서 빠져 월 납입금에 반영되는 것이 일반적입니다. 견적서에서 국비·지방비 차감 내역을 확인하세요." },
+      { q: "리스 보조금의 지방비는 제 주소 기준인가요?", a: "공고마다 다릅니다. 이용자 주소지를 기준으로 하는 공고도 있고 소유자 사업장을 기준으로 하는 공고도 있으니, 리스사에 어느 지자체 공고로 신청하는지 확인하세요." },
+      { q: "견적서의 보조금이 지역 페이지 금액과 다르면요?", a: "기준 지역, 차종 트림, 물량 구분, 공고 시점이 다를 수 있습니다. 이 사이트의 차종별 지방비는 서울 외 지역이 비례 추정이므로, 차이가 크면 리스사에 기준 공고를 묻고 공고의 공식 표로 확인하세요." },
+    ],
+  };
+}
+
 export const GUIDES_WEEKLY: Guide[] = [
+  buildLeaseGuide(),
   buildNoticeReadingGuide(),
   {
     slug: "ev-acquisition-tax-excise-reduction-process",
