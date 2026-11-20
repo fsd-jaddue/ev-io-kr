@@ -334,7 +334,86 @@ ${table}
   };
 }
 
+/** 공고 방식 글: 시·도별 공고 방식(단일·시·군 동일 금액·시·군별 금액)과 공고 현황은 빌드 시 local-price·remain 스냅샷에서 계산한다 */
+function buildNoticePatternGuide(): Guide {
+  const snap = remainSnapshot as { fetchedAt: string; rows: RemainRow[] };
+  const rows = passengerRows(snap.rows);
+  const at = formatFetchedAt(snap.fetchedAt);
+  const local = getLocalPriceSnapshot();
+  const summaries = summarizeBySido(local.rows).filter((x) => x.known > 0);
+  const kind = (x: (typeof summaries)[number]) => (x.uniform ? "단일 공고" : x.equal ? "시·군별 공고, 금액 같음" : "시·군별 공고, 금액 다름");
+  const named = (k: string) => summaries.filter((x) => kind(x) === k).map((x) => x.short);
+  const single = named("단일 공고");
+  const equal = named("시·군별 공고, 금액 같음");
+  const differ = named("시·군별 공고, 금액 다름");
+  const n = (v: number) => v.toLocaleString("ko-KR");
+  const table = summaries
+    .map((x) => {
+      const mine = rows.filter((r) => sidoSlugOfRow(r) === x.slug);
+      const closed = mine.filter((r) => parseRemainNote(r.note).status?.includes("마감")).length;
+      const remaining = mine.reduce((a, r) => a + (r.remaining ?? 0), 0);
+      const range = x.min === x.max ? `${n(x.max ?? 0)}만원` : `${n(x.min ?? 0)}~${n(x.max ?? 0)}만원`;
+      return `<tr><td><a href="/region/${x.slug}">${x.short}</a></td><td>${kind(x)}</td><td>${mine.length}건</td><td>${range}</td><td>${closed}건</td><td>${n(remaining)}대</td></tr>`;
+    })
+    .join("\n");
+
+  return {
+    slug: "ev-subsidy-notice-patterns-by-sido",
+    title: "시·도별 전기차 보조금 공고 방식: 단일 공고와 시·군별 공고는 무엇이 다르고, 신청 전에 무엇을 봐야 하나",
+    description:
+      "특별·광역시처럼 시·도 전체가 공고 하나로 움직이는 곳과, 도 지역처럼 시·군마다 공고를 따로 내는 곳은 금액·물량·마감이 다르게 움직입니다. 17개 시·도의 공고 방식, 지방비 최대 범위, 신청마감 표시와 출고잔여를 누리집 수집값으로 정리하고 신청 전에 확인할 점을 안내합니다.",
+    category: "지역",
+    published: "2026-11-20",
+    updated: "2026-11-20",
+    keywords: ["전기차 보조금 시도별 공고", "전기차 보조금 단일 공고", "전기차 보조금 시군별 공고", "전기차 보조금 지역 차이"],
+    sources: [
+      { title: "무공해차 통합누리집 · 지자체별 공고·지급현황", url: EV_PORTAL.remain },
+      { title: "기후에너지환경부 · 2026년 전기자동차 보급사업 업무처리지침 (2026-06-23 개정)", url: "https://mcee.go.kr/home/web/public_info/read.do?menuId=10123&publicInfoId=1144" },
+    ],
+    body: `
+<p>전기차 지방비는 거주지 공고를 따릅니다. 그런데 '거주지 공고'가 어디인지는 시·도마다 다릅니다. ${single.join("·")}는 시·도 전체가 공고 하나로 운영돼 어느 구·군에 살든 같은 금액과 같은 물량을 나눠 씁니다. 도 지역은 시·군마다 공고를 따로 내므로 금액과 물량, 마감 시점이 시·군 단위로 갈립니다. 이 차이를 알면 어느 페이지의 숫자를 봐야 하는지, 옆 지역 소식이 나와 관계있는지를 바로 판단할 수 있습니다.</p>
+
+<h2>1. 세 가지 공고 방식</h2>
+<ul>
+<li><strong>단일 공고</strong>(${single.join("·")}) — 시·도 공고 1건에 금액 하나, 물량 하나입니다. 소진되면 그 시·도 전체가 함께 멈추고, 추경도 시·도 단위로 열립니다.</li>
+<li><strong>시·군별 공고, 금액 같음</strong>(${equal.join("·") || "해당 없음"}) — 공고는 시·군마다 따로지만 지방비 최대액이 같습니다. 금액은 같아도 물량과 잔여, 마감은 시·군마다 다릅니다.</li>
+<li><strong>시·군별 공고, 금액 다름</strong>(${differ.join("·") || "해당 없음"}) — 금액도 물량도 시·군마다 다릅니다. 같은 도 안에서도 지방비 차이가 큽니다.</li>
+</ul>
+<p>단일 공고 지역의 구·군 페이지는 시·도 페이지와 숫자가 같아 이 사이트에서 검색 노출을 하지 않고, 도 지역은 시·군 페이지마다 그 지역의 공고 흐름을 따로 보여 줍니다.</p>
+
+<h2>2. 17개 시·도 공고 방식과 현황</h2>
+<p>${at} 무공해차 통합누리집 수집값 기준입니다. 지방비 최대는 시·도 안 시·군별 최대액의 범위이며, 국비가 가장 높은 차종 행의 값이라 실제 차종별 지방비는 이보다 적습니다.</p>
+<div class="table-wrap"><table class="nowrap">
+<thead><tr><th>시·도</th><th>공고 방식</th><th>승용 공고</th><th>지방비 최대</th><th>신청마감 표시</th><th>출고잔여 합계</th></tr></thead>
+<tbody>
+${table}
+</tbody>
+</table></div>
+<p>값은 수집 시각의 누리집 표시값이며 지금 접수할 수 있다는 뜻이 아닙니다. 출고잔여는 공고 대수에서 출고 대수를 뺀 값이라 신청마감 뒤에도 남아 보일 수 있습니다(<a href="/guide/how-to-check-remaining-quota">잔여대수 읽는 법</a>).</p>
+
+<h2>3. 단일 공고 지역에서 볼 것</h2>
+<p>구·군을 옮겨도 금액과 물량이 같으므로 시·도 페이지 하나만 보면 됩니다. 대신 물량을 시·도 전체가 함께 쓰기 때문에 접수 속도가 빠르고, 마감되면 다른 구로 옮겨도 소용이 없습니다. 추경이 나오는지는 시·도 공고와 누리집 표의 공고 차수 변화로 확인하세요(<a href="/guide/how-to-read-ev-subsidy-notice">공고문 읽는 법</a>).</p>
+
+<h2>4. 시·군별 공고 지역에서 볼 것</h2>
+<p>내 시·군 페이지의 금액·잔여·마감 표시가 기준입니다. 옆 시·군이 추경을 열었거나 잔여가 많아도 주소지가 아니면 신청할 수 없습니다. 보조금 때문에 주소를 옮기려 해도 공고가 정한 거주 기간(대개 30일 이상, 지자체별 상이)을 채워야 하고, 그사이 물량이 끝날 수 있습니다(<a href="/guide/ev-subsidy-common-mistakes">자주 하는 실수</a>). 금액이 다른 도에서는 도 페이지의 시·군 비교표로 내 시·군의 위치를 보고, 차종별 지방비는 비례 추정이라 계약 전 공고 표로 다시 확인하세요.</p>
+
+<h2>5. 이 사이트에서 확인하는 순서</h2>
+<ol>
+<li><a href="/region">지역별 보조금</a>에서 내 시·도의 공고 방식을 확인합니다.</li>
+<li>단일 공고면 시·도 페이지, 시·군별 공고면 내 시·군 페이지의 접수·출고·잔여와 마감 표시를 봅니다.</li>
+<li>계약할 차종의 국비를 <a href="/car">차종별 국비</a>에서 확인하고, 지방비는 공고 금액표의 같은 행으로 대조합니다.</li>
+</ol>
+`,
+    faq: [
+      { q: "같은 도 안의 다른 시·군 공고로 신청할 수 있나요?", a: "지방비는 주소지 기준이라 다른 시·군 공고로는 신청할 수 없습니다. 주소를 옮기는 경우에도 공고가 정한 거주 기간을 채워야 합니다." },
+      { q: "서울은 구마다 보조금이 다른가요?", a: "누리집 수집값 기준으로 서울은 시 전체 공고 하나로 운영돼 구와 관계없이 금액과 물량이 같습니다. 추가 지원 조건은 서울시 공고문으로 확인하세요." },
+      { q: "금액이 같은 도에서는 아무 시·군이나 같은 조건인가요?", a: "지방비 최대액은 같아도 공고는 시·군별이라 물량, 잔여, 접수 기간과 마감은 다릅니다. 내 시·군 페이지와 공고문으로 확인하세요." },
+    ],
+  };
+}
+
 export const GUIDES_WEEKLY: Guide[] = [
+  buildNoticePatternGuide(),
   buildLeaseGuide(),
   buildNoticeReadingGuide(),
   {
