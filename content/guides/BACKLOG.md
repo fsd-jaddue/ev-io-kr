@@ -21,7 +21,7 @@
 - [x] 전기차 보조금 공고문 읽는 법: 물량 구분·우선순위·접수 방법 항목별 해설 (how-to-read-ev-subsidy-notice, 2026-11-13 · 공고 차수 분포 표는 remain.json 빌드 시 계산)
 - [x] 리스·장기렌트 전기차 보조금: 견적서에서 국비·지방비 반영 확인하는 법 (lease-long-term-rent-ev-subsidy-quote-check, 2026-11-17 · 시·도별 지방비 범위·대표 차종 합산 예상 표는 local-price.json 빌드 시 계산, 기준 지역은 "공고 확인")
 - [x] 시·도별 전기차 보조금 공고 패턴: 단일 공고 vs 시·군별 공고의 차이와 신청 전략 (ev-subsidy-notice-patterns-by-sido, 2026-11-20 · 공고 방식·현황 표는 빌드 시 계산)
-- [ ] 전기차 보조금 잔여 물량이 가장 빨리 소진된 지역 유형 분석 (remain.json 계산, 원인은 추정으로 표기)
+- [x] 전기차 보조금 잔여 물량이 가장 빨리 소진된 지역 유형 분석 (ev-subsidy-sold-out-region-types, 2026-11-24 · 유형별 잔여 0 비율·관측 중 먼저 0이 된 곳은 remain.json·remain-history.json·local-price.json 빌드 시 계산, 비교 방향도 계산값, 원인은 추정 표기)
 - [ ] 전기차 보조금 신청 서류 반려 사유 TOP: 등본 발급일·명의·주소 표기 문제
 - [ ] 같은 모델인데 국비가 다른 이유: 2WD·AWD·휠 크기·배터리 트림별 국비 비교 (cars.json 계산)
 - [ ] 수입 전기차 국비 한눈에: 브랜드별 국비 분포 (cars.json 계산, 차량 가격은 공식 표 확인)
