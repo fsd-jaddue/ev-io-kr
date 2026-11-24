@@ -8,6 +8,7 @@ import { EV_PORTAL } from "@/lib/ev/portal";
 import remainSnapshot from "@/data/snapshot/remain.json";
 import { regionLink } from "./timely";
 import { getLocalPriceSnapshot } from "@/lib/ev/localPrice";
+import { historyFacts, historyFor } from "@/lib/ev/remainHistory";
 import { LOCAL_REF_NATIONAL, TOP_CAR_LABEL, headlineTotal, summarizeBySido } from "@/lib/ev/summary";
 
 const portal = { title: "무공해차 통합누리집 (충전인프라·공지사항)", url: "https://ev.or.kr" };
@@ -412,7 +413,145 @@ ${table}
   };
 }
 
+/**
+ * 소진 지역 유형 글: 유형별 잔여 0 비율과 관측 기간 중 먼저 0이 된 곳은 빌드 시 remain.json·remain-history.json·local-price.json 에서 계산한다.
+ * 비교 문장의 방향(높다/낮다)도 계산값으로 정한다. 원인 설명은 '추정'으로만 표기한다.
+ */
+function buildSoldOutTypesGuide(): Guide {
+  const snap = remainSnapshot as { fetchedAt: string; rows: RemainRow[] };
+  const at = formatFetchedAt(snap.fetchedAt);
+  const lp = getLocalPriceSnapshot();
+  const sums = summarizeBySido(lp.rows);
+  const localOf = (r: RemainRow): number | null => {
+    const slug = sidoSlugOfRow(r);
+    const s = sums.find((x) => x.slug === slug);
+    if (!s) return null;
+    if (s.uniform) return s.max;
+    return lp.rows.find((x) => x.sido === slug && x.sigungu === r.region)?.amount ?? null;
+  };
+  const items = passengerRows(snap.rows).map((r) => {
+    const pts = historyFor(r);
+    const f = historyFacts(pts);
+    let seenZero = false;
+    let reopened = false;
+    for (const p of pts) {
+      if (p.remaining !== null && p.remaining <= 0) seenZero = true;
+      else if (seenZero && (p.remaining ?? 0) > 0) reopened = true;
+    }
+    const slug = sidoSlugOfRow(r);
+    return {
+      r,
+      local: localOf(r),
+      uniform: sums.find((x) => x.slug === slug)?.uniform ?? false,
+      zeroNow: r.remaining !== null && r.remaining <= 0,
+      zeroAtStart: f !== null && f.first.remaining !== null && f.first.remaining <= 0,
+      soldOutOn: f && f.soldOutOn && f.soldOutOn > f.first.date ? f.soldOutOn : null,
+      start: f?.first.date ?? null,
+      reopened,
+    };
+  });
+  type Item = (typeof items)[number];
+  const total = items.length;
+  const zeroNow = items.filter((x) => x.zeroNow).length;
+  const zeroAtStart = items.filter((x) => x.zeroAtStart).length;
+  const during = items.filter((x) => x.soldOutOn).sort((a, b) => a.soldOutOn!.localeCompare(b.soldOutOn!));
+  const reopened = items.filter((x) => x.reopened).length;
+  const closedOf = (x: Item) => parseRemainNote(x.r.note).status?.includes("마감") ?? false;
+  const zeroOpen = items.filter((x) => x.zeroNow && !closedOf(x)).length;
+  const leftClosed = items.filter((x) => !x.zeroNow && closedOf(x)).length;
+  const start = items.map((x) => x.start).filter((d): d is string => !!d).sort()[0] ?? "";
+  const md = (d: string) => `${Number(d.slice(5, 7))}월 ${Number(d.slice(8, 10))}일`;
+  const pct = (a: number, b: number) => (b ? Math.round((a / b) * 100) : 0);
+  const won = (v: number | null) => (v === null ? "공고 확인" : `${v.toLocaleString("ko-KR")}만원`);
+  const n = (v: number | null) => (v === null ? "-" : `${v.toLocaleString("ko-KR")}대`);
+
+  const groups: { label: string; f: (x: Item) => boolean }[] = [
+    { label: "공고 형태 · 시·도 단일 공고", f: (x) => x.uniform },
+    { label: "공고 형태 · 시·군별 공고", f: (x) => !x.uniform },
+    { label: "공고 물량 · 300대 미만", f: (x) => x.r.announced !== null && x.r.announced < 300 },
+    { label: "공고 물량 · 300~999대", f: (x) => x.r.announced !== null && x.r.announced >= 300 && x.r.announced < 1000 },
+    { label: "공고 물량 · 1,000대 이상", f: (x) => x.r.announced !== null && x.r.announced >= 1000 },
+    { label: "지방비 최대 · 400만원 미만", f: (x) => x.local !== null && x.local < 400 },
+    { label: "지방비 최대 · 400~599만원", f: (x) => x.local !== null && x.local >= 400 && x.local < 600 },
+    { label: "지방비 최대 · 600만원 이상", f: (x) => x.local !== null && x.local >= 600 },
+  ];
+  const stat = (f: (x: Item) => boolean) => {
+    const g = items.filter(f);
+    const z = g.filter((x) => x.zeroNow).length;
+    return { count: g.length, z, p: pct(z, g.length), s: g.filter((x) => x.zeroAtStart).length };
+  };
+  const groupTable = groups
+    .map((g) => ({ ...g, ...stat(g.f) }))
+    .filter((g) => g.count > 0)
+    .map((g) => `<tr><td>${g.label}</td><td>${g.count}곳</td><td>${g.z}곳 (${g.p}%)</td><td>${g.s}곳</td></tr>`)
+    .join("\n");
+  const hi = stat((x) => x.local !== null && x.local >= 600);
+  const lo = stat((x) => x.local !== null && x.local < 400);
+  const hiSmall = stat((x) => x.local !== null && x.local >= 600 && x.r.announced !== null && x.r.announced < 300);
+  const loSmall = stat((x) => x.local !== null && x.local < 400 && x.r.announced !== null && x.r.announced < 300);
+  const cmp = (a: number, b: number) => (a > b ? "높습니다" : a < b ? "낮습니다" : "같습니다");
+  const earlyTable = during
+    .slice(0, 10)
+    .map((x) => `<tr><td>${x.r.sido} ${regionLink(x.r)}</td><td>${md(x.soldOutOn!)}</td><td>${n(x.r.announced)}</td><td>${won(x.local)}</td><td>${x.zeroNow ? "0" : n(x.r.remaining)}</td></tr>`)
+    .join("\n");
+
+  return {
+    slug: "ev-subsidy-sold-out-region-types",
+    title: `전기차 보조금 잔여 물량, 어떤 지역이 먼저 0이 됐나: 승용 공고 ${total}곳 유형별 집계`,
+    description: `무공해차 통합누리집 수집값으로 승용 공고 ${total}곳의 출고잔여를 공고 형태·공고 물량·지방비 수준별로 나눠, 잔여 0 표시 비율과 관측 기간(${md(start)}부터)에 먼저 0이 된 곳을 정리했습니다. 수치는 관측값이며 원인은 확인되지 않아 추정으로만 적었습니다.`,
+    category: "지역",
+    published: "2026-11-24",
+    updated: "2026-11-24",
+    keywords: ["전기차 보조금 소진 지역", "전기차 보조금 잔여 0", "전기차 보조금 빨리 마감", "전기차 보조금 지역별 소진"],
+    sources: [
+      { title: "무공해차 통합누리집 · 지자체별 공고·지급현황", url: EV_PORTAL.remain },
+      { title: "기후에너지환경부 · 2026년 전기자동차 보급사업 업무처리지침 (2026-06-23 개정)", url: "https://mcee.go.kr/home/web/public_info/read.do?menuId=10123&publicInfoId=1144" },
+    ],
+    body: `
+<p>"보조금이 빨리 끝나는 지역이 따로 있나"는 계약 시점을 고르는 분들이 자주 묻는 질문입니다. 이 글은 이 사이트가 ${md(start)}부터 누리집에서 수집해 온 승용 공고 ${total}곳의 값으로, 어떤 유형의 지역에서 출고잔여가 0으로 표시된 곳이 많은지 집계했습니다. <strong>수치는 모두 관측값이고, 왜 그런지는 수집값으로 확인할 수 없어 추정으로만 적었습니다.</strong></p>
+
+<h2>1. 이 글이 보는 것과 보지 않는 것</h2>
+<p>'출고잔여'는 누리집 표의 공고 대수에서 출고 대수를 뺀 값이고, 0은 공고 물량만큼 출고가 표시됐다는 뜻입니다. 접수 마감과 같은 말은 아닙니다. 잔여가 0이어도 대기 접수를 받는 공고가 있고, 추경으로 물량이 늘면 다시 잔여가 생깁니다. 날짜는 이 사이트가 값을 수집한 날이라 지자체의 실제 처리일과 다를 수 있습니다. 관측은 ${md(start)}에 시작해 그 전의 소진 시점은 알 수 없습니다.</p>
+
+<h2>2. 지금 잔여 0 표시: ${total}곳 중 ${zeroNow}곳</h2>
+<p>${at} 수집값 기준 승용 공고 ${total}곳 가운데 ${zeroNow}곳(${pct(zeroNow, total)}%)이 출고잔여 0입니다. 관측을 시작한 날 이미 0이던 곳이 ${zeroAtStart}곳, 관측 기간 중 처음 0이 된 곳이 ${during.length}곳입니다. 0이 됐다가 공고 물량이 바뀌어 다시 잔여가 생긴 곳도 ${reopened}곳 있습니다. 잔여 0과 '신청마감' 표시는 따로 움직입니다. 같은 수집값에서 잔여가 0인데 신청마감 표시가 없는 공고가 ${zeroOpen}곳, 잔여가 남아 있는데 신청마감 표시가 붙은 공고가 ${leftClosed}곳입니다. 그래서 잔여 숫자 하나만 보고 접수 가능 여부를 판단하면 안 되고, 공고문과 누리집의 접수 상태를 함께 봐야 합니다. 소진 현황 전체는 <a href="/guide/ev-subsidy-h2-2026-remaining-status">하반기 추경·소진 현황</a>에 있습니다.</p>
+
+<h2>3. 유형별로 나눠 보면</h2>
+<div class="table-wrap"><table class="nowrap">
+<thead><tr><th>유형</th><th>공고 수</th><th>지금 잔여 0</th><th>관측 시작 때 이미 0</th></tr></thead>
+<tbody>
+${groupTable}
+</tbody>
+</table></div>
+<p>지방비 최대가 600만원 이상인 곳은 ${hi.count}곳 중 ${hi.z}곳(${hi.p}%)이 잔여 0으로, 400만원 미만(${lo.count}곳 중 ${lo.z}곳, ${lo.p}%)보다 비율이 ${cmp(hi.p, lo.p)}. 공고 물량이 300대 미만인 곳만 놓고 봐도 600만원 이상은 ${hiSmall.count}곳 중 ${hiSmall.z}곳(${hiSmall.p}%), 400만원 미만은 ${loSmall.count}곳 중 ${loSmall.z}곳(${loSmall.p}%)입니다. 공고 형태와 공고 물량별 차이는 표에서 직접 비교해 보세요.</p>
+<p>이 차이가 왜 생겼는지는 확인되지 않았습니다. 지방비가 높으면 같은 차를 더 적은 부담으로 살 수 있어 신청이 몰렸을 수 있다는 설명은 <strong>추정</strong>일 뿐입니다. 인구, 접수 방식, 추경 시점과 규모가 지역마다 달라 이 표만으로 원인을 말할 수 없습니다.</p>
+
+<h2>4. 관측 기간에 먼저 0이 된 곳</h2>
+<div class="table-wrap"><table class="nowrap">
+<thead><tr><th>지역</th><th>처음 0 표시</th><th>공고(현재)</th><th>지방비 최대</th><th>지금 잔여</th></tr></thead>
+<tbody>
+${earlyTable}
+</tbody>
+</table></div>
+<p>관측 초반 날짜는 그 전에 이미 거의 소진된 상태였을 수 있습니다. 공고 물량은 추경 등으로 바뀌었을 수 있는 현재 값입니다. 각 지역 페이지의 '물량 흐름'에서 공고 변경일과 주간 출고 추이를 볼 수 있습니다.</p>
+
+<h2>5. 내 지역에 적용하는 법</h2>
+<ul>
+<li>지역 페이지에서 지금 잔여와 최근 28일 출고 증가를 함께 보세요. 잔여가 적고 출고가 빠르면 대기 접수 여부를 먼저 확인합니다.</li>
+<li>잔여가 0이면 공고문에서 대기 접수, 추가 공고 계획, 취소분 재배정 문구를 찾아보세요(<a href="/guide/how-to-read-ev-subsidy-notice">공고문 읽는 법</a>).</li>
+<li>이 사이트의 값은 수집 시각 기준이라 누리집 원표와 차이가 있을 수 있습니다. 최신값은 <a href="${EV_PORTAL.remain}" target="_blank" rel="noopener noreferrer">누리집 원표</a>와 <a href="/guide/how-to-check-remaining-quota">잔여 물량 확인법</a>으로 확인하세요.</li>
+</ul>
+`,
+    faq: [
+      { q: "출고잔여가 0이면 신청할 수 없나요?", a: "꼭 그렇지는 않습니다. 대기 접수를 받거나 추경·취소분으로 다시 물량이 생기는 공고가 있습니다. 공고문과 누리집 원표, 대리점을 통해 접수 가능 여부를 확인하세요." },
+      { q: "지방비가 높은 지역은 보조금이 빨리 끝나나요?", a: "이 사이트 수집값에서는 지방비가 높은 곳에서 잔여 0 비율이 다르게 나타났지만, 원인은 확인되지 않았습니다. 인구·접수 방식·추경 시점 등이 함께 섞여 있으니 거주지 공고의 현재 값을 직접 보세요." },
+      { q: "날짜는 지자체가 마감한 날인가요?", a: "아닙니다. 이 사이트가 누리집 값을 수집한 날 기준이라 실제 처리일과 다를 수 있고, 관측 시작 전의 소진 시점은 알 수 없습니다." },
+    ],
+  };
+}
+
 export const GUIDES_WEEKLY: Guide[] = [
+  buildSoldOutTypesGuide(),
   buildNoticePatternGuide(),
   buildLeaseGuide(),
   buildNoticeReadingGuide(),
