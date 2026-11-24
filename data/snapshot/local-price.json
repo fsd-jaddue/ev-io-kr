@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-23",
+  "updatedAt": "2026-11-24",
   "note": "scripts/fetch-snapshot.ts 가 ev.or.kr '지자체별 차종·모델 보조금'을 수집해 채웁니다. rows가 비어 있으면 data/snapshot/local-price.ts 의 취합값이 사용됩니다.",
   "rows": [
     {
@@ -51,41 +51,6 @@
       "sido": "gyeonggi",
       "sigungu": "성남시",
       "amount": 205
-    },
-    {
-      "sido": "gyeonggi",
-      "sigungu": "의정부시",
-      "amount": 237
-    },
-    {
-      "sido": "gyeonggi",
-      "sigungu": "안양시",
-      "amount": 275
-    },
-    {
-      "sido": "gyeonggi",
-      "sigungu": "부천시",
-      "amount": 194
-    },
-    {
-      "sido": "gyeonggi",
-      "sigungu": "광명시",
-      "amount": 453
-    },
-    {
-      "sido": "gyeonggi",
-      "sigungu": "평택시",
-      "amount": 324
-    },
-    {
-      "sido": "gyeonggi",
-      "sigungu": "동두천시",
-      "amount": 362
-    },
-    {
-      "sido": "gyeonggi",
-      "sigungu": "안산시",
-      "amount": 259
     },
     {
       "sido": "gyeonggi",
@@ -159,38 +124,8 @@
     },
     {
       "sido": "gyeonggi",
-      "sigungu": "화성시",
-      "amount": 216
-    },
-    {
-      "sido": "gyeonggi",
-      "sigungu": "광주시",
-      "amount": 194
-    },
-    {
-      "sido": "gyeonggi",
-      "sigungu": "양주시",
-      "amount": 270
-    },
-    {
-      "sido": "gyeonggi",
       "sigungu": "포천시",
       "amount": 259
-    },
-    {
-      "sido": "gyeonggi",
-      "sigungu": "여주시",
-      "amount": 446
-    },
-    {
-      "sido": "gyeonggi",
-      "sigungu": "연천군",
-      "amount": 615
-    },
-    {
-      "sido": "gyeonggi",
-      "sigungu": "가평군",
-      "amount": 216
     },
     {
       "sido": "gyeonggi",
@@ -676,91 +611,6 @@
       "sido": "gyeongbuk",
       "sigungu": "고령군",
       "amount": 667
-    },
-    {
-      "sido": "gyeongbuk",
-      "sigungu": "성주군",
-      "amount": 667
-    },
-    {
-      "sido": "gyeongbuk",
-      "sigungu": "칠곡군",
-      "amount": 667
-    },
-    {
-      "sido": "gyeongbuk",
-      "sigungu": "예천군",
-      "amount": 667
-    },
-    {
-      "sido": "gyeongbuk",
-      "sigungu": "봉화군",
-      "amount": 667
-    },
-    {
-      "sido": "gyeongbuk",
-      "sigungu": "울진군",
-      "amount": 667
-    },
-    {
-      "sido": "gyeongbuk",
-      "sigungu": "울릉군",
-      "amount": 1224
-    },
-    {
-      "sido": "gyeongnam",
-      "sigungu": "창원시",
-      "amount": 195
-    },
-    {
-      "sido": "gyeongnam",
-      "sigungu": "진주시",
-      "amount": 195
-    },
-    {
-      "sido": "gyeongnam",
-      "sigungu": "통영시",
-      "amount": 616
-    },
-    {
-      "sido": "gyeongnam",
-      "sigungu": "사천시",
-      "amount": 227
-    },
-    {
-      "sido": "gyeongnam",
-      "sigungu": "김해시",
-      "amount": 195
-    },
-    {
-      "sido": "gyeongnam",
-      "sigungu": "밀양시",
-      "amount": 260
-    },
-    {
-      "sido": "gyeongnam",
-      "sigungu": "거제시",
-      "amount": 227
-    },
-    {
-      "sido": "gyeongnam",
-      "sigungu": "양산시",
-      "amount": 194
-    },
-    {
-      "sido": "gyeongnam",
-      "sigungu": "의령군",
-      "amount": 195
-    },
-    {
-      "sido": "gyeongnam",
-      "sigungu": "함안군",
-      "amount": 195
-    },
-    {
-      "sido": "gyeongnam",
-      "sigungu": "창녕군",
-      "amount": 455
     }
   ]
 }
