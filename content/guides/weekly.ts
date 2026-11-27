@@ -7,6 +7,8 @@ import { formatFetchedAt } from "@/lib/ev/format";
 import { EV_PORTAL } from "@/lib/ev/portal";
 import remainSnapshot from "@/data/snapshot/remain.json";
 import { regionLink } from "./timely";
+import { CARS_SNAPSHOT } from "@/data/cars";
+import { passengerConversion } from "@/lib/ev/subsidy";
 import { getLocalPriceSnapshot } from "@/lib/ev/localPrice";
 import { historyFacts, historyFor } from "@/lib/ev/remainHistory";
 import { LOCAL_REF_NATIONAL, TOP_CAR_LABEL, headlineTotal, summarizeBySido } from "@/lib/ev/summary";
@@ -550,7 +552,110 @@ ${earlyTable}
   };
 }
 
+/** 트림별 국비 글: 같은 모델 계열의 트림별 국비는 빌드 시 cars.json(서울 그리드 수집값)에서 계산한다 */
+function buildTrimNationalGuide(): Guide {
+  const rows = CARS_SNAPSHOT.rows.filter((r) => r.national !== null && !/단종/.test(r.model));
+  const drive = (m: string) => m.match(/\b(2WD|AWD|4WD)\b/)?.[1] ?? "";
+  const wheel = (m: string) => Number(m.match(/(\d+)인치/)?.[1] ?? 0);
+  const battery = (m: string) => m.match(/롱레인지|스탠다드/)?.[0] ?? "";
+  const family = (m: string) => m.replace(/\b(2WD|AWD|4WD)\b|\d+인치|롱레인지|스탠다드/g, " ").replace(/\s+/g, " ").trim();
+  const rest = (m: string) => family(m);
+  const groups = new Map<string, typeof rows>();
+  for (const r of rows) {
+    const base = r.model.replace(/\b(2WD|AWD|4WD)\b|\d+인치|롱레인지|스탠다드|N라인|GTL|빌트인 캠 미적용|항속형|성능형/g, " ").replace(/\s+/g, " ").trim();
+    const k = `${r.maker} ${base}`;
+    groups.set(k, [...(groups.get(k) ?? []), r]);
+  }
+  const families = [...groups.entries()]
+    .filter(([, v]) => v.length >= 3)
+    .map(([k, v]) => ({ k, v, min: Math.min(...v.map((r) => r.national!)), max: Math.max(...v.map((r) => r.national!)) }))
+    .sort((a, b) => b.max - b.min - (a.max - a.min));
+  // 한 가지 조건만 다른 트림 쌍에서 국비가 어느 쪽이 높은지 센다
+  const pairs = (differ: (a: string, b: string) => boolean) => {
+    let lower = 0, equal = 0, higher = 0;
+    for (const [, v] of groups) for (const a of v) for (const b of v) if (a !== b && differ(a.model, b.model)) {
+      if (b.national! < a.national!) lower++; else if (b.national! === a.national!) equal++; else higher++;
+    }
+    return { lower, equal, higher, total: lower + equal + higher };
+  };
+  const sameBut = (a: string, b: string) => rest(a) === rest(b);
+  const wheelP = pairs((a, b) => sameBut(a, b) && drive(a) === drive(b) && battery(a) === battery(b) && wheel(a) > 0 && wheel(b) > wheel(a));
+  const driveP = pairs((a, b) => sameBut(a, b) && wheel(a) === wheel(b) && battery(a) === battery(b) && drive(a) === "2WD" && /AWD|4WD/.test(drive(b)));
+  const batP = pairs((a, b) => sameBut(a, b) && drive(a) === drive(b) && wheel(a) === wheel(b) && battery(a) === "롱레인지" && battery(b) === "스탠다드");
+  const n = (v: number) => v.toLocaleString("ko-KR");
+  const summary = families
+    .map((f) => `<tr><td>${f.k}</td><td>${f.v.length}개</td><td>${n(f.min)}~${n(f.max)}만원</td><td>${n(f.max - f.min)}만원</td></tr>`)
+    .join("\n");
+  const detailFamily = families.find((f) => /아이오닉\s?5/.test(f.k)) ?? families[0];
+  const detail = [...detailFamily.v]
+    .sort((a, b) => b.national! - a.national!)
+    .map((r) => `<tr><td>${r.model}</td><td>${n(r.national!)}</td><td>${r.local === null ? "-" : n(r.local)}</td><td>${n(r.conversionNational ?? passengerConversion(r.national!))}</td></tr>`)
+    .join("\n");
+  const line = (p: { lower: number; equal: number; higher: number; total: number }, what: string) =>
+    p.total ? `${what} ${p.total}쌍 중 국비가 낮은 쪽 ${p.lower}쌍, 같은 쪽 ${p.equal}쌍, 높은 쪽 ${p.higher}쌍` : `${what}은 이번 수집값에서 비교할 쌍이 없습니다`;
+
+  return {
+    slug: "same-model-different-national-subsidy-by-trim",
+    title: "같은 모델인데 국비가 다른 이유: 구동 방식·휠 크기·배터리 트림별 국고보조금 비교",
+    description:
+      "전기차 국비는 모델이 아니라 트림(세부 모델) 단위로 정해집니다. 같은 차라도 2WD·AWD, 휠 크기, 롱레인지·스탠다드에 따라 국비가 수십만원씩 달라집니다. 누리집 수집값으로 모델 계열별 국비 범위와 트림별 차이를 정리하고, 계약 전에 확인할 점을 안내합니다.",
+    category: "차종",
+    published: "2026-11-27",
+    updated: "2026-11-27",
+    keywords: ["전기차 트림별 국비", "전기차 국고보조금 트림", "AWD 보조금 차이", "휠 크기 보조금 차이"],
+    sources: [
+      { title: "무공해차 통합누리집 · 지자체별 차종·모델 보조금", url: EV_PORTAL.localPrice },
+      { title: "기후에너지환경부 · 2026년 전기자동차 보급사업 업무처리지침 (2026-06-23 개정)", url: "https://mcee.go.kr/home/web/public_info/read.do?menuId=10123&publicInfoId=1144" },
+    ],
+    body: `
+<p>견적을 받다 보면 "아이오닉 5 국비 얼마"처럼 모델 이름으로 묻게 되지만, 보조금 표에는 모델이 아니라 <strong>트림(세부 모델) 행</strong>마다 금액이 따로 적혀 있습니다. 구동 방식, 휠 크기, 배터리 용량이 다르면 인증 주행거리와 전비가 달라지고, 국비 산정식의 성능보조금이 이 값에 연동되기 때문입니다. 이 글은 ${CARS_SNAPSHOT.updatedAt} 무공해차 통합누리집 서울 차종·모델 표 수집값(승용 ${rows.length}행)으로 같은 계열 안의 국비 차이를 정리했습니다. 산정식 자체는 <a href="/guide/national-subsidy-calculation-2026">국고보조금 산정 기준</a>에 있습니다.</p>
+
+<h2>1. 모델 계열별 국비 범위</h2>
+<p>트림이 3개 이상인 계열만 모았고, 최고와 최저의 차이가 큰 순서입니다.</p>
+<div class="table-wrap"><table class="nowrap">
+<thead><tr><th>모델 계열</th><th>트림 수</th><th>국비 범위</th><th>최고−최저</th></tr></thead>
+<tbody>
+${summary}
+</tbody>
+</table></div>
+<p>계열 이름은 누리집 모델명에서 구동·휠·배터리·N라인 같은 표기를 뺀 것입니다. EV3 GT, 아이오닉6 N처럼 이름 자체가 다른 고성능 트림은 별도 계열로 보아 이 표에서 뺐고, 단종 표시가 붙은 행도 제외했습니다.</p>
+
+<h2>2. 한 가지 조건만 다를 때</h2>
+<p>다른 조건이 같고 한 가지만 다른 트림끼리 비교한 결과입니다.</p>
+<ul>
+<li><strong>휠 크기</strong> — ${line(wheelP, "휠이 더 큰 트림과의 비교")}.</li>
+<li><strong>구동 방식</strong> — ${line(driveP, "2WD 대비 AWD·4WD 비교")}.</li>
+<li><strong>배터리</strong> — ${line(batP, "롱레인지 대비 스탠다드 비교")}.</li>
+</ul>
+<p>큰 휠과 사륜구동, 작은 배터리는 대체로 인증 전비나 주행거리가 낮게 나와 성능보조금이 줄어드는 방향입니다. 다만 같은 조건에서도 금액이 같은 쌍이 있어, 반드시 계약할 트림의 행으로 확인해야 합니다. 차량 기본가격이 5,300만원 이상이면 가격계수 0.5가 적용돼 국비가 절반 수준이 되므로, 상위 트림일수록 가격 기준도 함께 보세요.</p>
+
+<h2>3. ${detailFamily.k} 트림별 비교</h2>
+<div class="table-wrap"><table class="nowrap">
+<thead><tr><th>트림</th><th>국비</th><th>서울 지방비</th><th>전환지원 국비</th></tr></thead>
+<tbody>
+${detail}
+</tbody>
+</table></div>
+<p>서울 지방비는 같은 표의 수집값입니다. 지방비는 국비에 비례해 정해지므로 국비 차이가 지방비에서도 이어집니다. 다른 지역은 지역 최대 지방비에 국비 비율을 곱한 비례 추정이며, 서울은 수집값과 일치하지만 다른 지역은 공고 표로 다시 확인해야 합니다. 전환지원 국비는 국비 500만원 이상이면 최대 100만원, 그 미만은 국비에 비례합니다(<a href="/guide/conversion-incentive-100">전환지원금 조건</a>).</p>
+
+<h2>4. 계약 전에 확인할 것</h2>
+<ul>
+<li>견적서의 차명이 보조금 표의 어느 행인지(구동 방식·휠·배터리까지) 대리점에 확인하기</li>
+<li>휠·구동 옵션을 바꾸면 행이 바뀌어 국비가 달라질 수 있음. 옵션 변경 전에 금액 다시 확인</li>
+<li>선정 뒤 트림을 바꾸면 국비가 다시 산정될 수 있으니 공고 기준 확인</li>
+<li>지역 합산액은 <a href="/car">차종별 국비</a>와 <a href="/calculator">보조금 계산기</a>로 계산하고, 지방비는 거주지 공고 표로 대조</li>
+</ul>
+`,
+    faq: [
+      { q: "같은 아이오닉 5인데 왜 견적마다 보조금이 다르나요?", a: "보조금은 트림 행마다 정해집니다. 구동 방식, 휠 크기, 배터리가 다르면 국비가 달라지고 지방비도 국비에 비례해 달라집니다. 견적서의 차명이 보조금 표의 어느 행인지 확인하세요." },
+      { q: "휠만 큰 것으로 바꿔도 보조금이 줄어드나요?", a: "휠 크기가 다른 트림은 별도 행으로 인증되며, 수집값에서는 큰 휠 쪽 국비가 낮거나 같은 경우가 많았습니다. 바꾸기 전에 해당 행의 금액을 확인하세요." },
+      { q: "서울이 아닌 지역도 트림별 금액이 같은 비율로 달라지나요?", a: "국비는 전국이 같습니다. 지방비는 지역마다 기준액이 달라 이 사이트는 국비 비율로 비례 추정하며, 서울은 수집값과 일치하지만 다른 지역은 공고 표로 확인해야 합니다." },
+    ],
+  };
+}
+
 export const GUIDES_WEEKLY: Guide[] = [
+  buildTrimNationalGuide(),
   buildSoldOutTypesGuide(),
   buildNoticePatternGuide(),
   buildLeaseGuide(),
